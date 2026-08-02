@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.database.dao
 
 import androidx.room.Dao
@@ -14,7 +21,7 @@ interface RecentlyPlayedDao {
 
   @Query("DELETE FROM RecentlyPlayedEntity WHERE filePath = :filePath")
   suspend fun deleteExistingEntriesForFile(filePath: String)
-  
+
   @Query("SELECT * FROM RecentlyPlayedEntity WHERE filePath = :filePath LIMIT 1")
   suspend fun getByFilePath(filePath: String): RecentlyPlayedEntity?
 
@@ -46,29 +53,35 @@ interface RecentlyPlayedDao {
   )
   fun observeLastPlayedForHighlight(): Flow<RecentlyPlayedEntity?>
 
-  @Query("""
+  @Query(
+    """
     SELECT * FROM RecentlyPlayedEntity 
     WHERE (NOT (filePath LIKE '%.m3u%' OR filePath LIKE '%.m3u8%')) 
     ORDER BY timestamp DESC 
     LIMIT :limit
-  """)
+  """,
+  )
   suspend fun getRecentlyPlayed(limit: Int = 10): List<RecentlyPlayedEntity>
 
-  @Query("""
+  @Query(
+    """
     SELECT * FROM RecentlyPlayedEntity 
     WHERE (NOT (filePath LIKE '%.m3u%' OR filePath LIKE '%.m3u8%')) 
     ORDER BY timestamp DESC 
     LIMIT :limit
-  """)
+  """,
+  )
   fun observeRecentlyPlayed(limit: Int = 50): Flow<List<RecentlyPlayedEntity>>
 
-  @Query("""
+  @Query(
+    """
     SELECT * FROM RecentlyPlayedEntity 
     WHERE launchSource = :launchSource
     AND (NOT (filePath LIKE '%.m3u%' OR filePath LIKE '%.m3u8%'))
     ORDER BY timestamp DESC 
     LIMIT :limit
-  """)
+  """,
+  )
   suspend fun getRecentlyPlayedBySource(
     launchSource: String,
     limit: Int = 10,
@@ -99,7 +112,9 @@ interface RecentlyPlayedDao {
     videoTitle: String,
   )
 
-  @Query("UPDATE RecentlyPlayedEntity SET videoTitle = :videoTitle, duration = :duration, fileSize = :fileSize, width = :width, height = :height WHERE filePath = :filePath")
+  @Query(
+    "UPDATE RecentlyPlayedEntity SET videoTitle = :videoTitle, duration = :duration, fileSize = :fileSize, width = :width, height = :height WHERE filePath = :filePath",
+  )
   suspend fun updateVideoMetadata(
     filePath: String,
     videoTitle: String?,
@@ -147,4 +162,3 @@ interface RecentlyPlayedDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insertAll(items: List<RecentlyPlayedEntity>)
 }
-

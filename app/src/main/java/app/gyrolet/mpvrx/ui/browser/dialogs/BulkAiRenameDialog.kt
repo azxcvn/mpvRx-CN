@@ -1,4 +1,11 @@
-﻿package app.gyrolet.mpvrx.ui.browser.dialogs
+﻿/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
+package app.gyrolet.mpvrx.ui.browser.dialogs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,9 +40,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import app.gyrolet.mpvrx.R
 import app.gyrolet.mpvrx.domain.media.model.Video
 import app.gyrolet.mpvrx.preferences.AiPreferences
 import app.gyrolet.mpvrx.preferences.AiProvider
@@ -96,25 +105,26 @@ fun BulkAiRenameDialog(
       val results = mutableListOf<PreviewItem>()
       var failCount = 0
 
-      val deferred = selectedVideos.map { video ->
-        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-          try {
-            semaphore.withPermit {
-              val base = video.displayName.substringBeforeLast('.')
-              val ext = video.displayName.substringAfterLast('.', "").let { if (it.isNotEmpty()) ".$it" else null }
-              aiService.renameWithAi(base, ext)
-                .onSuccess { name ->
-                  synchronized(results) {
-                    results.add(PreviewItem(video, name.removeSuffix(ext ?: ""), ext))
-                  }
-                }
-                .onFailure { synchronized(results) { failCount++ } }
+      val deferred =
+        selectedVideos.map { video ->
+          scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+              semaphore.withPermit {
+                val base = video.displayName.substringBeforeLast('.')
+                val ext = video.displayName.substringAfterLast('.', "").let { if (it.isNotEmpty()) ".$it" else null }
+                aiService
+                  .renameWithAi(base, ext)
+                  .onSuccess { name ->
+                    synchronized(results) {
+                      results.add(PreviewItem(video, name.removeSuffix(ext ?: ""), ext))
+                    }
+                  }.onFailure { synchronized(results) { failCount++ } }
+              }
+            } catch (e: Exception) {
+              synchronized(results) { failCount++ }
             }
-          } catch (e: Exception) {
-            synchronized(results) { failCount++ }
           }
         }
-      }
       deferred.forEach { it.join() }
 
       if (results.isEmpty()) {
@@ -165,27 +175,32 @@ fun BulkAiRenameDialog(
     text = {
       Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         when {
-          !canUseAi -> Text(
-            "AI 重命名已禁用。请在设置 → AI 集成中启用。",
-            color = MaterialTheme.colorScheme.error,
-          )
-
-          phase == RenamePhase.IDLE -> Text(
-            "AI 将为 ${selectedVideos.size} selected file(s). " +
-              "You can review and edit each name before confirming.",
-            style = MaterialTheme.typography.bodyMedium,
-          )
-
-          phase == RenamePhase.GENERATING -> Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth(),
-          ) {
-            CircularProgressIndicator(modifier = Modifier.padding(bottom = 8.dp))
+          !canUseAi ->
             Text(
-              "正在处理 ${selectedVideos.size} 个文件...",
+              androidx.compose.ui.res.stringResource(
+                app.gyrolet.mpvrx.R.string.ui_ai_rename_is_disabled_enable_it_in_settings_ai_integration,
+              ),
+              color = MaterialTheme.colorScheme.error,
+            )
+
+          phase == RenamePhase.IDLE ->
+            Text(
+              "AI will suggest new names for ${selectedVideos.size} selected file(s). " +
+                "You can review and edit each name before confirming.",
               style = MaterialTheme.typography.bodyMedium,
             )
-          }
+
+          phase == RenamePhase.GENERATING ->
+            Column(
+              horizontalAlignment = Alignment.CenterHorizontally,
+              modifier = Modifier.fillMaxWidth(),
+            ) {
+              CircularProgressIndicator(modifier = Modifier.padding(bottom = 8.dp))
+              Text(
+                "Processing ${selectedVideos.size} file(s)…",
+                style = MaterialTheme.typography.bodyMedium,
+              )
+            }
 
           phase == RenamePhase.PREVIEW -> {
             if (errorMessage.isNotBlank()) {
@@ -231,10 +246,16 @@ fun BulkAiRenameDialog(
                     OutlinedTextField(
                       value = editedName,
                       onValueChange = { editedNames[key] = it },
-                      modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 48.dp),
-                      label = { Text("新名称") },
+                      modifier =
+                        Modifier
+                          .fillMaxWidth()
+                          .padding(start = 48.dp),
+                      label = {
+                        Text(
+                          androidx.compose.ui.res
+                            .stringResource(app.gyrolet.mpvrx.R.string.ui_new_name),
+                        )
+                      },
                       suffix = { item.extension?.let { Text(it, color = MaterialTheme.colorScheme.outline) } },
                       singleLine = true,
                       keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -266,9 +287,17 @@ fun BulkAiRenameDialog(
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             shape = MaterialTheme.shapes.extraLarge,
           ) {
-            Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+            Icon(
+              imageVector = Icons.RoundedFilled.AutoAwesome,
+              contentDescription = null,
+              modifier = Modifier.size(18.dp),
+            )
             Spacer(Modifier.width(8.dp))
-            Text("生成预览", fontWeight = FontWeight.Bold)
+            Text(
+              androidx.compose.ui.res
+                .stringResource(app.gyrolet.mpvrx.R.string.ui_generate_previews),
+              fontWeight = FontWeight.Bold,
+            )
           }
 
         RenamePhase.GENERATING -> {}
@@ -281,9 +310,17 @@ fun BulkAiRenameDialog(
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             shape = MaterialTheme.shapes.extraLarge,
           ) {
-            Icon(imageVector = app.gyrolet.mpvrx.ui.icons.Icons.Filled.DriveFileRenameOutline, contentDescription = null, modifier = Modifier.size(18.dp))
+            Icon(
+              imageVector = app.gyrolet.mpvrx.ui.icons.Icons.RoundedFilled.DriveFileRenameOutline,
+              contentDescription = null,
+              modifier = Modifier.size(18.dp),
+            )
             Spacer(Modifier.width(8.dp))
-            Text("Rename $checkedCount File(s)", fontWeight = FontWeight.Bold)
+            Text(
+              androidx.compose.ui.res
+                .pluralStringResource(R.plurals.rename_files_action, checkedCount, checkedCount),
+              fontWeight = FontWeight.Bold,
+            )
           }
         }
       }
@@ -291,13 +328,25 @@ fun BulkAiRenameDialog(
     dismissButton = {
       TextButton(
         onClick = {
-          if (phase == RenamePhase.PREVIEW) phase = RenamePhase.IDLE
-          else onDismiss()
+          if (phase == RenamePhase.PREVIEW) {
+            phase = RenamePhase.IDLE
+          } else {
+            onDismiss()
+          }
         },
         enabled = phase != RenamePhase.GENERATING,
         shape = MaterialTheme.shapes.extraLarge,
       ) {
-        Text(if (phase == RenamePhase.PREVIEW) "返回" else "Cancel", fontWeight = FontWeight.Medium)
+        Text(
+          if (phase ==
+            RenamePhase.PREVIEW
+          ) {
+            stringResource(R.string.back)
+          } else {
+            stringResource(R.string.generic_cancel)
+          },
+          fontWeight = FontWeight.Medium,
+        )
       }
     },
     containerColor = MaterialTheme.colorScheme.surface,

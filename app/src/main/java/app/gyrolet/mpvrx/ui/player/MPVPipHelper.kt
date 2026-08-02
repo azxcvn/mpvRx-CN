@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.player
 
 import android.app.PendingIntent
@@ -14,9 +21,9 @@ import android.util.Log
 import android.util.Rational
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AppCompatActivity
-import app.gyrolet.mpvrx.R
-import com.composables.icons.materialsymbols.roundedfilled.R as MaterialSymbolsR
 import app.gyrolet.mpvrx.preferences.PlayerPreferences
+import app.gyrolet.mpvrx.ui.icons.Icons
+import app.gyrolet.mpvrx.utils.media.resolveSeekMode
 import `is`.xyz.mpv.MPVLib
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -31,6 +38,7 @@ private const val PIP_FORWARD = 4
 class MPVPipHelper(
   private val activity: AppCompatActivity,
   private val mpvView: MPVView,
+  private val isAudioPlayer: () -> Boolean = { false },
 ) : KoinComponent {
   private val playerPreferences: PlayerPreferences by inject()
   private var pipReceiver: BroadcastReceiver? = null
@@ -51,10 +59,7 @@ class MPVPipHelper(
           context: Context?,
           intent: Intent?,
         ) {
-          // Use precise seeking for videos shorter than 2 minutes (120 seconds) or if preference is enabled
-          val duration = MPVLib.getPropertyInt("duration") ?: 0
-          val shouldUsePreciseSeeking = playerPreferences.usePreciseSeeking.get() || duration < 120
-          val seekMode = if (shouldUsePreciseSeeking) "relative+exact" else "relative+keyframes"
+          val seekMode = resolveSeekMode(playerPreferences)
           when (intent?.getIntExtra(PIP_INTENT_ACTION, 0)) {
             PIP_PLAY -> MPVLib.setPropertyBoolean("pause", false)
             PIP_PAUSE -> MPVLib.setPropertyBoolean("pause", true)
@@ -93,11 +98,15 @@ class MPVPipHelper(
       .apply {
         getVideoAspectRatio()?.let { aspectRatio ->
           setAspectRatio(aspectRatio)
-          setSourceRectHint(calculateSourceRect(aspectRatio))
+          calculateSourceRect(aspectRatio)?.let { sourceRect -> setSourceRectHint(sourceRect) }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-          setAutoEnterEnabled(playerPreferences.autoPiPOnNavigation.get())
+          val autoPipAllowed = playerPreferences.autoPiPOnNavigation.get() && !isAudioPlayer()
+          setAutoEnterEnabled(autoPipAllowed)
+          // Video surfaces can resize continuously, so let Android morph the
+          // full-screen frame into and out of PiP instead of cross-fading it.
+          setSeamlessResizeEnabled(!isAudioPlayer())
         }
 
         setActions(createPipActions())
@@ -112,22 +121,27 @@ class MPVPipHelper(
     return Rational(width, height).takeIf { it.toFloat() in 0.5f..2.39f }
   }
 
-  private fun calculateSourceRect(aspectRatio: Rational): Rect {
-    val viewWidth = mpvView.width.toFloat()
-    val viewHeight = mpvView.height.toFloat()
+  private fun calculateSourceRect(aspectRatio: Rational): Rect? {
+    val visiblePlayerRect = Rect()
+    if (!mpvView.getGlobalVisibleRect(visiblePlayerRect) || visiblePlayerRect.isEmpty) return null
+
+    val viewWidth = visiblePlayerRect.width().toFloat()
+    val viewHeight = visiblePlayerRect.height().toFloat()
+    if (viewWidth <= 0f || viewHeight <= 0f) return null
+
     val videoAspect = aspectRatio.toFloat()
     val viewAspect = viewWidth / viewHeight
 
     return if (viewAspect < videoAspect) {
       // Letterboxed (black bars top/bottom)
       val height = viewWidth / videoAspect
-      val top = ((viewHeight - height) / 2).toInt()
-      Rect(0, top, viewWidth.toInt(), (height + top).toInt())
+      val top = visiblePlayerRect.top + ((viewHeight - height) / 2).toInt()
+      Rect(visiblePlayerRect.left, top, visiblePlayerRect.right, top + height.toInt())
     } else {
       // Pillarboxed (black bars left/right)
       val width = viewHeight * videoAspect
-      val left = ((viewWidth - width) / 2).toInt()
-      Rect(left, 0, (width + left).toInt(), viewHeight.toInt())
+      val left = visiblePlayerRect.left + ((viewWidth - width) / 2).toInt()
+      Rect(left, visiblePlayerRect.top, left + width.toInt(), visiblePlayerRect.bottom)
     }
   }
 
@@ -135,13 +149,13 @@ class MPVPipHelper(
     val isPlaying = MPVLib.getPropertyBoolean("pause") == false
 
     return listOf(
-      createRemoteAction("rewind", android.R.drawable.ic_media_rew, PIP_REWIND),
+      createRemoteAction("rewind", Icons.Platform.FastRewind, PIP_REWIND),
       if (isPlaying) {
-        createRemoteAction("pause", MaterialSymbolsR.drawable.materialsymbols_ic_pause_rounded_filled, PIP_PAUSE)
+        createRemoteAction("pause", Icons.Platform.Pause, PIP_PAUSE)
       } else {
-        createRemoteAction("play", MaterialSymbolsR.drawable.materialsymbols_ic_play_arrow_rounded_filled, PIP_PLAY)
+        createRemoteAction("play", Icons.Platform.Play, PIP_PLAY)
       },
-      createRemoteAction("forward", android.R.drawable.ic_media_ff, PIP_FORWARD),
+      createRemoteAction("forward", Icons.Platform.FastForward, PIP_FORWARD),
     )
   }
 
@@ -173,6 +187,10 @@ class MPVPipHelper(
   }
 
   fun enterPipMode() {
+    if (isAudioPlayer()) {
+      Log.d("MPVPipHelper", "PiP mode is disabled for audio playback")
+      return
+    }
     runCatching {
       activity.enterPictureInPictureMode(buildPipParams())
     }.onFailure {
@@ -184,4 +202,3 @@ class MPVPipHelper(
     unregisterPipReceiver()
   }
 }
-

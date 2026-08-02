@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.player.controls
 
 import android.net.Uri
@@ -7,31 +14,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import app.gyrolet.mpvrx.preferences.preference.collectAsState
 import app.gyrolet.mpvrx.ui.player.Decoder
 import app.gyrolet.mpvrx.ui.player.Panels
 import app.gyrolet.mpvrx.ui.player.Sheets
 import app.gyrolet.mpvrx.ui.player.TrackNode
+import app.gyrolet.mpvrx.ui.player.controls.components.sheets.AmbientSheet
 import app.gyrolet.mpvrx.ui.player.controls.components.sheets.AspectRatioSheet
 import app.gyrolet.mpvrx.ui.player.controls.components.sheets.AudioTracksSheet
 import app.gyrolet.mpvrx.ui.player.controls.components.sheets.ChaptersSheet
 import app.gyrolet.mpvrx.ui.player.controls.components.sheets.DecodersSheet
 import app.gyrolet.mpvrx.ui.player.controls.components.sheets.FrameNavigationSheet
 import app.gyrolet.mpvrx.ui.player.controls.components.sheets.MoreSheet
+import app.gyrolet.mpvrx.ui.player.controls.components.sheets.OnlineSubtitleSearchSheet
 import app.gyrolet.mpvrx.ui.player.controls.components.sheets.PlaybackSpeedSheet
 import app.gyrolet.mpvrx.ui.player.controls.components.sheets.PlaylistSheet
 import app.gyrolet.mpvrx.ui.player.controls.components.sheets.SubtitlesSheet
-import app.gyrolet.mpvrx.ui.player.controls.components.sheets.OnlineSubtitleSearchSheet
 import app.gyrolet.mpvrx.ui.player.controls.components.sheets.VideoZoomSheet
-import app.gyrolet.mpvrx.ui.player.controls.components.sheets.AmbientSheet
+import app.gyrolet.mpvrx.ui.player.controls.components.sheets.VisualizerStyleSheet
+import app.gyrolet.mpvrx.ui.player.setTrackSelectionId
 import dev.vivvvek.seeker.Segment
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.compose.koinInject
 import androidx.compose.runtime.collectAsState as composeCollectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 
 @Composable
 fun PlayerSheets(
@@ -42,6 +51,7 @@ fun PlayerSheets(
   onAddSubtitle: (Uri) -> Unit,
   onToggleSubtitle: (Int) -> Unit,
   isSubtitleSelected: (Int) -> Boolean,
+  subtitleSelectionIndicator: (Int) -> String?,
   onRemoveSubtitle: (Int) -> Unit,
   // audio sheet
   audioTracks: ImmutableList<TrackNode>,
@@ -85,43 +95,46 @@ fun PlayerSheets(
       val savedPickerPath = subtitlesPreferences.pickerPath.get()
 
       val currentMediaTitle = viewModel.currentMediaTitle
-      val matchToName = if (currentMediaTitle.isNotBlank()) {
+      val matchToName =
+        if (currentMediaTitle.isNotBlank()) {
           // Remove extension if present to improve matching
           currentMediaTitle.substringBeforeLast(".")
-      } else null
+        } else {
+          null
+        }
 
       var showFilePicker by remember { mutableStateOf(false) }
 
       if (showFilePicker) {
-          app.gyrolet.mpvrx.ui.browser.dialogs.FilePickerDialog(
-              isOpen = true,
-              currentPath = savedPickerPath,
-              onDismiss = { showFilePicker = false },
-              onPathChanged = { path ->
-                  if (path != null) {
-                      subtitlesPreferences.pickerPath.set(path)
-                  }
-              },
-              onFileSelected = { path ->
-                  showFilePicker = false
-                   onAddSubtitle(Uri.parse("file://$path"))
-              },
-              onSystemPickerRequest = {
-                  showFilePicker = false
-                  subtitlesPicker.launch(
-                    arrayOf(
-                      "text/plain",
-                      "text/srt",
-                      "text/vtt",
-                      "application/x-subrip",
-                      "application/x-subtitle",
-                      "text/x-ssa",
-                      "*/*",
-                    ),
-                  )
-              },
-              matchToName = matchToName
-          )
+        app.gyrolet.mpvrx.ui.browser.dialogs.FilePickerDialog(
+          isOpen = true,
+          currentPath = savedPickerPath,
+          onDismiss = { showFilePicker = false },
+          onPathChanged = { path ->
+            if (path != null) {
+              subtitlesPreferences.pickerPath.set(path)
+            }
+          },
+          onFileSelected = { path ->
+            showFilePicker = false
+            onAddSubtitle(Uri.parse("file://$path"))
+          },
+          onSystemPickerRequest = {
+            showFilePicker = false
+            subtitlesPicker.launch(
+              arrayOf(
+                "text/plain",
+                "text/srt",
+                "text/vtt",
+                "application/x-subrip",
+                "application/x-subtitle",
+                "text/x-ssa",
+                "*/*",
+              ),
+            )
+          },
+          matchToName = matchToName,
+        )
       }
 
       val isTranslating by viewModel.isTranslatingSub.composeCollectAsState()
@@ -139,10 +152,13 @@ fun PlayerSheets(
       val provider by aiPreferences.provider.collectAsState()
       val autoTranslateLanguages by aiPreferences.autoTranslateLanguages.collectAsState()
 
+      val subtitlesOff = subtitles.none { isSubtitleSelected(it.id) }
+
       SubtitlesSheet(
         tracks = subtitles.toImmutableList(),
         onToggleSubtitle = onToggleSubtitle,
         isSubtitleSelected = isSubtitleSelected,
+        subtitleSelectionIndicator = subtitleSelectionIndicator,
         onAddSubtitle = { showFilePicker = true },
         onRemoveSubtitle = onRemoveSubtitle,
         onOpenSubtitleSettings = { onOpenPanel(Panels.SubtitleSettings) },
@@ -165,6 +181,12 @@ fun PlayerSheets(
         autoTranslateLanguages = autoTranslateLanguages,
         aiEnabled = aiEnabled,
         realtimeSubsEnabled = realtimeSubsEnabled,
+        subtitlesOff = subtitlesOff,
+        onDisableSubtitles = {
+          setTrackSelectionId("sid", null)
+          setTrackSelectionId("secondary-sid", null)
+          subtitlesPreferences.autoEnableSubtitles.set(false)
+        },
       )
     }
 
@@ -179,7 +201,7 @@ fun PlayerSheets(
       // Media Search / Autocomplete
       val mediaResults by viewModel.mediaSearchResults.composeCollectAsState()
       val isSearchingMedia by viewModel.isSearchingMedia.composeCollectAsState()
-      
+
       // TV Show / Seasons / Episodes
       val selectedTvShow by viewModel.selectedTvShow.composeCollectAsState()
       val isFetchingTvDetails by viewModel.isFetchingTvDetails.composeCollectAsState()
@@ -211,7 +233,7 @@ fun PlayerSheets(
         isFetchingEpisodes = isFetchingEpisodes,
         selectedEpisode = selectedEpisode,
         onSelectEpisode = { viewModel.selectEpisode(it) },
-        onClearMediaSelection = { viewModel.clearMediaSelection() }
+        onClearMediaSelection = { viewModel.clearMediaSelection() },
       )
     }
 
@@ -250,13 +272,15 @@ fun PlayerSheets(
     }
 
     Sheets.More -> {
+      val anime4KUiState by viewModel.anime4KUiState.composeCollectAsState()
       MoreSheet(
         remainingTime = sleepTimerTimeRemaining,
         onStartTimer = onStartSleepTimer,
         onDismissRequest = onDismissRequest,
         onEnterFiltersPanel = { onOpenPanel(Panels.VideoFilters) },
         onEnterLuaScriptsPanel = { onOpenPanel(Panels.LuaScripts) },
-        onAnime4KChanged = viewModel::restartHdrScreenOutputAndAmbientIfActive,
+        anime4KUiState = anime4KUiState,
+        onAnime4KModeSelected = viewModel::selectAnime4KMode,
       )
     }
 
@@ -345,7 +369,6 @@ fun PlayerSheets(
       )
     }
 
-
     Sheets.Playlist -> {
       // Refresh playlist items when sheet is shown
       LaunchedEffect(Unit) {
@@ -354,13 +377,24 @@ fun PlayerSheets(
 
       // Observe playlist updates
       val playlist by viewModel.playlistItems.collectAsState()
+      val isAudioOnly by viewModel.isAudioOnly.collectAsState()
       val playerPreferences = koinInject<app.gyrolet.mpvrx.preferences.PlayerPreferences>()
       val isPlaylistSwipeActive by viewModel.isPlaylistSwipeActive.collectAsState()
       val playlistSwipeOffset by viewModel.playlistSwipeOffset.collectAsState()
 
-      if (playlist.isNotEmpty()) {
-        val playlistImmutable = playlist.toImmutableList()
-        val totalCount = viewModel.getPlaylistTotalCount()
+      val filteredPlaylist =
+        remember(playlist, isAudioOnly) {
+          if (isAudioOnly) {
+            val audioOnly = playlist.filter { it.isAudio }
+            audioOnly.ifEmpty { playlist }
+          } else {
+            playlist
+          }
+        }
+
+      if (filteredPlaylist.isNotEmpty()) {
+        val playlistImmutable = filteredPlaylist.toImmutableList()
+        val totalCount = filteredPlaylist.size
         val isM3U = viewModel.isPlaylistM3U()
         PlaylistSheet(
           playlist = playlistImmutable,
@@ -368,11 +402,15 @@ fun PlayerSheets(
           onItemClick = { item ->
             viewModel.playPlaylistItem(item.index)
           },
+          onReorder = { from, to ->
+            viewModel.reorderPlaylistItem(from, to)
+          },
           totalCount = totalCount,
           isM3UPlaylist = isM3U,
           playerPreferences = playerPreferences,
           isSwipeActive = isPlaylistSwipeActive,
           swipeOffset = playlistSwipeOffset,
+          isAudioOnly = isAudioOnly,
         )
       }
     }
@@ -380,7 +418,37 @@ fun PlayerSheets(
     Sheets.AmbientConfig -> {
       AmbientSheet(
         viewModel = viewModel,
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
+      )
+    }
+
+    Sheets.Equalizer -> {
+      val equalizerState by viewModel.equalizerState.collectAsState()
+      app.gyrolet.mpvrx.ui.player.controls.components.sheets.EqualizerSheet(
+        state = equalizerState,
+        onEnabledChanged = viewModel::setEqualizerEnabled,
+        onPresetSelected = viewModel::applyEqualizerPreset,
+        onBandChanged = viewModel::setEqualizerBandGain,
+        onVolumeBoostChanged = viewModel::setEqualizerVolumeBoost,
+        onDismissRequest = onDismissRequest,
+      )
+    }
+
+    Sheets.AudioProperties -> {
+      val properties = remember { viewModel.getAudioPropertiesData() }
+      app.gyrolet.mpvrx.ui.player.controls.components.sheets.AudioPropertiesSheet(
+        properties = properties,
+        onDismissRequest = onDismissRequest,
+      )
+    }
+
+    Sheets.VisualizerStyle -> {
+      val audioPreferences = koinInject<app.gyrolet.mpvrx.preferences.AudioPreferences>()
+      val audioVisualizerStyle by audioPreferences.audioVisualizerStyle.collectAsState()
+      VisualizerStyleSheet(
+        selectedStyle = audioVisualizerStyle,
+        onSelectStyle = { audioPreferences.audioVisualizerStyle.set(it) },
+        onDismissRequest = onDismissRequest,
       )
     }
   }

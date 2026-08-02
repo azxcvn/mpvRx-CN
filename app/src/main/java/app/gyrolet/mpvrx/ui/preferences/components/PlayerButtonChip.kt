@@ -1,7 +1,13 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.preferences.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -16,11 +22,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.draw.rotate
 import app.gyrolet.mpvrx.preferences.PlayerButton
 import app.gyrolet.mpvrx.preferences.getPlayerButtonLabel
 import app.gyrolet.mpvrx.ui.icons.AppIcon
@@ -78,7 +84,10 @@ fun PlayerButtonChip(
         when (button) {
           PlayerButton.VIDEO_TITLE -> {
             Text(
-              text = "Video Title", // TODO: strings
+              text =
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.ui_video_title),
+              // TODO: strings
               fontSize = 15.sp, // Increased font size
               textAlign = TextAlign.Center,
               lineHeight = 14.sp,
@@ -92,11 +101,14 @@ fun PlayerButtonChip(
               Icon(
                 imageVector = button.icon,
                 contentDescription = label,
-                modifier = Modifier.size(24.dp), 
+                modifier = Modifier.size(24.dp),
               )
               Text(
-                text = "1:06 • Chapter 1", // TODO: strings
-                fontSize = 15.sp, 
+                text =
+                  androidx.compose.ui.res
+                    .stringResource(app.gyrolet.mpvrx.R.string.ui_1_06_chapter_1),
+                // TODO: strings
+                fontSize = 15.sp,
                 textAlign = TextAlign.Center,
                 lineHeight = 14.sp,
                 modifier = Modifier.padding(start = 8.dp),
@@ -113,9 +125,10 @@ fun PlayerButtonChip(
             Icon(
               imageVector = button.icon,
               contentDescription = label,
-              modifier = Modifier.size(24.dp).then(
-                if (button == PlayerButton.VERTICAL_FLIP) Modifier.rotate(90f) else Modifier
-              ),
+              modifier =
+                Modifier.size(24.dp).then(
+                  if (button == PlayerButton.VERTICAL_FLIP) Modifier.rotate(90f) else Modifier,
+                ),
             )
           }
         }
@@ -137,4 +150,3 @@ fun PlayerButtonChip(
     }
   }
 }
-

@@ -1,7 +1,11 @@
-package app.gyrolet.mpvrx.ui.player.controls.components.panels
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.player.controls.components.panels
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +35,8 @@ import app.gyrolet.mpvrx.preferences.preference.collectAsState
 import app.gyrolet.mpvrx.preferences.preference.deleteAndGet
 import app.gyrolet.mpvrx.presentation.components.ExpandableCard
 import app.gyrolet.mpvrx.presentation.components.SliderItem
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
 import app.gyrolet.mpvrx.ui.player.DebandSettings
 import app.gyrolet.mpvrx.ui.player.Debanding
 import app.gyrolet.mpvrx.ui.player.controls.CARDS_MAX_WIDTH
@@ -50,7 +56,7 @@ fun VideoSettingsDebandCard(modifier: Modifier = Modifier) {
     isExpanded,
     title = {
       Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
-        Icon(Icons.Default.Gradient, null)
+        Icon(Icons.RoundedFilled.Gradient, null)
         Text(stringResource(R.string.player_sheets_deband_title))
       }
     },
@@ -89,9 +95,9 @@ fun VideoSettingsDebandCard(modifier: Modifier = Modifier) {
               },
             ) {
               when (it) {
-                Debanding.None -> Icon(Icons.Default.NotInterested, null)
-                Debanding.CPU -> Icon(Icons.Default.Memory, null)
-                Debanding.GPU -> Icon(Icons.Default.DeveloperBoard, null)
+                Debanding.None -> Icon(Icons.RoundedFilled.NotInterested, null)
+                Debanding.CPU -> Icon(Icons.RoundedFilled.Memory, null)
+                Debanding.GPU -> Icon(Icons.RoundedFilled.DeveloperBoard, null)
               }
             }
           }
@@ -113,7 +119,7 @@ fun VideoSettingsDebandCard(modifier: Modifier = Modifier) {
               horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall),
               verticalAlignment = Alignment.CenterVertically,
             ) {
-              Icon(Icons.Default.ResetIso, null)
+              Icon(Icons.RoundedFilled.ResetIso, null)
               Text(stringResource(R.string.generic_reset))
             }
           }
@@ -137,7 +143,3 @@ fun VideoSettingsDebandCard(modifier: Modifier = Modifier) {
     }
   }
 }
-
-
-
-

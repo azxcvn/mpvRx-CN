@@ -1,17 +1,21 @@
-package app.gyrolet.mpvrx.presentation.crash
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.presentation.crash
 
 import android.app.Activity
 import android.content.ClipData
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -60,6 +64,8 @@ import app.gyrolet.mpvrx.MainActivity
 import app.gyrolet.mpvrx.R
 import app.gyrolet.mpvrx.preferences.AppearancePreferences
 import app.gyrolet.mpvrx.preferences.preference.collectAsState
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
 import app.gyrolet.mpvrx.ui.theme.DarkMode
 import app.gyrolet.mpvrx.ui.theme.MpvrxTheme
 import app.gyrolet.mpvrx.ui.theme.spacing
@@ -74,7 +80,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 
-class CrashActivity : ComponentActivity() {
+class CrashActivity : AppCompatActivity() {
   private var logcat: String = ""
   private val appearancePreferences: AppearancePreferences by inject()
 
@@ -292,7 +298,7 @@ class CrashActivity : ComponentActivity() {
                 )
               },
             ) {
-              Icon(Icons.Default.ContentCopy, null)
+              Icon(Icons.RoundedFilled.ContentCopy, null)
             }
           }
           OutlinedButton(
@@ -317,7 +323,7 @@ class CrashActivity : ComponentActivity() {
       ) {
         Spacer(Modifier.height(paddingValues.calculateTopPadding()))
         Icon(
-          Icons.Outlined.BugReport,
+          Icons.RoundedFilled.BugReport,
           null,
           modifier = Modifier.size(48.dp),
           tint = MaterialTheme.colorScheme.primary,
@@ -345,7 +351,8 @@ class CrashActivity : ComponentActivity() {
         )
         LogsContainer(exceptionString)
         Text(
-          "Logcat:",
+          androidx.compose.ui.res
+            .stringResource(app.gyrolet.mpvrx.R.string.ui_logcat),
           style = MaterialTheme.typography.headlineSmall,
         )
         LogsContainer(logcat)
@@ -378,9 +385,3 @@ class CrashActivity : ComponentActivity() {
     }
   }
 }
-
-
-
-
-
-

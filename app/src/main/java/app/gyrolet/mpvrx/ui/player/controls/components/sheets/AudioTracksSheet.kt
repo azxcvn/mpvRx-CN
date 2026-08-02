@@ -1,7 +1,11 @@
-package app.gyrolet.mpvrx.ui.player.controls.components.sheets
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.player.controls.components.sheets
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +36,8 @@ import app.gyrolet.mpvrx.preferences.AudioChannels
 import app.gyrolet.mpvrx.preferences.AudioPreferences
 import app.gyrolet.mpvrx.preferences.preference.collectAsState
 import app.gyrolet.mpvrx.presentation.components.PlayerSheet
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
 import app.gyrolet.mpvrx.ui.player.TrackNode
 import app.gyrolet.mpvrx.ui.theme.spacing
 import `is`.xyz.mpv.MPVLib
@@ -57,7 +63,7 @@ fun AudioTracksSheet(
         onAddAudioTrack,
         actions = {
           IconButton(onClick = onOpenDelayPanel) {
-            Icon(Icons.Default.AvTimer, null)
+            Icon(Icons.RoundedFilled.AvTimer, null)
           }
         },
       )
@@ -72,9 +78,10 @@ fun AudioTracksSheet(
         }
         item {
           Column(
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(MaterialTheme.spacing.medium),
+            modifier =
+              Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.spacing.medium),
           ) {
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
             Text(

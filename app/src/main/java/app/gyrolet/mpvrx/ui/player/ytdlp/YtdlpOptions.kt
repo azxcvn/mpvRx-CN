@@ -1,10 +1,19 @@
+﻿/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.player.ytdlp
 
 import app.gyrolet.mpvrx.preferences.SubtitlesPreferences
 import app.gyrolet.mpvrx.preferences.YtdlPreferences
 
-enum class YtdlCodecPreference(val title: String) {
-  AUTO("自动"),
+enum class YtdlCodecPreference(
+  val title: String,
+) {
+  AUTO("Auto"),
   H264("H.264 / AVC"),
   HEVC("HEVC / H.265"),
   VP9("VP9"),
@@ -12,32 +21,50 @@ enum class YtdlCodecPreference(val title: String) {
   AV1("AV1"),
 }
 
-enum class YtdlContainerPreference(val title: String) {
-  ANY("不限"),
+enum class YtdlContainerPreference(
+  val title: String,
+) {
+  ANY("Any"),
   MP4("MP4"),
   WEBM("WebM"),
 }
 
-enum class YtdlHdrPreference(val title: String) {
-  ANY("不限"),
-  SDR("偏好 SDR"),
-  HDR("偏好 HDR"),
+enum class YtdlHdrPreference(
+  val title: String,
+) {
+  ANY("Any"),
+  SDR("Prefer SDR"),
+  HDR("Prefer HDR"),
 }
 
-enum class YtdlPlaylistMode(val title: String) {
-  DEFAULT("yt-dlp 默认"),
-  SINGLE_VIDEO("仅单个视频"),
-  WHOLE_PLAYLIST("整个播放列表"),
+enum class YtdlPlaylistMode(
+  val title: String,
+) {
+  DEFAULT("yt-dlp default"),
+  SINGLE_VIDEO("Single video only"),
+  WHOLE_PLAYLIST("Whole playlist"),
 }
 
-enum class YtdlAudioPreference(val title: String) {
-  AUTO("自动 / 最佳"),
+enum class YtdlAudioPreference(
+  val title: String,
+) {
+  AUTO("Auto / Best"),
   AAC("AAC"),
   OPUS("Opus"),
   M4A("M4A"),
   WEBM("WebM"),
 }
 
+enum class YtdlAudioQuality(
+  val title: String,
+  val maxBitrateKbps: Int?,
+) {
+  AUTO("Auto / Best", null),
+  KBPS_64("Prefer up to 64 kbps", 64),
+  KBPS_128("Prefer up to 128 kbps", 128),
+  KBPS_192("Prefer up to 192 kbps", 192),
+  KBPS_256("Prefer up to 256 kbps", 256),
+}
 
 data class YtdlpOptionSettings(
   val codecPreference: YtdlCodecPreference = YtdlCodecPreference.AUTO,
@@ -47,6 +74,7 @@ data class YtdlpOptionSettings(
   val hdrPreference: YtdlHdrPreference = YtdlHdrPreference.ANY,
   val containerPreference: YtdlContainerPreference = YtdlContainerPreference.ANY,
   val audioPreference: YtdlAudioPreference = YtdlAudioPreference.AUTO,
+  val audioQuality: YtdlAudioQuality = YtdlAudioQuality.AUTO,
   val formatSort: String = "",
   val mergeOutputFormat: String = "",
   val writeSubs: Boolean = true,
@@ -79,6 +107,7 @@ data class YtdlpOptionSettings(
         hdrPreference = ytdlPreferences.hdrPreference.get(),
         containerPreference = ytdlPreferences.containerPreference.get(),
         audioPreference = ytdlPreferences.audioPreference.get(),
+        audioQuality = ytdlPreferences.audioQuality.get(),
         formatSort = ytdlPreferences.formatSort.get(),
         mergeOutputFormat = ytdlPreferences.mergeOutputFormat.get(),
         writeSubs = ytdlPreferences.writeSubs.get(),
@@ -114,7 +143,10 @@ object YtdlpOptionsBuilder {
     val format = buildFormat(settings)
     val rawOptions = linkedMapOf<String, String?>()
 
-    fun add(key: String, value: String? = "") {
+    fun add(
+      key: String,
+      value: String? = "",
+    ) {
       val cleanedKey = key.trim().trimStart('-')
       if (cleanedKey.isNotEmpty()) {
         rawOptions[cleanedKey] = value?.trim()
@@ -153,34 +185,45 @@ object YtdlpOptionsBuilder {
     )
   }
 
-  private fun YtdlAudioPreference.audioSelector(): String =
-    when (this) {
-      YtdlAudioPreference.AUTO -> "ba"
-      YtdlAudioPreference.AAC -> "ba[acodec^=?aac]"
-      YtdlAudioPreference.OPUS -> "ba[acodec^=?opus]"
-      YtdlAudioPreference.M4A -> "ba[ext=m4a]"
-      YtdlAudioPreference.WEBM -> "ba[ext=webm]"
-    }
+  private fun YtdlAudioPreference.audioSelector(quality: YtdlAudioQuality): String {
+    val selector =
+      when (this) {
+        YtdlAudioPreference.AUTO -> "ba"
+        YtdlAudioPreference.AAC -> "ba[acodec^=?aac]"
+        YtdlAudioPreference.OPUS -> "ba[acodec^=?opus]"
+        YtdlAudioPreference.M4A -> "ba[ext=m4a]"
+        YtdlAudioPreference.WEBM -> "ba[ext=webm]"
+      }
+    return quality.maxBitrateKbps?.let { "$selector[abr<=?$it]" } ?: selector
+  }
 
   fun buildFormat(settings: YtdlpOptionSettings): String {
-    val codec = if (settings.codecPreference == YtdlCodecPreference.AUTO && settings.legacyPreferH264) {
-      YtdlCodecPreference.H264
-    } else {
-      settings.codecPreference
-    }
+    val codec =
+      if (settings.codecPreference == YtdlCodecPreference.AUTO && settings.legacyPreferH264) {
+        YtdlCodecPreference.H264
+      } else {
+        settings.codecPreference
+      }
 
-    val audioSel = settings.audioPreference.audioSelector()
+    val audioSel = settings.audioPreference.audioSelector(settings.audioQuality)
 
-    val videoSelectors = codec.videoSelectors(settings.containerPreference)
-      .map { selector -> selector + settings.formatFilters() }
+    val videoSelectors =
+      codec
+        .videoSelectors(settings.containerPreference)
+        .map { selector -> selector + settings.formatFilters() }
     val videoGroup = videoSelectors.joinToString("/")
-    val singleGroup = "b*" + settings.formatFilters()
-    val primary = if (videoGroup.isBlank()) {
-      singleGroup
-    } else {
-      "($videoGroup)+$audioSel/$singleGroup"
-    }
-    return "$primary/bv*+$audioSel/b"
+    val audioBitrateFilter =
+      settings.audioQuality.maxBitrateKbps
+        ?.let { "[abr<=?$it]" }
+        .orEmpty()
+    val singleGroup = "b*" + settings.formatFilters() + audioBitrateFilter
+    val primary =
+      if (videoGroup.isBlank()) {
+        singleGroup
+      } else {
+        "($videoGroup)+$audioSel/$singleGroup"
+      }
+    return "$primary/bv*+$audioSel/b$audioBitrateFilter"
   }
 
   fun parseRawOptions(raw: String): List<RawYtdlpOption> =
@@ -198,8 +241,7 @@ object YtdlpOptionsBuilder {
             value = normalized.substring(eqIndex + 1).trim().trimMatchingQuotes(),
           )
         }
-      }
-      .filter { it.key.isNotBlank() }
+      }.filter { it.key.isNotBlank() }
 
   fun escapeRawOptionValue(value: String): String {
     if (value.isBlank()) return ""
@@ -243,35 +285,41 @@ object YtdlpOptionsBuilder {
   }
 
   private fun YtdlCodecPreference.videoSelectors(container: YtdlContainerPreference): List<String> {
-    val containerFilter = when (container) {
-      YtdlContainerPreference.ANY -> ""
-      YtdlContainerPreference.MP4 -> "[ext=mp4]"
-      YtdlContainerPreference.WEBM -> "[ext=webm]"
-    }
+    val containerFilter =
+      when (container) {
+        YtdlContainerPreference.ANY -> ""
+        YtdlContainerPreference.MP4 -> "[ext=mp4]"
+        YtdlContainerPreference.WEBM -> "[ext=webm]"
+      }
     return when (this) {
       YtdlCodecPreference.AUTO -> listOf("bv*$containerFilter")
-      YtdlCodecPreference.H264 -> listOf(
-        "bv*[vcodec^=?avc]$containerFilter",
-        "bv*[vcodec^=?h264]$containerFilter",
-        "bv*[ext=mp4]",
-      )
-      YtdlCodecPreference.HEVC -> listOf(
-        "bv*[vcodec^=?hev1]$containerFilter",
-        "bv*[vcodec^=?hvc1]$containerFilter",
-        "bv*[vcodec^=?hevc]$containerFilter",
-      )
-      YtdlCodecPreference.VP9 -> listOf(
-        "bv*[vcodec^=?vp9]$containerFilter",
-        "bv*[vcodec^=?vp09]$containerFilter",
-      )
-      YtdlCodecPreference.VP9_PROFILE2 -> listOf(
-        "bv*[vcodec^=?vp9.2]$containerFilter",
-        "bv*[vcodec^=?vp09.02]$containerFilter",
-      )
-      YtdlCodecPreference.AV1 -> listOf(
-        "bv*[vcodec^=?av01]$containerFilter",
-        "bv*[vcodec^=?av1]$containerFilter",
-      )
+      YtdlCodecPreference.H264 ->
+        listOf(
+          "bv*[vcodec^=?avc]$containerFilter",
+          "bv*[vcodec^=?h264]$containerFilter",
+          "bv*[ext=mp4]",
+        )
+      YtdlCodecPreference.HEVC ->
+        listOf(
+          "bv*[vcodec^=?hev1]$containerFilter",
+          "bv*[vcodec^=?hvc1]$containerFilter",
+          "bv*[vcodec^=?hevc]$containerFilter",
+        )
+      YtdlCodecPreference.VP9 ->
+        listOf(
+          "bv*[vcodec^=?vp9]$containerFilter",
+          "bv*[vcodec^=?vp09]$containerFilter",
+        )
+      YtdlCodecPreference.VP9_PROFILE2 ->
+        listOf(
+          "bv*[vcodec^=?vp9.2]$containerFilter",
+          "bv*[vcodec^=?vp09.02]$containerFilter",
+        )
+      YtdlCodecPreference.AV1 ->
+        listOf(
+          "bv*[vcodec^=?av01]$containerFilter",
+          "bv*[vcodec^=?av1]$containerFilter",
+        )
     }
   }
 

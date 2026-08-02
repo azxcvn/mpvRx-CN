@@ -1,3 +1,10 @@
+﻿/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.player
 
 import androidx.annotation.StringRes
@@ -103,6 +110,9 @@ enum class Sheets {
   Playlist,
   AmbientConfig,
   FrameNavigation,
+  Equalizer,
+  AudioProperties,
+  VisualizerStyle,
 }
 
 enum class Panels {
@@ -165,8 +175,8 @@ sealed class PlayerUpdates {
  * Sharpness uses MPV's 'sharpen' property which ranges from -5 (blur) to 5 (sharp).
  */
 enum class FilterPreset(
-  val displayName: String,
-  val description: String,
+  @StringRes val displayNameRes: Int,
+  @StringRes val descriptionRes: Int,
   val brightness: Int,
   val saturation: Int,
   val contrast: Int,
@@ -175,8 +185,8 @@ enum class FilterPreset(
   val sharpness: Int,
 ) {
   NONE(
-    displayName = "无",
-    description = "默认设置，无任何调整",
+    displayNameRes = R.string.filter_preset_none,
+    descriptionRes = R.string.filter_preset_default_settings_with_no_adjustments,
     brightness = 0,
     saturation = 0,
     contrast = 0,
@@ -185,8 +195,8 @@ enum class FilterPreset(
     sharpness = 0,
   ),
   VIVID(
-    displayName = "鲜艳",
-    description = "增强色彩，细节清晰",
+    displayNameRes = R.string.filter_preset_vivid,
+    descriptionRes = R.string.filter_preset_enhanced_colors_with_crisp_details,
     brightness = 5,
     saturation = 25,
     contrast = 15,
@@ -195,8 +205,8 @@ enum class FilterPreset(
     sharpness = 0,
   ),
   WARM_TONE(
-    displayName = "暖色调",
-    description = "温暖色彩，金色光泽",
+    displayNameRes = R.string.filter_preset_warm_tone,
+    descriptionRes = R.string.filter_preset_warmer_colors_with_golden_tint,
     brightness = 5,
     saturation = 10,
     contrast = 5,
@@ -205,8 +215,8 @@ enum class FilterPreset(
     sharpness = 0,
   ),
   COOL_TONE(
-    displayName = "冷色调",
-    description = "冷色系，蓝色光泽",
+    displayNameRes = R.string.filter_preset_cool_tone,
+    descriptionRes = R.string.filter_preset_cooler_colors_with_blue_tint,
     brightness = 0,
     saturation = 5,
     contrast = 10,
@@ -215,8 +225,8 @@ enum class FilterPreset(
     sharpness = 0,
   ),
   SOFT_PASTEL(
-    displayName = "柔和粉彩",
-    description = "柔和淡雅，温柔质感",
+    displayNameRes = R.string.filter_preset_soft_pastel,
+    descriptionRes = R.string.filter_preset_soft_muted_colors_with_gentle_look,
     brightness = 10,
     saturation = -15,
     contrast = -10,
@@ -225,8 +235,8 @@ enum class FilterPreset(
     sharpness = 0,
   ),
   CINEMATIC(
-    displayName = "电影质感",
-    description = "电影级调色，富有层次",
+    displayNameRes = R.string.filter_preset_cinematic,
+    descriptionRes = R.string.filter_preset_film_like_color_grading_with_depth,
     brightness = -5,
     saturation = -10,
     contrast = 20,
@@ -235,8 +245,8 @@ enum class FilterPreset(
     sharpness = 0,
   ),
   DRAMATIC(
-    displayName = "戏剧效果",
-    description = "高对比度，戏剧化观感",
+    displayNameRes = R.string.filter_preset_dramatic,
+    descriptionRes = R.string.filter_preset_high_contrast_dramatic_look,
     brightness = -10,
     saturation = 15,
     contrast = 30,
@@ -245,8 +255,8 @@ enum class FilterPreset(
     sharpness = 0,
   ),
   NIGHT_MODE(
-    displayName = "夜间模式",
-    description = "降低亮度，适合暗光环境",
+    displayNameRes = R.string.filter_preset_night_mode,
+    descriptionRes = R.string.filter_preset_reduced_brightness_for_dark_environments,
     brightness = -20,
     saturation = -5,
     contrast = 5,
@@ -255,8 +265,8 @@ enum class FilterPreset(
     sharpness = 0,
   ),
   NOSTALGIC(
-    displayName = "怀旧风格",
-    description = "复古胶片质感，柔焦效果",
+    displayNameRes = R.string.filter_preset_nostalgic,
+    descriptionRes = R.string.filter_preset_vintage_film_look_with_soft_focus,
     brightness = 5,
     saturation = -20,
     contrast = 10,
@@ -265,8 +275,8 @@ enum class FilterPreset(
     sharpness = 0,
   ),
   GHIBLI_STYLE(
-    displayName = "吉卜力风格",
-    description = "柔和梦幻的动漫色彩",
+    displayNameRes = R.string.filter_preset_ghibli_style,
+    descriptionRes = R.string.filter_preset_soft_dreamy_anime_colors,
     brightness = 8,
     saturation = 15,
     contrast = -5,
@@ -275,8 +285,8 @@ enum class FilterPreset(
     sharpness = 0,
   ),
   NEON_POP(
-    displayName = "霓虹流行",
-    description = "鲜艳霓虹色调，极具冲击力",
+    displayNameRes = R.string.filter_preset_neon_pop,
+    descriptionRes = R.string.filter_preset_vibrant_neon_like_colors_with_edge,
     brightness = 5,
     saturation = 40,
     contrast = 20,
@@ -285,8 +295,8 @@ enum class FilterPreset(
     sharpness = 0,
   ),
   DEEP_BLACK(
-    displayName = "深邃黑",
-    description = "增强黑色，适配 OLED 屏幕",
+    displayNameRes = R.string.filter_preset_deep_black,
+    descriptionRes = R.string.filter_preset_enhanced_blacks_for_oled_displays,
     brightness = -15,
     saturation = 5,
     contrast = 25,
@@ -375,7 +385,9 @@ enum class DebandSettings(
 }
 
 /** Controls whether the playback service shows a notification, and which style it uses. */
-enum class NotificationStyle(val displayName: String) {
+enum class NotificationStyle(
+  val displayName: String,
+) {
   /** Do not show any playback notification. */
   None("不显示通知"),
 
@@ -393,4 +405,3 @@ enum class NotificationStyle(val displayName: String) {
       None, Media -> true
     }
 }
-

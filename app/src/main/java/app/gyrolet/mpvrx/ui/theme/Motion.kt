@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.theme
 
 import android.animation.ValueAnimator
@@ -16,11 +23,13 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
 /**
- * MpvRx motion policy — respects system reduce-motion accessibility setting.
+ * mpvRx motion policy — respects system reduce-motion accessibility setting.
  * When reduce-motion is true, all animations use non-bouncing standard specs.
  */
 @Stable
-data class MotionPolicy(val reduceMotion: Boolean = false)
+data class MotionPolicy(
+  val reduceMotion: Boolean = false,
+)
 
 val LocalMotionPolicy = staticCompositionLocalOf { MotionPolicy() }
 
@@ -56,10 +65,11 @@ object AppMotion {
   val ReducedDp: SpringSpec<Dp> = noBounce(stiffness = Spring.StiffnessMedium)
 
   /** IntSize-specific spring for expandVertically/shrinkVertically animations. */
-  val IntSizeSpring: SpringSpec<IntSize> = spring(
-    dampingRatio = Spring.DampingRatioLowBouncy,
-    stiffness = Spring.StiffnessMediumLow,
-  )
+  val IntSizeSpring: SpringSpec<IntSize> =
+    spring(
+      dampingRatio = Spring.DampingRatioLowBouncy,
+      stiffness = Spring.StiffnessMediumLow,
+    )
 
   /** Spatial animations — can overshoot for expressive feel. */
   object Spatial {

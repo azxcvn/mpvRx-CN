@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.player
 
 import `is`.xyz.mpv.MPVLib
@@ -66,9 +73,11 @@ class PlayerObserver(
     activity.runOnUiThread { activity.onObserverEvent(property, value) }
   }
 
-  override fun event(eventId: Int, data: MPVNode) {
+  override fun event(
+    eventId: Int,
+    data: MPVNode,
+  ) {
     if (activity.player.isExiting) return
     activity.runOnUiThread { activity.event(eventId) }
   }
 }
-

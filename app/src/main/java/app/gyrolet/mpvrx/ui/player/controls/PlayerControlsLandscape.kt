@@ -1,7 +1,11 @@
-package app.gyrolet.mpvrx.ui.player.controls
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.player.controls
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -21,14 +25,20 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.gyrolet.mpvrx.R
 import app.gyrolet.mpvrx.preferences.PlayerButton
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
 import app.gyrolet.mpvrx.ui.player.Panels
 import app.gyrolet.mpvrx.ui.player.PlayerActivity
 import app.gyrolet.mpvrx.ui.player.PlayerViewModel
@@ -63,7 +73,7 @@ fun TopLeftPlayerControlsLandscape(
       horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall),
     ) {
       ControlsButton(
-        icon = Icons.Default.ArrowBack,
+        icon = Icons.RoundedFilled.ArrowBack,
         onClick = onBackPress,
         color = if (hideBackground) controlColor else MaterialTheme.colorScheme.onSurface,
         modifier = Modifier.size(45.dp),
@@ -142,6 +152,40 @@ fun TopLeftPlayerControlsLandscape(
       }
     }
 
+    val syncplayManager = org.koin.compose.koinInject<app.gyrolet.mpvrx.domain.syncplay.SyncplayManager>()
+    val syncplayState by syncplayManager.state.collectAsState()
+
+    androidx.compose.animation.AnimatedVisibility(
+      visible = syncplayState.isConnected,
+      enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.slideInVertically { -it },
+      exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.slideOutVertically { -it },
+    ) {
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(start = MaterialTheme.spacing.medium, top = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+      ) {
+        Icon(
+          imageVector = Icons.RoundedFilled.CloudDownload,
+          contentDescription = null,
+          modifier = Modifier.size(14.dp),
+          tint = MaterialTheme.colorScheme.tertiary,
+        )
+        Text(
+          text =
+            stringResource(
+              R.string.syncplay_player_status,
+              syncplayState.room.orEmpty(),
+              syncplayState.users.size,
+            ),
+          style = MaterialTheme.typography.labelSmall,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+          color = MaterialTheme.colorScheme.tertiary,
+        )
+      }
+    }
+
     androidx.compose.animation.AnimatedVisibility(
       visible = isTranslatingSub || isRealtimeSubsActive,
       enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.slideInVertically { -it },
@@ -153,17 +197,18 @@ fun TopLeftPlayerControlsLandscape(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
       ) {
         Icon(
-          imageVector = Icons.Default.Translate,
+          imageVector = Icons.RoundedFilled.Translate,
           contentDescription = null,
           modifier = Modifier.size(14.dp),
           tint = MaterialTheme.colorScheme.tertiary,
         )
         Text(
-          text = if (isRealtimeSubsActive) {
-            "Real-time subs: ${realtimeSubsLanguage.ifBlank { "?" }} ${translationStatus.ifBlank { "" }}"
-          } else {
-            "Translating ${translatingTrackName.ifBlank { "subs" }} ${translationStatus.ifBlank { "" }}"
-          },
+          text =
+            if (isRealtimeSubsActive) {
+              "Real-time subs: ${realtimeSubsLanguage.ifBlank { "?" }} ${translationStatus.ifBlank { "" }}"
+            } else {
+              "Translating ${translatingTrackName.ifBlank { "subs" }} ${translationStatus.ifBlank { "" }}"
+            },
           style = MaterialTheme.typography.labelSmall,
           maxLines = 1,
           overflow = TextOverflow.Ellipsis,
@@ -311,7 +356,3 @@ fun BottomLeftPlayerControlsLandscape(
     }
   }
 }
-
-
-
-

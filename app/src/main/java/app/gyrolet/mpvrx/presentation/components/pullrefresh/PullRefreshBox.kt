@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.presentation.components.pullrefresh
 
 import androidx.compose.animation.core.Spring
@@ -70,82 +77,89 @@ fun PullRefreshBox(
 
   val activeJob = remember { mutableStateOf<Job?>(null) }
 
-  val targetTranslationY = if (isRefreshing.value) {
-    maxTranslationPx
-  } else {
-    (state.distanceFraction * maxTranslationPx).coerceAtLeast(0f)
-  }
+  val targetTranslationY =
+    if (isRefreshing.value) {
+      maxTranslationPx
+    } else {
+      (state.distanceFraction * maxTranslationPx).coerceAtLeast(0f)
+    }
 
   val animatedTranslationY by animateFloatAsState(
     targetValue = targetTranslationY,
-    animationSpec = spring(
-      dampingRatio = Spring.DampingRatioMediumBouncy,
-      stiffness = Spring.StiffnessMediumLow,
-    ),
+    animationSpec =
+      spring(
+        dampingRatio = Spring.DampingRatioMediumBouncy,
+        stiffness = Spring.StiffnessMediumLow,
+      ),
     label = "content_translationY",
   )
 
   val indicatorScale by animateFloatAsState(
     targetValue = if (isRefreshing.value) 1f else state.distanceFraction.coerceIn(0f, 1f),
-    animationSpec = spring(
-      dampingRatio = Spring.DampingRatioLowBouncy,
-      stiffness = Spring.StiffnessMedium,
-    ),
+    animationSpec =
+      spring(
+        dampingRatio = Spring.DampingRatioLowBouncy,
+        stiffness = Spring.StiffnessMedium,
+      ),
     label = "indicator_scale",
   )
 
-  val expressivePolygons = remember {
-    listOf(
-      MaterialShapes.Cookie4Sided,
-      MaterialShapes.SoftBurst,
-      MaterialShapes.Oval,
-    )
-  }
+  val expressivePolygons =
+    remember {
+      listOf(
+        MaterialShapes.Cookie4Sided,
+        MaterialShapes.SoftBurst,
+        MaterialShapes.Oval,
+      )
+    }
 
   val indicatorSize = 56.dp
   val indicatorSizePx = remember(density) { with(density) { indicatorSize.toPx() } }
 
   Box(
-    modifier = modifier.pullToRefresh(
-      isRefreshing = isRefreshing.value,
-      state = state,
-      enabled = enabled,
-      onRefresh = {
-        activeJob.value?.cancel()
-        isRefreshing.value = true
-        activeJob.value = coroutineScope.launch {
-          try {
-            onRefresh()
-            delay(delayAfterRefresh)
-          } finally {
-            isRefreshing.value = false
-          }
-        }
-      },
-    ),
+    modifier =
+      modifier.pullToRefresh(
+        isRefreshing = isRefreshing.value,
+        state = state,
+        enabled = enabled,
+        onRefresh = {
+          activeJob.value?.cancel()
+          isRefreshing.value = true
+          activeJob.value =
+            coroutineScope.launch {
+              try {
+                onRefresh()
+                delay(delayAfterRefresh)
+              } finally {
+                isRefreshing.value = false
+              }
+            }
+        },
+      ),
   ) {
     Box(
-      modifier = Modifier
-        .matchParentSize()
-        .graphicsLayer { translationY = animatedTranslationY },
+      modifier =
+        Modifier
+          .matchParentSize()
+          .graphicsLayer { translationY = animatedTranslationY },
     ) {
       content()
     }
 
     Box(
-      modifier = Modifier
-        .align(Alignment.TopCenter)
-        .graphicsLayer {
-          translationY = (animatedTranslationY / 2f) - (indicatorSizePx / 2f)
-          scaleX = indicatorScale
-          scaleY = indicatorScale
-          alpha = indicatorScale
-        }
-        .shadow(elevation = 4.dp, shape = CircleShape, clip = false)
-        .size(indicatorSize)
-        .clip(CircleShape)
-        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-        .padding(6.dp),
+      modifier =
+        Modifier
+          .align(Alignment.TopCenter)
+          .graphicsLayer {
+            translationY = (animatedTranslationY / 2f) - (indicatorSizePx / 2f)
+            scaleX = indicatorScale
+            scaleY = indicatorScale
+            alpha = indicatorScale
+          }.shadow(elevation = 4.dp, shape = CircleShape, clip = false)
+          .size(indicatorSize)
+          .clip(CircleShape)
+          .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+          .padding(6.dp),
       contentAlignment = Alignment.Center,
     ) {
       if (isRefreshing.value) {

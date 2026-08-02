@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.database.entities
 
 import androidx.room.Entity
@@ -13,4 +20,3 @@ data class PlaylistEntity(
   val isM3uPlaylist: Boolean = false, // True if this playlist was created from an M3U source
   val userAgent: String? = null, // Custom User-Agent for fetching this M3U
 )
-

@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.browser.states
 
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -33,9 +40,9 @@ import app.gyrolet.mpvrx.ui.theme.AppShapeScale
 
 @Composable
 fun LoadingState(
-  icon: AppIcon = Icons.Filled.FolderOpen,
-  title: String = "Scanning for videos...",
-  message: String = "Please wait while we search your device",
+  icon: AppIcon = Icons.RoundedFilled.FolderOpen,
+  title: String = "正在扫描视频...",
+  message: String = "请稍候，正在搜索设备",
   modifier: Modifier = Modifier,
 ) {
   // Animated alpha for subtle pulsing effect (same as EmptyState)
@@ -53,13 +60,15 @@ fun LoadingState(
 
   Box(
     modifier = modifier.fillMaxSize(),
-    contentAlignment = Alignment.Center
+    contentAlignment = Alignment.Center,
   ) {
     Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 48.dp)
-        .padding(bottom = 80.dp), // Account for bottom navigation bar
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 48.dp)
+          .padding(bottom = 80.dp),
+      // Account for bottom navigation bar
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center,
     ) {
@@ -105,4 +114,3 @@ fun LoadingState(
     }
   }
 }
-

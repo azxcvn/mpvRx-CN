@@ -1,7 +1,11 @@
-﻿package app.gyrolet.mpvrx.ui.browser.sheets
+﻿/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.browser.sheets
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
 import app.gyrolet.mpvrx.utils.history.RecentlyPlayedOps
 import app.gyrolet.mpvrx.utils.media.MediaUtils
 import kotlinx.coroutines.launch
@@ -100,7 +106,9 @@ fun PlayLinkSheet(
     ) {
       // Title
       Text(
-        text = "播放链接",
+        text =
+          androidx.compose.ui.res
+            .stringResource(app.gyrolet.mpvrx.R.string.ui_play_link),
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Medium,
         color = MaterialTheme.colorScheme.onSurface,
@@ -117,7 +125,12 @@ fun PlayLinkSheet(
             isLinkInputUrlValid = newValue.isBlank() || MediaUtils.isURLValid(newValue)
           },
           modifier = Modifier.fillMaxWidth(),
-          label = { Text("输入 URL") },
+          label = {
+            Text(
+              androidx.compose.ui.res
+                .stringResource(app.gyrolet.mpvrx.R.string.ui_enter_url),
+            )
+          },
           placeholder = { Text("https://example.com/video.mp4") },
           singleLine = true,
           isError = linkInputUrl.isNotBlank() && !isLinkInputUrlValid,
@@ -130,7 +143,9 @@ fun PlayLinkSheet(
 
         if (linkInputUrl.isNotBlank() && !isLinkInputUrlValid) {
           Text(
-            text = "不支持的 URL 协议",
+            text =
+              androidx.compose.ui.res
+                .stringResource(app.gyrolet.mpvrx.R.string.ui_unsupported_url_protocol),
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Medium,
@@ -145,7 +160,9 @@ fun PlayLinkSheet(
       ) {
         TextButton(onClick = handleDismiss) {
           Text(
-            text = "取消",
+            text =
+              androidx.compose.ui.res
+                .stringResource(app.gyrolet.mpvrx.R.string.generic_cancel),
             fontWeight = FontWeight.Medium,
           )
         }
@@ -159,7 +176,9 @@ fun PlayLinkSheet(
             ),
         ) {
           Text(
-            text = "播放",
+            text =
+              androidx.compose.ui.res
+                .stringResource(app.gyrolet.mpvrx.R.string.ui_play),
             fontWeight = FontWeight.SemiBold,
           )
         }
@@ -174,19 +193,19 @@ fun PlayLinkSheet(
 private fun ValidationIcon(isValid: Boolean) {
   if (isValid) {
     Icon(
-      Icons.Filled.Check,
-      contentDescription = "Valid URL",
+      Icons.RoundedFilled.Check,
+      contentDescription =
+        androidx.compose.ui.res
+          .stringResource(app.gyrolet.mpvrx.R.string.ui_valid_url),
       tint = MaterialTheme.colorScheme.primary,
     )
   } else {
     Icon(
-      Icons.Filled.Close,
-      contentDescription = "Invalid URL",
+      Icons.RoundedFilled.Close,
+      contentDescription =
+        androidx.compose.ui.res
+          .stringResource(app.gyrolet.mpvrx.R.string.ui_invalid_url),
       tint = MaterialTheme.colorScheme.error,
     )
   }
 }
-
-
-
-

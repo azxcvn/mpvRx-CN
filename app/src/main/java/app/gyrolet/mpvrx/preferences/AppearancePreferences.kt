@@ -1,17 +1,31 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.preferences
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -35,11 +49,15 @@ class AppearancePreferences(
   val unplayedOldVideoDays = preferenceStore.getInt("unplayed_old_video_days", 7)
   val showNetworkThumbnails = preferenceStore.getBoolean("show_network_thumbnails", false)
   val seekbarStyle = preferenceStore.getEnum("seekbar_style", SeekbarStyle.Thick)
+  val portraitPlaybackControlsPosition =
+    preferenceStore.getEnum("portrait_playback_controls_position", PortraitPlaybackControlsPosition.Center)
   val navigationStyle = preferenceStore.getEnum("navigation_style", NavigationStyle.Slide)
   val showHomeTab = preferenceStore.getBoolean("show_home_tab", true)
   val showRecentsTab = preferenceStore.getBoolean("show_recents_tab", true)
   val showPlaylistsTab = preferenceStore.getBoolean("show_playlists_tab", true)
   val showNetworkTab = preferenceStore.getBoolean("show_network_tab", false)
+  val showQuickPlayFab = preferenceStore.getBoolean("show_quick_play_fab", true)
+  val quickPlayFabDirect = preferenceStore.getBoolean("quick_play_fab_direct", false)
 
   val topLeftControls =
     preferenceStore.getString(
@@ -50,7 +68,7 @@ class AppearancePreferences(
   val topRightControls =
     preferenceStore.getString(
       "top_right_controls",
-      "CURRENT_CHAPTER,DECODER,AUDIO_TRACK,SUBTITLES,MORE_OPTIONS",
+      "CAST,CURRENT_CHAPTER,DECODER,AUDIO_TRACK,SUBTITLES,MORE_OPTIONS",
     )
 
   val bottomRightControls =
@@ -68,8 +86,32 @@ class AppearancePreferences(
   val portraitBottomControls =
     preferenceStore.getString(
       "portrait_bottom_controls",
-      "SCREEN_ROTATION,DECODER,AUDIO_TRACK,SUBTITLES,BOOKMARKS_CHAPTERS,PLAYBACK_SPEED,BACKGROUND_PLAYBACK,REPEAT_MODE,SHUFFLE,VIDEO_ZOOM,FRAME_NAVIGATION,ASPECT_RATIO,PICTURE_IN_PICTURE,LOCK_CONTROLS,MORE_OPTIONS",
+      "CAST,SCREEN_ROTATION,DECODER,AUDIO_TRACK,SUBTITLES,BOOKMARKS_CHAPTERS,PLAYBACK_SPEED,BACKGROUND_PLAYBACK,REPEAT_MODE,SHUFFLE,VIDEO_ZOOM,FRAME_NAVIGATION,ASPECT_RATIO,PICTURE_IN_PICTURE,LOCK_CONTROLS,MORE_OPTIONS",
     )
+
+  private val castButtonMigrationComplete =
+    preferenceStore.getBoolean("cast_button_migration_complete", false)
+
+  init {
+    if (!castButtonMigrationComplete.get()) {
+      val landscapeButtons =
+        listOf(
+          topLeftControls.get(),
+          topRightControls.get(),
+          bottomRightControls.get(),
+          bottomLeftControls.get(),
+        ).flatMap { it.split(',') }
+          .map { it.trim().uppercase() }
+      if ("CAST" !in landscapeButtons) {
+        topRightControls.set("CAST,${topRightControls.get()}")
+      }
+      val portraitButtons = portraitBottomControls.get().split(',').map { it.trim().uppercase() }
+      if ("CAST" !in portraitButtons) {
+        portraitBottomControls.set("CAST,${portraitBottomControls.get()}")
+      }
+      castButtonMigrationComplete.set(true)
+    }
+  }
 
   fun parseButtons(
     csv: String,
@@ -89,42 +131,54 @@ class AppearancePreferences(
       .toList()
 }
 
+enum class PortraitPlaybackControlsPosition(
+  val displayName: String,
+) {
+  Center("Center of screen"),
+  BelowSeekbar("Between seekbar and controls"),
+}
+
 @Composable
 fun MultiChoiceSegmentedButton(
   choices: ImmutableList<String>,
   selectedIndices: ImmutableList<Int>,
-  onClick: (Int) -> Unit,
+  onClick: (Int, Offset) -> Unit,
   modifier: Modifier = Modifier,
 ) {
   Row(
-    modifier = modifier
-      .fillMaxWidth()
-      .padding(MaterialTheme.spacing.medium),
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .padding(MaterialTheme.spacing.medium),
     horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
   ) {
     choices.forEachIndexed { index, choice ->
+      var buttonCenter by remember(choice) { mutableStateOf(Offset.Zero) }
       ToggleButton(
         checked = selectedIndices.contains(index),
-        onCheckedChange = { onClick(index) },
-        modifier = Modifier
-          .weight(1f)
-          .defaultMinSize(minHeight = MaterialTheme.spacing.extraLarge)
-          .semantics { role = Role.RadioButton },
-        colors = ToggleButtonDefaults.toggleButtonColors(
-          checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-          checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-          containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
-          contentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-        ),
-        shapes = when (index) {
-          0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-          choices.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-          else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-        },
+        onCheckedChange = { onClick(index, buttonCenter) },
+        modifier =
+          Modifier
+            .weight(1f)
+            .defaultMinSize(minHeight = MaterialTheme.spacing.extraLarge)
+            .onGloballyPositioned { buttonCenter = it.boundsInWindow().center }
+            .semantics { role = Role.RadioButton },
+        colors =
+          ToggleButtonDefaults.toggleButtonColors(
+            checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+            contentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+          ),
+        shapes =
+          when (index) {
+            0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+            choices.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+          },
       ) {
         Text(text = choice)
       }
     }
   }
 }
-

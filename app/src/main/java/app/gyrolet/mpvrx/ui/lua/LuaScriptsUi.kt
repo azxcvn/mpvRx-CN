@@ -1,7 +1,11 @@
-package app.gyrolet.mpvrx.ui.lua
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.lua
 
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -36,6 +40,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
+import app.gyrolet.mpvrx.R
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -96,7 +103,15 @@ fun rememberLuaScriptsCatalog(
         }
       }.onFailure { error ->
         state = LuaScriptsCatalogState(availableScripts = emptyList(), isLoading = false)
-        Toast.makeText(context, "Error loading scripts: ${error.message}", Toast.LENGTH_LONG).show()
+        Toast
+          .makeText(
+            context,
+            context.getString(
+              R.string.toast_error_loading_scripts,
+              error.message ?: context.getString(R.string.generic_unknown_error),
+            ),
+            Toast.LENGTH_LONG,
+          ).show()
       }
   }
 
@@ -169,7 +184,7 @@ fun LuaRuntimeStatusCard(
           contentAlignment = Alignment.Center,
         ) {
           Icon(
-            imageVector = Icons.Default.Code,
+            imageVector = Icons.RoundedFilled.Code,
             contentDescription = null,
             tint =
               if (enabled && hasStorageLocation) {
@@ -186,7 +201,9 @@ fun LuaRuntimeStatusCard(
         verticalArrangement = Arrangement.spacedBy(2.dp),
       ) {
         Text(
-          text = "Script runtime",
+          text =
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.ui_script_runtime),
           style = MaterialTheme.typography.titleMedium,
           fontWeight = FontWeight.SemiBold,
         )
@@ -207,9 +224,7 @@ fun LuaRuntimeStatusCard(
 }
 
 @Composable
-fun LuaScriptsLoadingState(
-  modifier: Modifier = Modifier,
-) {
+fun LuaScriptsLoadingState(modifier: Modifier = Modifier) {
   Row(
     modifier =
       modifier
@@ -253,7 +268,7 @@ fun LuaScriptsEmptyState(
           contentAlignment = Alignment.Center,
         ) {
           Icon(
-            imageVector = Icons.Default.Code,
+            imageVector = Icons.RoundedFilled.Code,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -337,7 +352,7 @@ fun LuaScriptToggleCard(
           contentAlignment = Alignment.Center,
         ) {
           Icon(
-            imageVector = Icons.Default.Code,
+            imageVector = Icons.RoundedFilled.Code,
             contentDescription = null,
             tint =
               if (active) {
@@ -384,16 +399,17 @@ fun LuaScriptToggleCard(
 }
 
 @Composable
-fun LuaSelectionFootnote(
-  modifier: Modifier = Modifier,
-) {
+fun LuaSelectionFootnote(modifier: Modifier = Modifier) {
   Text(
-    text = "Newly enabled scripts can load during playback. Scripts you turn off may need the video to be reopened before they fully stop running.",
+    text =
+      androidx.compose.ui.res.stringResource(
+        app.gyrolet.mpvrx.R.string.ui_newly_enabled_scripts_can_load_during_playback_scripts_you_turn,
+      ),
     style = MaterialTheme.typography.bodySmall,
     color = MaterialTheme.colorScheme.onSurfaceVariant,
-    modifier = modifier
-      .fillMaxWidth()
-      .padding(horizontal = 4.dp),
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .padding(horizontal = 4.dp),
   )
 }
-

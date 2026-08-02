@@ -1,7 +1,11 @@
-package app.gyrolet.mpvrx.ui.player.controls.components.panels
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.player.controls.components.panels
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
@@ -43,6 +47,8 @@ import app.gyrolet.mpvrx.preferences.preference.deleteAndGet
 import app.gyrolet.mpvrx.presentation.components.ExpandableCard
 import app.gyrolet.mpvrx.presentation.components.ExposedTextDropDownMenu
 import app.gyrolet.mpvrx.presentation.components.SliderItem
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
 import app.gyrolet.mpvrx.ui.player.PlayerViewModel
 import app.gyrolet.mpvrx.ui.player.controls.CARDS_MAX_WIDTH
 import app.gyrolet.mpvrx.ui.player.controls.panelCardsColors
@@ -87,9 +93,12 @@ fun SubtitleSettingsTypographyCard(
             .filter { fileManager.isFile(it) && fileManager.getName(it).lowercase().matches(".*\\.[ot]tf$".toRegex()) }
             .mapNotNull {
               runCatching {
-                TTFFile.open(fileManager.getInputStream(it) ?: return@mapNotNull null).families.values.first()
+                TTFFile
+                  .open(fileManager.getInputStream(it) ?: return@mapNotNull null)
+                  .families.values
+                  .first()
               }.getOrNull()
-            }.distinct()
+            }.distinct(),
         )
       }
       fontsLoadingIndicator = null
@@ -103,7 +112,7 @@ fun SubtitleSettingsTypographyCard(
       Row(
         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
       ) {
-        Icon(Icons.Default.FormatColorText, null)
+        Icon(Icons.RoundedFilled.FormatColorText, null)
         Text(stringResource(R.string.player_sheets_sub_typography_card_title))
       }
     },
@@ -123,7 +132,10 @@ fun SubtitleSettingsTypographyCard(
       val fontSize by MPVLib.propInt["sub-font-size"].collectAsState()
       val mpvBorderStyle by MPVLib.propString["sub-border-style"].collectAsState()
       val borderStyle by remember {
-        derivedStateOf { SubtitlesBorderStyle.entries.firstOrNull { it.value == mpvBorderStyle } ?: SubtitlesBorderStyle.OutlineAndShadow }
+        derivedStateOf {
+          SubtitlesBorderStyle.entries.firstOrNull { it.value == mpvBorderStyle }
+            ?: SubtitlesBorderStyle.OutlineAndShadow
+        }
       }
       val borderSize by MPVLib.propInt["sub-outline-size"].collectAsState()
       val shadowOffset by MPVLib.propInt["sub-shadow-offset"].collectAsState()
@@ -146,7 +158,7 @@ fun SubtitleSettingsTypographyCard(
           },
         ) {
           Icon(
-            Icons.Default.FormatBold,
+            Icons.RoundedFilled.FormatBold,
             null,
             modifier = Modifier.size(32.dp),
           )
@@ -160,7 +172,7 @@ fun SubtitleSettingsTypographyCard(
           },
         ) {
           Icon(
-            Icons.Default.FormatItalic,
+            Icons.RoundedFilled.FormatItalic,
             null,
             modifier = Modifier.size(32.dp),
           )
@@ -192,7 +204,7 @@ fun SubtitleSettingsTypographyCard(
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall),
             verticalAlignment = Alignment.CenterVertically,
           ) {
-            Icon(Icons.Default.FormatClear, null)
+            Icon(Icons.RoundedFilled.FormatClear, null)
             Text(stringResource(R.string.generic_reset))
           }
         }
@@ -203,7 +215,7 @@ fun SubtitleSettingsTypographyCard(
         verticalAlignment = Alignment.CenterVertically,
       ) {
         Icon(
-          Icons.Default.BrandFamily,
+          Icons.RoundedFilled.BrandFamily,
           null,
           modifier = Modifier.size(32.dp),
         )
@@ -232,7 +244,7 @@ fun SubtitleSettingsTypographyCard(
           MPVLib.setPropertyInt("secondary-sub-font-size", it)
         },
       ) {
-        Icon(Icons.Default.FormatSize, null)
+        Icon(Icons.RoundedFilled.FormatSize, null)
       }
       ProvidePreferenceLocals(
         theme = preferenceTheme(iconContainerMinWidth = 64.dp),
@@ -249,7 +261,7 @@ fun SubtitleSettingsTypographyCard(
           values = SubtitlesBorderStyle.entries,
           type = ListPreferenceType.DROPDOWN_MENU,
           summary = { Text(stringResource(borderStyle.titleRes)) },
-          icon = { Icon(Icons.Default.BorderStyle, null) },
+          icon = { Icon(Icons.RoundedFilled.BorderStyle, null) },
         )
       }
       SliderItem(
@@ -264,14 +276,15 @@ fun SubtitleSettingsTypographyCard(
           MPVLib.setPropertyInt("secondary-sub-outline-size", it)
         },
         max = 20,
-        icon = { Icon(Icons.Default.BorderColor, null) },
+        icon = { Icon(Icons.RoundedFilled.BorderColor, null) },
       )
       SliderItem(
         stringResource(R.string.player_sheets_subtitles_shadow_offset),
         value = localShadowOffset.coerceIn(-20, 20),
-        valueText = localShadowOffset.coerceIn(-20, 20).let {
-          if (it > 0) "+$it" else it.toString()
-        },
+        valueText =
+          localShadowOffset.coerceIn(-20, 20).let {
+            if (it > 0) "+$it" else it.toString()
+          },
         onChange = {
           localShadowOffset = it
           preferences.shadowOffset.set(it)
@@ -280,7 +293,7 @@ fun SubtitleSettingsTypographyCard(
         },
         min = -20,
         max = 20,
-        icon = { Icon(Icons.Default.Shadow, null) },
+        icon = { Icon(Icons.RoundedFilled.Shadow, null) },
       )
     }
   }
@@ -318,7 +331,3 @@ enum class SubtitlesBorderStyle(
   OpaqueBox("opaque-box", R.string.player_sheets_subtitles_border_style_opaque_box),
   BackgroundBox("background-box", R.string.player_sheets_subtitles_border_style_background_box),
 }
-
-
-
-

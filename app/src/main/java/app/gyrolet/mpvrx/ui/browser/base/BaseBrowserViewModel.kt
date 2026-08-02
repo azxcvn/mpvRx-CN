@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.browser.base
 
 import android.app.Application
@@ -21,6 +28,7 @@ abstract class BaseBrowserViewModel(
 ) : AndroidViewModel(application),
   KoinComponent {
   protected val metadataCache: VideoMetadataCacheRepository by inject()
+
   /**
    * Observable recently played file path for highlighting
    * Automatically filters out non-existent files
@@ -74,4 +82,3 @@ abstract class BaseBrowserViewModel(
     return result
   }
 }
-

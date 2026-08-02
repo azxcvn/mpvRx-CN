@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.browser
 
 import androidx.compose.runtime.getValue
@@ -28,11 +35,11 @@ object NavigationBarState {
 
   fun updateSelectionState(
     inSelectionMode: Boolean,
-    onlyVideos: Boolean,
+    onlyVideos: Boolean = false,
   ) {
     isInSelectionMode = inSelectionMode
     onlyVideosSelected = onlyVideos
-    shouldHideNavigationBar = inSelectionMode && onlyVideos
+    shouldHideNavigationBar = inSelectionMode
   }
 
   fun updatePermissionState(denied: Boolean) {

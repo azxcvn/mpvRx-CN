@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.preferences.components
 
 import androidx.compose.foundation.clickable
@@ -40,29 +47,32 @@ fun SettingsClickableItem(
   isLastItem: Boolean = false,
   trailing: @Composable (() -> Unit)? = null,
 ) {
-  val shape = RoundedCornerShape(
-    topStart = if (isFirstItem) 16.dp else 0.dp,
-    topEnd = if (isFirstItem) 16.dp else 0.dp,
-    bottomStart = if (isLastItem) 16.dp else 0.dp,
-    bottomEnd = if (isLastItem) 16.dp else 0.dp,
-  )
+  val shape =
+    RoundedCornerShape(
+      topStart = if (isFirstItem) 16.dp else 0.dp,
+      topEnd = if (isFirstItem) 16.dp else 0.dp,
+      bottomStart = if (isLastItem) 16.dp else 0.dp,
+      bottomEnd = if (isLastItem) 16.dp else 0.dp,
+    )
 
   Surface(
-    modifier = modifier
-      .fillMaxWidth()
-      .clickable(
-        enabled = enabled,
-        onClick = onClick,
-        interactionSource = remember { MutableInteractionSource() },
-        indication = null,
-      ),
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .clickable(
+          enabled = enabled,
+          onClick = onClick,
+          interactionSource = remember { MutableInteractionSource() },
+          indication = null,
+        ),
     shape = shape,
     color = MaterialTheme.colorScheme.surfaceContainerLow,
   ) {
     Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp, vertical = 14.dp),
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 16.dp, vertical = 14.dp),
       verticalAlignment = Alignment.CenterVertically,
     ) {
       if (icon != null) {
@@ -145,7 +155,7 @@ fun SettingsSwitchItem(
         thumbContent = {
           if (isChecked) {
             Icon(
-              imageVector = Icons.Filled.Check,
+              imageVector = Icons.RoundedFilled.Check,
               contentDescription = null,
               modifier = Modifier.size(SwitchDefaults.IconSize),
               tint = MaterialTheme.colorScheme.onPrimaryContainer,

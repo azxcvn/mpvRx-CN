@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.player
 
 internal class ScreenUnlockPlaybackController {
@@ -8,7 +15,6 @@ internal class ScreenUnlockPlaybackController {
     wasPlayingBeforePause: Boolean,
     isCurrentlyPaused: Boolean?,
     backgroundPlaybackActive: Boolean,
-    isInPictureInPictureMode: Boolean,
     isUserFinishing: Boolean,
     isFinishing: Boolean,
   ) {
@@ -16,12 +22,13 @@ internal class ScreenUnlockPlaybackController {
 
     pendingResumeAfterUnlock =
       autoplayAfterScreenUnlockEnabled &&
-        wasPlayingWhenScreenTurnedOff &&
-        !backgroundPlaybackActive &&
-        !isInPictureInPictureMode &&
-        !isUserFinishing &&
-        !isFinishing
+      wasPlayingWhenScreenTurnedOff &&
+      !backgroundPlaybackActive &&
+      !isUserFinishing &&
+      !isFinishing
   }
+
+  fun hasPendingResume(): Boolean = pendingResumeAfterUnlock
 
   fun consumeResumeAfterUnlockIfReady(isDeviceLocked: Boolean): Boolean {
     if (!pendingResumeAfterUnlock || isDeviceLocked) return false

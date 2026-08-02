@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.repository.subtitle
 
 internal object EpisodeScopeMatcher {
@@ -76,18 +83,27 @@ internal object EpisodeScopeMatcher {
     wantedEpisode: Int,
   ): Boolean {
     val sxeRegex = Regex("""\bs\s*(\d{1,2})\s*e\s*(\d{1,4})\b""", RegexOption.IGNORE_CASE)
-    if (sxeRegex.findAll(text).any { it.groupValues[1].toIntOrNull() != wantedSeason || it.groupValues[2].toIntOrNull() != wantedEpisode }) {
+    if (sxeRegex.findAll(text).any {
+        it.groupValues[1].toIntOrNull() != wantedSeason ||
+          it.groupValues[2].toIntOrNull() != wantedEpisode
+      }
+    ) {
       return true
     }
 
     val crossRegex = Regex("""\b(\d{1,2})\s*x\s*(\d{1,4})\b""", RegexOption.IGNORE_CASE)
-    if (crossRegex.findAll(text).any { it.groupValues[1].toIntOrNull() != wantedSeason || it.groupValues[2].toIntOrNull() != wantedEpisode }) {
+    if (crossRegex.findAll(text).any {
+        it.groupValues[1].toIntOrNull() != wantedSeason ||
+          it.groupValues[2].toIntOrNull() != wantedEpisode
+      }
+    ) {
       return true
     }
 
     val seasonEpisodeRegex =
       Regex("""\bseason\s*(\d{1,2}).{0,16}\bepisode\s*(\d{1,4})\b""", RegexOption.IGNORE_CASE)
-    return seasonEpisodeRegex.findAll(text)
+    return seasonEpisodeRegex
+      .findAll(text)
       .any { it.groupValues[1].toIntOrNull() != wantedSeason || it.groupValues[2].toIntOrNull() != wantedEpisode }
   }
 }

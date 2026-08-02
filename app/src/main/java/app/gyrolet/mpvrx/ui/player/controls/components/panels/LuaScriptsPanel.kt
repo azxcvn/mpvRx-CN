@@ -1,7 +1,11 @@
-package app.gyrolet.mpvrx.ui.player.controls.components.panels
+﻿/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.player.controls.components.panels
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -21,9 +25,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import app.gyrolet.mpvrx.R
 import app.gyrolet.mpvrx.preferences.AdvancedPreferences
 import app.gyrolet.mpvrx.preferences.preference.collectAsState
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
 import app.gyrolet.mpvrx.ui.lua.LuaRuntimeStatusCard
 import app.gyrolet.mpvrx.ui.lua.LuaScriptToggleCard
 import app.gyrolet.mpvrx.ui.lua.LuaScriptsEmptyState
@@ -81,12 +89,14 @@ fun LuaScriptsPanel(
             .padding(top = MaterialTheme.spacing.small),
       ) {
         Text(
-          text = "脚本（Lua / JS）",
+          text =
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.pref_section_scripts),
           style = MaterialTheme.typography.titleLarge,
         )
         Spacer(Modifier.weight(1f))
         IconButton(onClick = onDismissRequest) {
-          Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(32.dp))
+          Icon(Icons.RoundedFilled.Close, contentDescription = null, modifier = Modifier.size(32.dp))
         }
       }
     },
@@ -112,14 +122,14 @@ fun LuaScriptsPanel(
         }
         mpvConfStorageLocation.isBlank() -> {
           LuaScriptsEmptyState(
-            title = "未选择 MPV 文件夹",
-            summary = "请在高级设置中选择 MPV 配置文件夹，然后重新打开此面板以管理脚本。",
+            title = stringResource(R.string.lua_no_mpv_folder),
+            summary = "Choose an MPV config folder in Advanced settings, then open this panel again to manage scripts.",
           )
         }
         catalog.availableScripts.isEmpty() -> {
           LuaScriptsEmptyState(
-            title = "未找到脚本",
-            summary = "将 .lua 或 .js 文件放入 MPV scripts 文件夹即可在此管理。",
+            title = stringResource(R.string.lua_no_scripts_found),
+            summary = "Put your .lua or .js files inside the MPV scripts folder to manage them here.",
           )
         }
         else -> {
@@ -138,4 +148,3 @@ fun LuaScriptsPanel(
     }
   }
 }
-

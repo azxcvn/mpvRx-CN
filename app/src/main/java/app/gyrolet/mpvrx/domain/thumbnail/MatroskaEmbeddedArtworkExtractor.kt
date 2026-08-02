@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.domain.thumbnail
 
 import android.graphics.Bitmap
@@ -97,10 +104,15 @@ internal object MatroskaEmbeddedArtworkExtractor {
     val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
     BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
     val sampleSize = calculateThumbnailSampleSize(options.outWidth, options.outHeight)
-    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size, BitmapFactory.Options().apply {
-      inSampleSize = sampleSize
-      inPreferredConfig = Bitmap.Config.RGB_565
-    })
+    return BitmapFactory.decodeByteArray(
+      bytes,
+      0,
+      bytes.size,
+      BitmapFactory.Options().apply {
+        inSampleSize = sampleSize
+        inPreferredConfig = Bitmap.Config.RGB_565
+      },
+    )
   }
 
   private fun readElementHeader(file: RandomAccessFile): ElementHeader? {

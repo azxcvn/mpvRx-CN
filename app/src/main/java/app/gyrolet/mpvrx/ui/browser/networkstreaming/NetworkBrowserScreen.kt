@@ -1,18 +1,21 @@
-﻿package app.gyrolet.mpvrx.ui.browser.networkstreaming
+﻿/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.browser.networkstreaming
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -22,18 +25,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import app.gyrolet.mpvrx.database.dao.NetworkConnectionDao
+import app.gyrolet.mpvrx.R
 import app.gyrolet.mpvrx.domain.network.NetworkConnection
 import app.gyrolet.mpvrx.domain.network.NetworkFile
 import app.gyrolet.mpvrx.preferences.preference.collectAsState
@@ -46,6 +48,7 @@ import app.gyrolet.mpvrx.ui.browser.components.ExpressiveScrollBar
 import app.gyrolet.mpvrx.ui.browser.components.fastScrollGlyph
 import app.gyrolet.mpvrx.ui.browser.playlist.PlaylistDetailScreen
 import app.gyrolet.mpvrx.ui.browser.states.EmptyState
+import app.gyrolet.mpvrx.ui.icons.Icons
 import app.gyrolet.mpvrx.ui.preferences.PreferencesScreen
 import app.gyrolet.mpvrx.ui.utils.LocalBackStack
 import app.gyrolet.mpvrx.ui.utils.popSafely
@@ -75,6 +78,7 @@ data class NetworkBrowserScreen(
       )
 
     val files by viewModel.files.collectAsState()
+    val connection by viewModel.connection.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
@@ -124,8 +128,7 @@ data class NetworkBrowserScreen(
     ) { padding ->
       NetworkBrowserContent(
         files = files,
-        connectionId = connectionId,
-        connectionName = connectionName,
+        connection = connection,
         isLoading = isLoading && files.isEmpty(),
         isRefreshing = isRefreshing,
         error = error,
@@ -151,8 +154,7 @@ data class NetworkBrowserScreen(
 @Composable
 private fun NetworkBrowserContent(
   files: List<NetworkFile>,
-  connectionId: Long,
-  connectionName: String,
+  connection: NetworkConnection?,
   isLoading: Boolean,
   isRefreshing: MutableState<Boolean>,
   error: String?,
@@ -161,20 +163,14 @@ private fun NetworkBrowserContent(
   onVideoClick: (NetworkFile) -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  // Load connection details
-  val dao = org.koin.compose.koinInject<NetworkConnectionDao>()
-  var connection by remember { mutableStateOf<NetworkConnection?>(null) }
-
-  LaunchedEffect(connectionId) {
-    connection = dao.getConnectionById(connectionId)
-  }
-
   when {
     isLoading -> {
       Box(
-        modifier = modifier
-          .fillMaxSize()
-          .padding(bottom = 80.dp), // Account for bottom navigation bar
+        modifier =
+          modifier
+            .fillMaxSize()
+            .padding(bottom = 80.dp),
+        // Account for bottom navigation bar
         contentAlignment = Alignment.Center,
       ) {
         CircularProgressIndicator(
@@ -190,8 +186,8 @@ private fun NetworkBrowserContent(
         contentAlignment = Alignment.Center,
       ) {
         EmptyState(
-          icon = Icons.Filled.Folder,
-          title = "加载文件出错",
+          icon = Icons.RoundedFilled.Folder,
+          title = stringResource(R.string.ui_error_loading_files),
           message = error,
         )
       }
@@ -203,17 +199,20 @@ private fun NetworkBrowserContent(
         contentAlignment = Alignment.Center,
       ) {
         EmptyState(
-          icon = Icons.Filled.Folder,
-          title = "空文件夹",
-          message = "此文件夹不包含任何文件或目录",
+          icon = Icons.RoundedFilled.Folder,
+          title = stringResource(R.string.ui_empty_folder),
+          message = "此文件夹中没有文件或目录",
         )
       }
     }
 
     else -> {
-      val folders = files.filter { it.isDirectory }
-      val videos = files.filter { !it.isDirectory && (it.mimeType?.startsWith("video/") == true || it.isM3uFile()) }
-      val networkListState = LazyListState()
+      val folders = remember(files) { files.filter { it.isDirectory } }
+      val videos =
+        remember(files) {
+          files.filter { !it.isDirectory && (it.mimeType?.startsWith("video/") == true || it.isM3uFile()) }
+        }
+      val networkListState = rememberLazyListState()
 
       // Only show scrollbar if list has more than 20 items (folders + videos)
       val hasEnoughItems = (folders.size + videos.size) > 20
@@ -221,10 +220,11 @@ private fun NetworkBrowserContent(
       // Animate scrollbar alpha
       val scrollbarAlpha by androidx.compose.animation.core.animateFloatAsState(
         targetValue = if (hasEnoughItems) 1f else 0f,
-        animationSpec = androidx.compose.animation.core.spring(
-          dampingRatio = app.gyrolet.mpvrx.ui.theme.AppMotion.Effect.Alpha.dampingRatio,
-          stiffness = app.gyrolet.mpvrx.ui.theme.AppMotion.Effect.Alpha.stiffness,
-        ),
+        animationSpec =
+          androidx.compose.animation.core.spring(
+            dampingRatio = app.gyrolet.mpvrx.ui.theme.AppMotion.Effect.Alpha.dampingRatio,
+            stiffness = app.gyrolet.mpvrx.ui.theme.AppMotion.Effect.Alpha.stiffness,
+          ),
         label = "scrollbarAlpha",
       )
 
@@ -234,39 +234,44 @@ private fun NetworkBrowserContent(
         listState = networkListState,
         modifier = modifier.fillMaxSize(),
       ) {
-        val scrollbarLabels = remember(folders, videos) {
-          buildList<String?> {
-            if (folders.isNotEmpty()) {
-              add(null)
-              addAll(folders.map { it.name })
-            }
-            if (videos.isNotEmpty()) {
-              add(null)
-              addAll(videos.map { it.name })
+        val scrollbarLabels =
+          remember(folders, videos) {
+            buildList<String?> {
+              if (folders.isNotEmpty()) {
+                add(null)
+                addAll(folders.map { it.name })
+              }
+              if (videos.isNotEmpty()) {
+                add(null)
+                addAll(videos.map { it.name })
+              }
             }
           }
-        }
         val navigationBarHeight = app.gyrolet.mpvrx.ui.browser.LocalNavigationBarHeight.current
         Box(
-          modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = navigationBarHeight)
+          modifier =
+            Modifier
+              .fillMaxSize()
+              .padding(bottom = navigationBarHeight),
         ) {
           LazyColumn(
             state = networkListState,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(
-              start = 8.dp,
-              end = 8.dp,
-              top = 8.dp,
-              bottom = navigationBarHeight
-            ),
+            contentPadding =
+              PaddingValues(
+                start = 8.dp,
+                end = 8.dp,
+                top = 8.dp,
+                bottom = navigationBarHeight,
+              ),
           ) {
             // Folders section
             if (folders.isNotEmpty()) {
               item {
                 Text(
-                  text = "文件夹",
+                  text =
+                    androidx.compose.ui.res
+                      .stringResource(app.gyrolet.mpvrx.R.string.pref_folders_title),
                   style = MaterialTheme.typography.titleMedium,
                   color = MaterialTheme.colorScheme.primary,
                   modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
@@ -288,7 +293,9 @@ private fun NetworkBrowserContent(
             if (videos.isNotEmpty()) {
               item {
                 Text(
-                  text = "视频",
+                  text =
+                    androidx.compose.ui.res
+                      .stringResource(app.gyrolet.mpvrx.R.string.ui_videos),
                   style = MaterialTheme.typography.titleMedium,
                   color = MaterialTheme.colorScheme.primary,
                   modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
@@ -316,10 +323,11 @@ private fun NetworkBrowserContent(
               dragLabelProvider = { index: Int ->
                 fastScrollGlyph(scrollbarLabels.getOrNull(index))
               },
-              modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding(end = 4.dp)
-                .graphicsLayer { alpha = scrollbarAlpha },
+              modifier =
+                Modifier
+                  .align(Alignment.CenterEnd)
+                  .padding(end = 4.dp)
+                  .graphicsLayer { alpha = scrollbarAlpha },
             )
           }
         }
@@ -335,11 +343,11 @@ private fun NetworkFile.isM3uFile(): Boolean {
     lowerName.endsWith(".m3u8") ||
     lowerPath.endsWith(".m3u") ||
     lowerPath.endsWith(".m3u8") ||
-    mimeType in setOf(
+    mimeType in
+    setOf(
       "application/x-mpegurl",
       "application/vnd.apple.mpegurl",
       "audio/x-mpegurl",
       "audio/mpegurl",
     )
 }
-

@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.player
 
 import dev.vivvvek.seeker.Segment
@@ -20,7 +27,7 @@ data class TrackNode(
   val title: String? = null,
   val lang: String? = null,
   val image: Boolean? = null,
-  @SerialName("albumArt") val albumArt: Boolean? = null,
+  @SerialName("albumart") val albumArt: Boolean? = null,
   val default: Boolean? = null,
   val forced: Boolean? = null,
   val dependent: Boolean? = null,
@@ -62,7 +69,8 @@ data class TrackNode(
   val metadata: Map<String, String?>? = null,
 ) {
   val isAudio = type == "audio"
+  val isVideo = type == "video"
+  val isAlbumArtwork = albumArt == true || image == true
   val isSubtitle = type == "sub"
   val isSelected = selected == true
 }
-

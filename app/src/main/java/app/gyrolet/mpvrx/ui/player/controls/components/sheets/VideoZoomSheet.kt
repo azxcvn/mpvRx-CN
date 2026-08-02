@@ -1,7 +1,11 @@
-package app.gyrolet.mpvrx.ui.player.controls.components.sheets
+﻿/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.player.controls.components.sheets
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
@@ -41,6 +45,8 @@ import app.gyrolet.mpvrx.preferences.PlayerPreferences
 import app.gyrolet.mpvrx.preferences.preference.collectAsState
 import app.gyrolet.mpvrx.presentation.components.PlayerSheet
 import app.gyrolet.mpvrx.presentation.components.SliderItem
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
 import app.gyrolet.mpvrx.ui.theme.spacing
 import `is`.xyz.mpv.MPVLib
 import org.koin.compose.koinInject
@@ -132,7 +138,13 @@ private fun ZoomVideoSheet(
         },
         modifier = Modifier.size(36.dp),
       ) {
-        Icon(Icons.Default.Remove, contentDescription = "缩小", modifier = Modifier.size(18.dp))
+        Icon(
+          Icons.RoundedFilled.Remove,
+          contentDescription =
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.ui_decrease_zoom),
+          modifier = Modifier.size(18.dp),
+        )
       }
 
       SliderItem(
@@ -152,7 +164,13 @@ private fun ZoomVideoSheet(
         },
         modifier = Modifier.size(36.dp),
       ) {
-        Icon(Icons.Default.Add, contentDescription = "放大", modifier = Modifier.size(18.dp))
+        Icon(
+          Icons.RoundedFilled.Add,
+          contentDescription =
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.ui_increase_zoom),
+          modifier = Modifier.size(18.dp),
+        )
       }
     }
 
@@ -181,29 +199,31 @@ private fun ZoomVideoSheet(
             Crossfade(
               targetState = panAndZoomEnabled,
               animationSpec = tween(durationMillis = 200),
-              label = "SwitchIconAnimation"
+              label = "SwitchIconAnimation",
             ) { isChecked ->
               if (isChecked) {
                 Icon(
-                  Icons.Filled.Check,
+                  Icons.RoundedFilled.Check,
                   contentDescription = null,
                   modifier = Modifier.size(SwitchDefaults.IconSize),
-                  tint = MaterialTheme.colorScheme.onPrimaryContainer
+                  tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
               } else {
                 Icon(
-                  Icons.Filled.Close,
+                  Icons.RoundedFilled.Close,
                   contentDescription = null,
                   modifier = Modifier.size(SwitchDefaults.IconSize),
-                  tint = MaterialTheme.colorScheme.onSurfaceVariant
+                  tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
               }
             }
-          }
+          },
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-          text = "平移与缩放",
+          text =
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.ui_pan_zoom),
           style = MaterialTheme.typography.bodyMedium,
           color = if (panAndZoomEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -233,7 +253,3 @@ private fun ZoomVideoSheet(
     }
   }
 }
-
-
-
-

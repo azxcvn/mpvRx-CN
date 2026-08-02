@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.repository.ai
 
 import kotlinx.coroutines.Dispatchers
@@ -30,34 +37,21 @@ private data class OpenAiMessage(
 )
 
 @Serializable
-private data class OpenAiChoice(
-  val message: OpenAiMessage? = null,
+private data class OpenAiErrorBody(
+  val error: OpenAiErrorDetail? = null,
 )
 
 @Serializable
-private data class OpenAiUsage(
-  @SerialName("prompt_tokens") val promptTokens: Int = 0,
-  @SerialName("completion_tokens") val completionTokens: Int = 0,
+private data class OpenAiErrorDetail(
+  val message: String? = null,
 )
-
-@Serializable
-private data class OpenAiResponse(
-  val choices: List<OpenAiChoice>? = null,
-  val usage: OpenAiUsage? = null,
-)
-
-@Serializable
-private data class OpenAiErrorBody(val error: OpenAiErrorDetail? = null)
-
-@Serializable
-private data class OpenAiErrorDetail(val message: String? = null)
 
 @Serializable
 private data class OpenAiChatRequest(
   val model: String,
   val messages: List<OpenAiMessage>,
-  val temperature: Double = 0.3,
-  @SerialName("max_tokens") val maxTokens: Int = 200,
+  val temperature: Double? = null,
+  @SerialName("max_completion_tokens") val maxCompletionTokens: Int = 200,
 )
 
 class OpenAiClient(
@@ -65,55 +59,61 @@ class OpenAiClient(
   private val json: Json,
 ) : AiClient {
   companion object {
-    private const val TAG = "OpenAiClient"
     private const val BASE_URL = "https://api.openai.com/v1"
     private val JSON_MEDIA_TYPE = "application/json".toMediaType()
   }
 
   private val apiClient: OkHttpClient =
-    client.newBuilder()
+    client
+      .newBuilder()
       .connectTimeout(60, TimeUnit.SECONDS)
       .readTimeout(120, TimeUnit.SECONDS)
       .writeTimeout(60, TimeUnit.SECONDS)
       .build()
 
-  override suspend fun fetchModels(apiKey: String): Result<List<AiModelInfo>> = withContext(Dispatchers.IO) {
-    runCatching {
-      val request = Request.Builder()
-        .url("$BASE_URL/models")
-        .header("Authorization", "Bearer $apiKey")
-        .get()
-        .build()
+  override suspend fun fetchModels(apiKey: String): Result<List<AiModelInfo>> =
+    withContext(Dispatchers.IO) {
+      runCatching {
+        val request =
+          Request
+            .Builder()
+            .url("$BASE_URL/models")
+            .header("Authorization", "Bearer $apiKey")
+            .get()
+            .build()
 
-      val response = apiClient.newCall(request).execute()
-      val body = response.body.string()
+        val response = apiClient.newCall(request).execute()
+        val body = response.body.string()
 
-      if (!response.isSuccessful) throw Exception("OpenAI API error ${response.code}: ${parseError(body)}")
+        if (!response.isSuccessful) throw Exception("OpenAI API error ${response.code}: ${parseError(body)}")
 
-      val parsed = json.decodeFromString<OpenAiModelListResponse>(body)
-      parsed.data.map { model ->
-        AiModelInfo(
-          id = model.id,
-          displayName = model.id,
-          isFree = AiModelPricing.isZeroCost(model.pricing),
-        )
+        val parsed = json.decodeFromString<OpenAiModelListResponse>(body)
+        parsed.data.filter { AiModelCapabilities.isTextGenerationModel(it.id) }.map { model ->
+          AiModelInfo(
+            id = model.id,
+            displayName = model.id,
+            isFree = AiModelPricing.isZeroCost(model.pricing),
+          )
+        }
       }
     }
-  }
 
-  override suspend fun verifyKey(apiKey: String): Result<String> = withContext(Dispatchers.IO) {
-    runCatching {
-      val request = Request.Builder()
-        .url("$BASE_URL/models")
-        .header("Authorization", "Bearer $apiKey")
-        .get()
-        .build()
+  override suspend fun verifyKey(apiKey: String): Result<String> =
+    withContext(Dispatchers.IO) {
+      runCatching {
+        val request =
+          Request
+            .Builder()
+            .url("$BASE_URL/models")
+            .header("Authorization", "Bearer $apiKey")
+            .get()
+            .build()
 
-      val response = apiClient.newCall(request).execute()
-      if (!response.isSuccessful) throw Exception("Invalid API key: ${response.code}")
-      "API key verified successfully"
+        val response = apiClient.newCall(request).execute()
+        if (!response.isSuccessful) throw Exception("Invalid API key: ${response.code}")
+        "API key verified successfully"
+      }
     }
-  }
 
   override suspend fun generateContent(
     apiKey: String,
@@ -121,42 +121,55 @@ class OpenAiClient(
     instruction: String,
     userInput: String,
     options: AiGenerationOptions,
-  ): Result<String> = withContext(Dispatchers.IO) {
-    runCatching {
-      val requestBody = json.encodeToString(
-        OpenAiChatRequest.serializer(),
-        OpenAiChatRequest(
-          model = model,
-          messages = listOf(
-            OpenAiMessage(role = "system", content = instruction),
-            OpenAiMessage(role = "user", content = userInput),
-          ),
-          temperature = options.temperature,
-          maxTokens = options.maxTokens,
-        ),
-      )
+  ): Result<AiGeneratedContent> =
+    withContext(Dispatchers.IO) {
+      runCatching {
+        val requestBody =
+          json.encodeToString(
+            OpenAiChatRequest.serializer(),
+            OpenAiChatRequest(
+              model = model,
+              messages =
+                listOf(
+                  OpenAiMessage(role = if (isReasoningModel(model)) "developer" else "system", content = instruction),
+                  OpenAiMessage(role = "user", content = userInput),
+                ),
+              temperature = options.temperature.takeUnless { isReasoningModel(model) },
+              maxCompletionTokens = options.maxTokens,
+            ),
+          )
 
-      val request = Request.Builder()
-        .url("$BASE_URL/chat/completions")
-        .header("Authorization", "Bearer $apiKey")
-        .post(requestBody.toRequestBody(JSON_MEDIA_TYPE))
-        .build()
+        val request =
+          Request
+            .Builder()
+            .url("$BASE_URL/chat/completions")
+            .header("Authorization", "Bearer $apiKey")
+            .post(requestBody.toRequestBody(JSON_MEDIA_TYPE))
+            .build()
 
-      val response = apiClient.newCall(request).execute()
-      val body = response.body.string()
+        val response = apiClient.newCall(request).execute()
+        val body = response.body.string()
 
-      if (!response.isSuccessful) throw Exception("OpenAI generate error ${response.code}: ${parseError(body)}")
+        if (!response.isSuccessful) throw Exception("OpenAI generate error ${response.code}: ${parseError(body)}")
 
-      val parsed = json.decodeFromString<OpenAiResponse>(body)
-      parsed.choices?.firstOrNull()?.message?.content?.trim()
-        ?: throw Exception("No response from OpenAI")
+        AiResponseParser.openAiCompatible(json, body, "OpenAI")
+      }
     }
-  }
 
-  private fun parseError(body: String): String = try {
-    val error = json.decodeFromString<OpenAiErrorBody>(body)
-    error.error?.message ?: body
-  } catch (_: Exception) {
-    body.take(200)
+  private fun parseError(body: String): String =
+    try {
+      val error = json.decodeFromString<OpenAiErrorBody>(body)
+      error.error?.message ?: body
+    } catch (_: Exception) {
+      body.take(200)
+    }
+
+  private fun isReasoningModel(model: String): Boolean {
+    val id = model.substringAfterLast('/').lowercase()
+    return id.startsWith("o1") ||
+      id.startsWith("o3") ||
+      id.startsWith("o4") ||
+      id.startsWith("gpt-5") ||
+      id.contains("codex")
   }
 }

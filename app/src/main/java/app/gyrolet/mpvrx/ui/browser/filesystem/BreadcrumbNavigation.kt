@@ -1,7 +1,11 @@
-package app.gyrolet.mpvrx.ui.browser.filesystem
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.browser.filesystem
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.gyrolet.mpvrx.domain.browser.PathComponent
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
 
 @Composable
 fun BreadcrumbNavigation(
@@ -44,8 +50,10 @@ fun BreadcrumbNavigation(
     breadcrumbs.forEachIndexed { index, component ->
       if (index > 0) {
         Icon(
-          imageVector = Icons.Filled.ChevronRight,
-          contentDescription = "Separator",
+          imageVector = Icons.RoundedFilled.ChevronRight,
+          contentDescription =
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.ui_separator),
           tint = MaterialTheme.colorScheme.onSurfaceVariant,
           modifier = Modifier.padding(horizontal = 4.dp),
         )
@@ -71,7 +79,3 @@ fun BreadcrumbNavigation(
     }
   }
 }
-
-
-
-

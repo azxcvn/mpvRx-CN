@@ -1,15 +1,23 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.browser.videolist
 
 import android.app.Application
 import android.util.Log
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import app.gyrolet.mpvrx.database.entities.PlaybackStateEntity
 import app.gyrolet.mpvrx.domain.media.model.Video
 import app.gyrolet.mpvrx.domain.playbackstate.repository.PlaybackStateRepository
 import app.gyrolet.mpvrx.repository.MediaFileRepository
 import app.gyrolet.mpvrx.ui.browser.base.BaseBrowserViewModel
-import app.gyrolet.mpvrx.utils.history.RecentlyPlayedOps
 import app.gyrolet.mpvrx.utils.media.MediaLibraryEvents
 import app.gyrolet.mpvrx.utils.media.MetadataRetrieval
 import app.gyrolet.mpvrx.utils.media.PlaybackStateEvents
@@ -24,11 +32,11 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
-import androidx.compose.runtime.Immutable
 
 @Immutable
 data class VideoWithPlaybackInfo(
@@ -67,20 +75,24 @@ class VideoListViewModel(
     recentlyPlayedRepository
       .observeRecentlyPlayed(limit = 100)
       .map { recentlyPlayedList ->
-        val folderPath = _videos.value.firstOrNull()?.path?.let { File(it).parent }
+        val folderPath =
+          _videos.value
+            .firstOrNull()
+            ?.path
+            ?.let { File(it).parent }
         if (folderPath != null) {
-          recentlyPlayedList.firstOrNull { entity ->
-            try {
-              File(entity.filePath).parent == folderPath
-            } catch (_: Exception) {
-              false
-            }
-          }?.filePath
+          recentlyPlayedList
+            .firstOrNull { entity ->
+              try {
+                File(entity.filePath).parent == folderPath
+              } catch (_: Exception) {
+                false
+              }
+            }?.filePath
         } else {
           null
         }
-      }
-      .distinctUntilChanged()
+      }.distinctUntilChanged()
       .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
   // Track previous video count to detect if folder became empty
@@ -93,12 +105,10 @@ class VideoListViewModel(
 
     // Listen for global media library changes and refresh this list when they occur
     viewModelScope.launch(Dispatchers.IO) {
-        MediaLibraryEvents.changes.collectLatest {
-          // Clear cache when media library changes
-          MediaFileRepository.clearCache()
-          loadVideos()
-        }
+      MediaLibraryEvents.changes.collectLatest {
+        loadVideos()
       }
+    }
 
     viewModelScope.launch(Dispatchers.IO) {
       PlaybackStateEvents.changes.collectLatest {
@@ -129,21 +139,23 @@ class VideoListViewModel(
     viewModelScope.launch(Dispatchers.IO) {
       try {
         // First attempt to load videos (basic info from MediaStore)
-        var videoList = MediaFileRepository.getVideosInFolder(
-          getApplication(),
-          bucketId,
-          forceFileSystemCheck = forceFileSystemCheck,
-        )
+        var videoList =
+          MediaFileRepository.getVideosInFolder(
+            getApplication(),
+            bucketId,
+            forceFileSystemCheck = forceFileSystemCheck,
+          )
 
         // Enrich with metadata only if chips are enabled
         if (MetadataRetrieval.isVideoMetadataNeeded(browserPreferences)) {
           Log.d(tag, "Metadata chips enabled, enriching ${videoList.size} videos")
-          videoList = MetadataRetrieval.enrichVideosIfNeeded(
-            context = getApplication(),
-            videos = videoList,
-            browserPreferences = browserPreferences,
-            metadataCache = metadataCache
-          )
+          videoList =
+            MetadataRetrieval.enrichVideosIfNeeded(
+              context = getApplication(),
+              videos = videoList,
+              browserPreferences = browserPreferences,
+              metadataCache = metadataCache,
+            )
         } else {
           Log.d(tag, "Metadata chips disabled, skipping metadata extraction")
         }
@@ -164,20 +176,22 @@ class VideoListViewModel(
           Log.d(tag, "No videos found for bucket $bucketId - attempting media rescan")
           triggerMediaScan()
           delay(1000)
-          var retryVideoList = MediaFileRepository.getVideosInFolder(
-            getApplication(),
-            bucketId,
-            forceFileSystemCheck = true,
-          )
+          var retryVideoList =
+            MediaFileRepository.getVideosInFolder(
+              getApplication(),
+              bucketId,
+              forceFileSystemCheck = true,
+            )
 
           // Enrich retry list if needed
           if (MetadataRetrieval.isVideoMetadataNeeded(browserPreferences)) {
-            retryVideoList = MetadataRetrieval.enrichVideosIfNeeded(
-              context = getApplication(),
-              videos = retryVideoList,
-              browserPreferences = browserPreferences,
-              metadataCache = metadataCache
-            )
+            retryVideoList =
+              MetadataRetrieval.enrichVideosIfNeeded(
+                context = getApplication(),
+                videos = retryVideoList,
+                browserPreferences = browserPreferences,
+                metadataCache = metadataCache,
+              )
           }
 
           // Update count after retry
@@ -218,34 +232,36 @@ class VideoListViewModel(
         val watchedThreshold = browserPreferences.watchedThreshold.get()
 
         // Calculate watch progress (0.0 to 1.0)
-        val progress = if (playbackState != null && video.duration > 0) {
-          // Duration is in milliseconds, convert to seconds
-          val durationSeconds = video.duration / 1000
-          val timeRemaining = playbackState.timeRemaining.toLong()
-          val watched = durationSeconds - timeRemaining
-          val progressValue = (watched.toFloat() / durationSeconds.toFloat()).coerceIn(0f, 1f)
+        val progress =
+          if (playbackState != null && video.duration > 0) {
+            // Duration is in milliseconds, convert to seconds
+            val durationSeconds = video.duration / 1000
+            val timeRemaining = playbackState.timeRemaining.toLong()
+            val watched = durationSeconds - timeRemaining
+            val progressValue = (watched.toFloat() / durationSeconds.toFloat()).coerceIn(0f, 1f)
 
-          // Only show progress for videos that are 1-99% complete
-          if (progressValue in 0.01f..0.99f) progressValue else null
-        } else {
-          null
-        }
+            // Only show progress for videos that are 1-99% complete
+            if (progressValue in 0.01f..0.99f) progressValue else null
+          } else {
+            null
+          }
 
         // Check if video is old and unplayed
         // Video is old if it's been more than threshold days since it was added/modified
         // Video is unplayed if there's no playback state record
         val isOldAndUnplayed = playbackState == null
 
-        val isWatched = if (playbackState != null && video.duration > 0) {
-           val durationSeconds = video.duration / 1000
-           val timeRemaining = playbackState.timeRemaining.toLong()
-           val watched = durationSeconds - timeRemaining
-           val progressValue = (watched.toFloat() / durationSeconds.toFloat()).coerceIn(0f, 1f)
-           val calculatedWatched = progressValue >= (watchedThreshold / 100f)
-           playbackState.hasBeenWatched || calculatedWatched
-        } else {
-           false
-        }
+        val isWatched =
+          playbackState?.hasBeenWatched == true ||
+            if (playbackState != null && video.duration > 0) {
+              val durationSeconds = video.duration / 1000
+              val timeRemaining = playbackState.timeRemaining.toLong()
+              val watched = durationSeconds - timeRemaining
+              val progressValue = (watched.toFloat() / durationSeconds.toFloat()).coerceIn(0f, 1f)
+              progressValue >= (watchedThreshold / 100f)
+            } else {
+              false
+            }
 
         VideoWithPlaybackInfo(
           video = video,
@@ -258,22 +274,93 @@ class VideoListViewModel(
     _videosWithPlaybackInfo.value = videosWithInfo
   }
 
+  fun setWatched(
+    video: Video,
+    watched: Boolean,
+  ) {
+    _videosWithPlaybackInfo.update { videos ->
+      videos.map { item ->
+        if (item.video.path == video.path) {
+          item.copy(
+            timeRemaining = if (watched) 0L else (video.duration / 1000L).coerceAtLeast(0L),
+            progressPercentage = null,
+            isOldAndUnplayed = false,
+            isWatched = watched,
+          )
+        } else {
+          item
+        }
+      }
+    }
+
+    viewModelScope.launch(Dispatchers.IO) {
+      val durationSeconds = (video.duration / 1000L).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+      runCatching {
+        val existing = playbackStateRepository.getVideoDataByTitle(video.displayName)
+        playbackStateRepository.upsert(
+          (existing ?: emptyPlaybackState(video, durationSeconds)).copy(
+            lastPosition = 0,
+            timeRemaining = if (watched) 0 else durationSeconds,
+            hasBeenWatched = watched,
+          ),
+        )
+        PlaybackStateEvents.notifyChanged(video.displayName)
+      }.onFailure { error ->
+        Log.e(tag, "Failed to update watched state for ${video.displayName}", error)
+        loadPlaybackInfo(_videos.value)
+      }
+    }
+  }
+
+  private fun emptyPlaybackState(
+    video: Video,
+    durationSeconds: Int,
+  ): PlaybackStateEntity =
+    PlaybackStateEntity(
+      mediaTitle = video.displayName,
+      lastPosition = 0,
+      playbackSpeed = 1.0,
+      sid = -1,
+      secondarySid = -1,
+      subDelay = 0,
+      subSpeed = 1.0,
+      aid = -1,
+      audioDelay = 0,
+      timeRemaining = durationSeconds,
+      hasBeenWatched = false,
+    )
+
   private fun triggerMediaScan() {
     try {
       // Trigger a targeted media scan for the specific folder
       val folder = File(bucketId)
-      
+
       if (folder.exists() && folder.isDirectory) {
         // Scan all video files in the folder
-        val videoFiles = folder.listFiles { file ->
-          file.isFile && file.extension.lowercase() in listOf(
-            "mp4", "mkv", "avi", "mov", "wmv", "flv", "webm", "m4v", "3gp", "mpg", "mpeg", "ts", "m2ts"
-          )
-        }
-        
+        val videoFiles =
+          folder.listFiles { file ->
+            file.isFile &&
+              file.extension.lowercase() in
+              listOf(
+                "mp4",
+                "mkv",
+                "avi",
+                "mov",
+                "wmv",
+                "flv",
+                "webm",
+                "m4v",
+                "3gp",
+                "mpg",
+                "mpeg",
+                "ts",
+                "m2ts",
+              )
+          }
+
         if (!videoFiles.isNullOrEmpty()) {
           val filePaths = videoFiles.map { it.absolutePath }.toTypedArray()
-          
+
           android.media.MediaScannerConnection.scanFile(
             getApplication(),
             filePaths,
@@ -281,7 +368,7 @@ class VideoListViewModel(
           ) { path, uri ->
             Log.d(tag, "Media scan completed for: $path -> $uri")
           }
-          
+
           Log.d(tag, "Triggered media scan for ${filePaths.size} files in: $bucketId")
         } else {
           Log.d(tag, "No video files found in folder: $bucketId")
@@ -313,4 +400,3 @@ class VideoListViewModel(
     }
   }
 }
-

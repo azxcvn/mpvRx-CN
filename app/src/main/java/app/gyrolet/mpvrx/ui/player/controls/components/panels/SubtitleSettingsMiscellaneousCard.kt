@@ -1,7 +1,11 @@
-package app.gyrolet.mpvrx.ui.player.controls.components.panels
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.player.controls.components.panels
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,12 +18,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import app.gyrolet.mpvrx.R
@@ -28,14 +32,16 @@ import app.gyrolet.mpvrx.preferences.SubtitlesPreferences
 import app.gyrolet.mpvrx.preferences.preference.deleteAndGet
 import app.gyrolet.mpvrx.presentation.components.ExpandableCard
 import app.gyrolet.mpvrx.presentation.components.SliderItem
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
 import app.gyrolet.mpvrx.ui.player.applySubtitleLayout
 import app.gyrolet.mpvrx.ui.player.controls.CARDS_MAX_WIDTH
 import app.gyrolet.mpvrx.ui.player.controls.components.sheets.toFixed
 import app.gyrolet.mpvrx.ui.player.controls.panelCardsColors
+import app.gyrolet.mpvrx.ui.preferences.components.SwitchPreference
 import app.gyrolet.mpvrx.ui.theme.spacing
 import `is`.xyz.mpv.MPVLib
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
-import app.gyrolet.mpvrx.ui.preferences.components.SwitchPreference
 import org.koin.compose.koinInject
 
 @Composable
@@ -47,7 +53,7 @@ fun SubtitlesMiscellaneousCard(modifier: Modifier = Modifier) {
     isExpanded,
     title = {
       Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
-        Icon(Icons.Default.Tune, null)
+        Icon(Icons.RoundedFilled.Tune, null)
         Text(stringResource(R.string.player_sheets_sub_misc_card_title))
       }
     },
@@ -114,7 +120,7 @@ fun SubtitlesMiscellaneousCard(modifier: Modifier = Modifier) {
           max = 5f,
           icon = {
             Icon(
-              Icons.Default.FormatSize,
+              Icons.RoundedFilled.FormatSize,
               null,
             )
           },
@@ -130,7 +136,7 @@ fun SubtitlesMiscellaneousCard(modifier: Modifier = Modifier) {
           max = 150,
           icon = {
             Icon(
-              Icons.Default.AlignVerticalCenter,
+              Icons.RoundedFilled.AlignVerticalCenter,
               null,
             )
           },
@@ -163,7 +169,7 @@ fun SubtitlesMiscellaneousCard(modifier: Modifier = Modifier) {
             },
           ) {
             Row {
-              Icon(Icons.Default.EditOff, null)
+              Icon(Icons.RoundedFilled.EditOff, null)
               Text(stringResource(R.string.generic_reset))
             }
           }
@@ -172,7 +178,3 @@ fun SubtitlesMiscellaneousCard(modifier: Modifier = Modifier) {
     }
   }
 }
-
-
-
-

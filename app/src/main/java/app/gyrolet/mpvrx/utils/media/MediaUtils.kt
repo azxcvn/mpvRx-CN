@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.utils.media
 
 import android.content.Context
@@ -8,9 +15,9 @@ import androidx.core.net.toUri
 import app.gyrolet.mpvrx.domain.media.model.Video
 import app.gyrolet.mpvrx.ui.player.PlayerActivity
 import app.gyrolet.mpvrx.ui.player.PlayerLookupHints
-import app.gyrolet.mpvrx.utils.history.RecentlyPlayedOps
 import `is`.xyz.mpv.Utils
 import java.io.File
+import kotlin.math.pow
 
 data class PlaybackSubtitleTrack(
   val url: String,
@@ -69,14 +76,25 @@ object MediaUtils {
         is Video -> {
           val intent = Intent(Intent.ACTION_VIEW, source.uri)
           intent.setClass(context, PlayerActivity::class.java)
+          intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+          intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
           intent.putExtra("internal_launch", true) // Enables subtitle autoload
+          source.path.takeIf { java.io.File(it).isFile }?.let { intent.putExtra("local_media_path", it) }
+          intent.putExtra("is_audio", source.isAudio)
           applyPlaybackExtras(
             intent = intent,
             launchSource = launchSource,
-            title = title
-              ?: source.title.takeIf { shouldForwardVideoTitle(source) && it.isNotBlank() }
-              ?: source.displayName.takeIf { shouldForwardVideoTitle(source) && it.isNotBlank() }
-              ?: if (launchSource != null && (launchSource.contains("playlist") || launchSource == "m3u_playlist")) source.displayName else null,
+            title =
+              title
+                ?: source.title.takeIf { shouldForwardVideoTitle(source) && it.isNotBlank() }
+                ?: source.displayName.takeIf { shouldForwardVideoTitle(source) && it.isNotBlank() }
+                ?: if (launchSource != null &&
+                  (launchSource.contains("playlist") || launchSource == "m3u_playlist")
+                ) {
+                  source.displayName
+                } else {
+                  null
+                },
             headers = headers,
             subtitles = subtitles,
             enabledSubtitles = enabledSubtitles,
@@ -92,11 +110,12 @@ object MediaUtils {
           // Handle file paths with # characters properly
           if (source.startsWith("/") || source.startsWith("file://")) {
             // It's a local file path - create URI safely
-            val filePath = if (source.startsWith("file://")) {
-              source.removePrefix("file://")
-            } else {
-              source
-            }
+            val filePath =
+              if (source.startsWith("file://")) {
+                source.removePrefix("file://")
+              } else {
+                source
+              }
             Uri.fromFile(java.io.File(filePath))
           } else {
             // It's likely a network URI - parse normally
@@ -157,15 +176,19 @@ object MediaUtils {
     val effectiveSubtitleTracks =
       if (subtitleTracks.isNotEmpty()) {
         subtitleTracks.mapNotNull { track ->
-          track.url.takeIf { it.isNotBlank() }?.let(Uri::parse)?.let { uri -> uri to track }
+          track.url
+            .takeIf { it.isNotBlank() }
+            ?.let(Uri::parse)
+            ?.let { uri -> uri to track }
         }
       } else {
         subtitles.map { uri ->
-          uri to PlaybackSubtitleTrack(
-            url = uri.toString(),
-            label = "",
-            languageCode = null,
-          )
+          uri to
+            PlaybackSubtitleTrack(
+              url = uri.toString(),
+              label = "",
+              languageCode = null,
+            )
         }
       }
 
@@ -189,6 +212,7 @@ object MediaUtils {
   }
 
   private fun shouldForwardVideoTitle(source: Video): Boolean {
+    if (source.isAudio) return true
     val scheme = source.uri.scheme?.lowercase() ?: return false
     return scheme !in setOf("file", "content", "android.resource")
   }
@@ -273,4 +297,10 @@ object MediaUtils {
     )
   }
 
+  fun formatFileSize(bytes: Long): String {
+    if (bytes <= 0) return "0 B"
+    val units = arrayOf("B", "KB", "MB", "GB")
+    val digitGroups = (kotlin.math.ln(bytes.toDouble()) / kotlin.math.ln(1024.0)).toInt().coerceIn(0, units.size - 1)
+    return "${java.text.DecimalFormat("#,##0.#").format(bytes / 1024.0.pow(digitGroups))} ${units[digitGroups]}"
+  }
 }

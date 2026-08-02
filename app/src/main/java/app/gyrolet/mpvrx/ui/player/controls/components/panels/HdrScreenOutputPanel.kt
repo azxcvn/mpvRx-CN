@@ -1,7 +1,11 @@
-package app.gyrolet.mpvrx.ui.player.controls.components.panels
+﻿/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.player.controls.components.panels
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -15,9 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import app.gyrolet.mpvrx.ui.theme.AppShapeScale
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -29,10 +31,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
 import app.gyrolet.mpvrx.ui.player.HdrScreenMode
 import app.gyrolet.mpvrx.ui.player.PlayerViewModel
+import app.gyrolet.mpvrx.ui.theme.AppShapeScale
 import app.gyrolet.mpvrx.ui.theme.spacing
 
 @Composable
@@ -43,6 +49,7 @@ fun HdrScreenOutputPanel(
 ) {
   val mode by viewModel.hdrScreenMode.collectAsState()
   val pipelineReady by viewModel.isHdrScreenOutputPipelineReady.collectAsState()
+  val isLinearHdrAvailable by viewModel.isLinearHdrAvailable.collectAsState()
 
   DraggablePanel(
     modifier = modifier,
@@ -50,18 +57,21 @@ fun HdrScreenOutputPanel(
       Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = MaterialTheme.spacing.medium)
-          .padding(top = MaterialTheme.spacing.small),
+        modifier =
+          Modifier
+            .fillMaxWidth()
+            .padding(horizontal = MaterialTheme.spacing.medium)
+            .padding(top = MaterialTheme.spacing.small),
       ) {
         Text(
-          text = "HDR 输出",
+          text =
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.ui_hdr_output),
           style = MaterialTheme.typography.titleLarge,
         )
         Spacer(Modifier.weight(1f))
         IconButton(onClick = onDismissRequest) {
-          Icon(Icons.Default.Close, null, modifier = Modifier.size(32.dp))
+          Icon(Icons.RoundedFilled.Close, null, modifier = Modifier.size(32.dp))
         }
       }
     },
@@ -79,7 +89,7 @@ fun HdrScreenOutputPanel(
         HdrModeOption(
           mode = option,
           selected = mode == option,
-          enabled = pipelineReady,
+          enabled = pipelineReady && (option != HdrScreenMode.LINEAR || isLinearHdrAvailable),
           onClick = { viewModel.setHdrScreenMode(option) },
         )
       }
@@ -88,9 +98,7 @@ fun HdrScreenOutputPanel(
 }
 
 @Composable
-private fun HdrPipelineUnavailableStatus(
-  modifier: Modifier = Modifier,
-) {
+private fun HdrPipelineUnavailableStatus(modifier: Modifier = Modifier) {
   val colors = MaterialTheme.colorScheme
   val containerColor = colors.errorContainer.copy(alpha = 0.72f)
   val contentColor = colors.onErrorContainer
@@ -103,21 +111,23 @@ private fun HdrPipelineUnavailableStatus(
     border = BorderStroke(1.dp, contentColor.copy(alpha = 0.16f)),
   ) {
     Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(14.dp),
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .padding(14.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
       Box(
-        modifier = Modifier
-          .size(38.dp)
-          .clip(CircleShape)
-          .background(contentColor.copy(alpha = 0.12f)),
+        modifier =
+          Modifier
+            .size(38.dp)
+            .clip(CircleShape)
+            .background(contentColor.copy(alpha = 0.12f)),
         contentAlignment = Alignment.Center,
       ) {
         Icon(
-          imageVector = Icons.Default.HdrOff,
+          imageVector = Icons.RoundedFilled.HdrOff,
           contentDescription = null,
           modifier = Modifier.size(22.dp),
           tint = contentColor,
@@ -125,12 +135,17 @@ private fun HdrPipelineUnavailableStatus(
       }
       Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(
-          text = "无法启用 HDR",
+          text =
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.ui_hdr_cannot_be_enabled),
           style = MaterialTheme.typography.titleLarge,
           fontWeight = FontWeight.SemiBold,
         )
         Text(
-          text = "请先启用 GPU Next 和 Vulkan 再使用 HDR 模式",
+          text =
+            androidx.compose.ui.res.stringResource(
+              app.gyrolet.mpvrx.R.string.ui_enable_gpu_next_and_vulkan_before_using_hdr_modes,
+            ),
           style = MaterialTheme.typography.bodySmall,
           color = contentColor.copy(alpha = 0.78f),
         )
@@ -148,54 +163,66 @@ private fun HdrModeOption(
   modifier: Modifier = Modifier,
 ) {
   val colors = MaterialTheme.colorScheme
-  val containerColor = when {
-    selected -> colors.primaryContainer.copy(alpha = 0.78f)
-    else -> colors.surfaceContainerHigh.copy(alpha = 0.9f)
-  }
-  val contentColor = when {
-    !enabled -> colors.onSurface.copy(alpha = 0.38f)
-    selected -> colors.onPrimaryContainer
-    else -> colors.onSurface
-  }
-  val borderColor = when {
-    selected -> colors.primary.copy(alpha = 0.45f)
-    else -> colors.outlineVariant.copy(alpha = 0.28f)
-  }
+  val containerColor =
+    when {
+      selected -> colors.primaryContainer.copy(alpha = 0.78f)
+      else -> colors.surfaceContainerHigh.copy(alpha = 0.9f)
+    }
+  val contentColor =
+    when {
+      !enabled -> colors.onSurface.copy(alpha = 0.38f)
+      selected -> colors.onPrimaryContainer
+      else -> colors.onSurface
+    }
+  val borderColor =
+    when {
+      selected -> colors.primary.copy(alpha = 0.45f)
+      else -> colors.outlineVariant.copy(alpha = 0.28f)
+    }
 
   Surface(
-    modifier = modifier
-      .fillMaxWidth()
-      .clip(AppShapeScale.largeIncreased)
-      .clickable(enabled = enabled, onClick = onClick),
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .clip(AppShapeScale.largeIncreased)
+        .clickable(enabled = enabled, onClick = onClick),
     shape = AppShapeScale.largeIncreased,
     color = containerColor,
     contentColor = contentColor,
     border = BorderStroke(1.dp, borderColor),
   ) {
     Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 14.dp, vertical = 12.dp),
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 14.dp, vertical = 12.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
       Box(
-        modifier = Modifier
-          .size(42.dp)
-          .clip(CircleShape)
-          .background(
-            if (selected) colors.primary.copy(alpha = 0.14f)
-            else colors.surfaceVariant.copy(alpha = 0.86f),
-          ),
+        modifier =
+          Modifier
+            .size(42.dp)
+            .clip(CircleShape)
+            .background(
+              if (selected) {
+                colors.primary.copy(alpha = 0.14f)
+              } else {
+                colors.surfaceVariant.copy(alpha = 0.86f)
+              },
+            ),
         contentAlignment = Alignment.Center,
       ) {
         Icon(
-          imageVector = if (mode == HdrScreenMode.OFF) Icons.Default.HdrOff else Icons.Default.HdrOn,
+          imageVector = if (mode == HdrScreenMode.OFF) Icons.RoundedFilled.HdrOff else Icons.RoundedFilled.HdrOn,
           contentDescription = null,
           modifier = Modifier.size(24.dp),
           tint =
-            if (selected) colors.primary
-            else contentColor.copy(alpha = 0.78f),
+            if (selected) {
+              colors.primary
+            } else {
+              contentColor.copy(alpha = 0.78f)
+            },
         )
       }
 
@@ -204,12 +231,12 @@ private fun HdrModeOption(
         verticalArrangement = Arrangement.spacedBy(2.dp),
       ) {
         Text(
-          text = mode.title,
+          text = stringResource(mode.titleRes),
           style = MaterialTheme.typography.titleMedium,
           fontWeight = FontWeight.SemiBold,
         )
         Text(
-          text = mode.description,
+          text = stringResource(mode.descriptionRes),
           style = MaterialTheme.typography.bodySmall,
           color = contentColor.copy(alpha = 0.72f),
         )

@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.player
 
 import android.content.ContentResolver
@@ -29,10 +36,16 @@ interface PlayerHost {
   val hostWindowManager: WindowManager
   val hostContentResolver: ContentResolver
   var hostRequestedOrientation: Int
-  
+
   fun requestAudioFocus(): Boolean
+
   fun abandonAudioFocus()
+
   fun currentMediaLookupHint(): String? = null
+
   fun currentPlayerLookupHints(): PlayerLookupHints = PlayerLookupHints()
+
   fun currentThumbnailSource(): String? = null
+
+  fun isCurrentMediaKnownAudio(): Boolean = false
 }

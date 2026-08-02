@@ -1,6 +1,14 @@
+﻿/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.preferences
 
 import android.widget.Toast
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,21 +16,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -42,10 +44,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
-import androidx.compose.foundation.lazy.items
-import androidx.compose.ui.text.style.TextOverflow
-import app.gyrolet.mpvrx.ui.icons.Icon
-import me.zhanghai.compose.preference.TextFieldPreference
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,11 +53,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.gyrolet.mpvrx.R
 import app.gyrolet.mpvrx.preferences.AiPreferences
@@ -68,24 +68,25 @@ import app.gyrolet.mpvrx.preferences.preference.collectAsState
 import app.gyrolet.mpvrx.presentation.Screen
 import app.gyrolet.mpvrx.repository.ai.AiModelInfo
 import app.gyrolet.mpvrx.repository.ai.AiService
-import app.gyrolet.mpvrx.repository.ai.LocalModelCatalog
-import app.gyrolet.mpvrx.repository.ai.LocalModelInfo
-import app.gyrolet.mpvrx.repository.ai.ModelDownloadManager
 import app.gyrolet.mpvrx.repository.ai.DownloadProgress
 import app.gyrolet.mpvrx.repository.ai.LocalModelBenchmark
+import app.gyrolet.mpvrx.repository.ai.LocalModelCatalog
+import app.gyrolet.mpvrx.repository.ai.LocalModelInfo
+import app.gyrolet.mpvrx.ui.icons.Icon
 import app.gyrolet.mpvrx.ui.icons.Icons
+import app.gyrolet.mpvrx.ui.preferences.PreferenceCard
+import app.gyrolet.mpvrx.ui.preferences.PreferenceDivider
+import app.gyrolet.mpvrx.ui.preferences.PreferenceSectionHeader
+import app.gyrolet.mpvrx.ui.preferences.components.SwitchPreference
 import app.gyrolet.mpvrx.ui.utils.LocalBackStack
+import app.gyrolet.mpvrx.ui.utils.LocalShowSettingsBackArrow
 import app.gyrolet.mpvrx.ui.utils.popSafely
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import me.zhanghai.compose.preference.ListPreference
-import me.zhanghai.compose.preference.Preference
-import app.gyrolet.mpvrx.ui.preferences.PreferenceCard
-import app.gyrolet.mpvrx.ui.preferences.PreferenceDivider
-import app.gyrolet.mpvrx.ui.preferences.PreferenceSectionHeader
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
-import app.gyrolet.mpvrx.ui.preferences.components.SwitchPreference
+import me.zhanghai.compose.preference.TextFieldPreference
 import org.koin.compose.koinInject
 
 private val allLanguages = mapOf(
@@ -121,7 +122,7 @@ object AiIntegrationScreen : Screen {
     val anthropicKey by preferences.anthropicApiKey.collectAsState()
     val openrouterKey by preferences.openrouterApiKey.collectAsState()
     val togetherKey by preferences.togetherApiKey.collectAsState()
-    val selectedModel by preferences.selectedModel.collectAsState()
+    val selectedModel by preferences.selectedModelFor(provider).collectAsState()
     val localModelId by preferences.localModelId.collectAsState()
     val localModelDownloaded by preferences.localModelDownloaded.collectAsState()
     val huggingfaceToken by preferences.huggingfaceToken.collectAsState()
@@ -149,11 +150,14 @@ object AiIntegrationScreen : Screen {
     var showSubtitleTranslationWarning by remember { mutableStateOf(false) }
     var downloadProgress by remember { mutableStateOf<DownloadProgress?>(null) }
     var isDownloading by remember { mutableStateOf(false) }
-    var localModelSort by remember { mutableStateOf("Recommended") }
+    var localModelSort by remember { mutableStateOf("推荐") }
     var benchmarks by remember { mutableStateOf(aiService.getLocalModelBenchmarks()) }
     var benchmarkingModelId by remember { mutableStateOf<String?>(null) }
 
-    val activityManager = context.getSystemService(android.content.Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+    val activityManager =
+      context.getSystemService(
+        android.content.Context.ACTIVITY_SERVICE,
+      ) as android.app.ActivityManager
     val memoryInfo = android.app.ActivityManager.MemoryInfo()
     activityManager.getMemoryInfo(memoryInfo)
     val ramMb = (memoryInfo.totalMem / (1024 * 1024)).toInt()
@@ -162,18 +166,21 @@ object AiIntegrationScreen : Screen {
     val json = koinInject<Json>()
 
     fun loadModels() {
+      val requestedProvider = provider
       scope.launch {
         isLoadingModels = true
         modelLoadError = null
-        aiService.fetchModels()
+        aiService
+          .fetchModelsForProvider(requestedProvider)
           .onSuccess { fetchedModels ->
-            models = fetchedModels
-            preferences.availableModels.set(json.encodeToString(
-              kotlinx.serialization.builtins.ListSerializer(AiModelInfo.serializer()),
-              fetchedModels,
-            ))
-          }
-          .onFailure { e ->
+            if (provider == requestedProvider) models = fetchedModels
+            preferences.availableModelsFor(requestedProvider).set(
+              json.encodeToString(
+                kotlinx.serialization.builtins.ListSerializer(AiModelInfo.serializer()),
+                fetchedModels,
+              ),
+            )
+          }.onFailure { e ->
             modelLoadError = e.message
           }
         isLoadingModels = false
@@ -181,14 +188,17 @@ object AiIntegrationScreen : Screen {
     }
 
     LaunchedEffect(provider) {
-      val stored = preferences.availableModels.get()
+      models = emptyList()
+      val stored = preferences.availableModelsFor(provider).get()
       if (stored.isNotBlank() && stored != "[]") {
         try {
-          models = json.decodeFromString(
-            kotlinx.serialization.builtins.ListSerializer(AiModelInfo.serializer()),
-            stored,
-          )
-        } catch (_: Exception) {}
+          models =
+            json.decodeFromString(
+              kotlinx.serialization.builtins.ListSerializer(AiModelInfo.serializer()),
+              stored,
+            )
+        } catch (_: Exception) {
+        }
       }
       if (models.isEmpty() && provider != AiProvider.LOCAL) {
         loadModels()
@@ -200,19 +210,23 @@ object AiIntegrationScreen : Screen {
         TopAppBar(
           title = {
             Text(
-              text = "AI 集成",
+              text =
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.pref_section_ai_title),
               style = MaterialTheme.typography.headlineSmall,
               fontWeight = FontWeight.ExtraBold,
               color = MaterialTheme.colorScheme.primary,
             )
           },
           navigationIcon = {
-            IconButton(onClick = { backstack.popSafely() }) {
-              Icon(
-                Icons.Default.ArrowBack,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.secondary,
-              )
+            if (LocalShowSettingsBackArrow.current) {
+              IconButton(onClick = { backstack.popSafely() }) {
+                Icon(
+                  Icons.RoundedFilled.ArrowBack,
+                  contentDescription = null,
+                  tint = MaterialTheme.colorScheme.secondary,
+                )
+              }
             }
           },
         )
@@ -220,18 +234,24 @@ object AiIntegrationScreen : Screen {
     ) { padding ->
       ProvidePreferenceLocals {
         LazyColumn(
-          modifier = Modifier
-            .fillMaxSize()
-            .padding(padding),
+          modifier =
+            Modifier
+              .fillMaxSize()
+              .padding(padding),
         ) {
-          item { PreferenceSectionHeader(title = "AI 功能") }
+          item { PreferenceSectionHeader(title = stringResource(R.string.pref_ai_features_section)) }
 
           item {
             PreferenceCard {
               SwitchPreference(
                 value = enabled,
                 onValueChange = { preferences.enabled.set(it) },
-                title = { Text("启用 AI 功能") },
+                title = {
+                  Text(
+                    androidx.compose.ui.res
+                      .stringResource(app.gyrolet.mpvrx.R.string.pref_ai_enabled_title),
+                  )
+                },
                 summary = {
                   Text(
                     if (enabled) "AI 功能已激活" else "AI 功能已禁用",
@@ -243,7 +263,7 @@ object AiIntegrationScreen : Screen {
           }
 
           if (enabled) {
-            item { PreferenceSectionHeader(title = "提供商") }
+            item { PreferenceSectionHeader(title = stringResource(R.string.pref_ai_provider_section)) }
 
             item {
               PreferenceCard {
@@ -252,11 +272,18 @@ object AiIntegrationScreen : Screen {
                   value = provider,
                   onValueChange = {
                     preferences.provider.set(it)
-                    preferences.selectedModel.set("")
                   },
                   values = providers,
-                  valueToText = { androidx.compose.ui.text.AnnotatedString(it.displayName) },
-                  title = { Text("AI 提供商") },
+                  valueToText = {
+                    androidx.compose.ui.text
+                      .AnnotatedString(it.displayName)
+                  },
+                  title = {
+                    Text(
+                      androidx.compose.ui.res
+                        .stringResource(app.gyrolet.mpvrx.R.string.pref_ai_provider_title),
+                    )
+                  },
                   summary = {
                     Text(provider.displayName, color = MaterialTheme.colorScheme.outline)
                   },
@@ -265,30 +292,53 @@ object AiIntegrationScreen : Screen {
             }
 
             if (provider == AiProvider.LOCAL) {
-              item { PreferenceSectionHeader(title = "Hugging Face 设置") }
-              
+              item { PreferenceSectionHeader(title = stringResource(R.string.pref_hf_setup_section)) }
+
               item {
                 PreferenceCard {
                   TextFieldPreference(
                     value = huggingfaceToken,
                     onValueChange = preferences.huggingfaceToken::set,
                     textToValue = { it.trim() },
-                    title = { Text("Hugging Face 令牌") },
+                    title = {
+                      Text(
+                        androidx.compose.ui.res
+                          .stringResource(app.gyrolet.mpvrx.R.string.pref_hf_token_title),
+                      )
+                    },
                     summary = {
                       if (huggingfaceToken.isBlank()) {
-                        Text("受限模型需要令牌。请从 huggingface.co/settings/tokens 获取", color = MaterialTheme.colorScheme.error)
+                        Text(
+                          androidx.compose.ui.res.stringResource(
+                            app.gyrolet.mpvrx.R.string.pref_hf_token_summary_error,
+                          ),
+                          color = MaterialTheme.colorScheme.error,
+                        )
                       } else {
-                        Text("令牌已保存在设备上", color = MaterialTheme.colorScheme.outline)
+                        Text(
+                          androidx.compose.ui.res.stringResource(
+                            app.gyrolet.mpvrx.R.string.pref_hf_token_summary_saved,
+                          ),
+                          color = MaterialTheme.colorScheme.outline,
+                        )
                       }
                     },
                     textField = { value, onValueChange, _ ->
                       Column {
-                        Text("粘贴你的 Hugging Face 令牌")
+                        Text(
+                          androidx.compose.ui.res
+                            .stringResource(app.gyrolet.mpvrx.R.string.pref_hf_token_dialog_text),
+                        )
                         TextField(
                           value = value,
                           onValueChange = onValueChange,
                           modifier = Modifier.fillMaxWidth(),
-                          placeholder = { Text("hf_...") },
+                          placeholder = {
+                            Text(
+                              androidx.compose.ui.res
+                                .stringResource(app.gyrolet.mpvrx.R.string.ui_hf),
+                            )
+                          },
                           singleLine = true,
                           visualTransformation = if (showApiKey) VisualTransformation.None else PasswordVisualTransformation(),
                         )
@@ -298,30 +348,37 @@ object AiIntegrationScreen : Screen {
                 }
               }
 
-              item { PreferenceSectionHeader(title = "离线模型") }
+              item { PreferenceSectionHeader(title = stringResource(R.string.pref_offline_models_section)) }
 
               item {
                 Column(
-                  modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                  modifier =
+                    Modifier
+                      .fillMaxWidth()
+                      .padding(horizontal = 16.dp, vertical = 8.dp),
                   verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                   Text(
-                    text = "速度优先模型选择器",
+                    text =
+                      androidx.compose.ui.res
+                        .stringResource(app.gyrolet.mpvrx.R.string.pref_model_picker_header),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                   )
                   Text(
-                    text = "模型按加载后响应速度、内存占用和字幕翻译质量进行排序。",
+                    text =
+                      androidx.compose.ui.res.stringResource(
+                        app.gyrolet.mpvrx.R.string.pref_model_picker_description,
+                      ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline,
                   )
                   Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier
-                      .fillMaxWidth()
-                      .horizontalScroll(rememberScrollState()),
+                    modifier =
+                      Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
                   ) {
                     listOf("推荐", "最快", "最佳翻译", "已下载").forEach { mode ->
                       FilterChip(
@@ -346,87 +403,161 @@ object AiIntegrationScreen : Screen {
               }
 
               items(visibleLocalModels) { model ->
-                  val isDownloaded = remember(model.id, isDownloading) {
-                      aiService.isLocalModelDownloaded(model.id)
+                val isDownloaded =
+                  remember(model.id, isDownloading) {
+                    aiService.isLocalModelDownloaded(model.id)
                   }
-                  val isSelected = localModelId == model.id
-                  val isThisDownloading = isDownloading && localModelId == model.id
-                  val benchmark = benchmarks.firstOrNull { it.modelId == model.id }
+                val isSelected = localModelId == model.id
+                val isThisDownloading = isDownloading && localModelId == model.id
+                val benchmark = benchmarks.firstOrNull { it.modelId == model.id }
 
-                  OfflineModelCard(
-                      model = model,
-                      isDownloaded = isDownloaded,
-                      isSelected = isSelected,
-                      isDownloading = isThisDownloading,
-                      isBenchmarking = benchmarkingModelId == model.id,
-                      isRecommended = recommendedModelIds.contains(model.id),
-                      benchmark = benchmark,
-                      downloadProgress = if (isThisDownloading) downloadProgress else null,
-                      onDownload = {
-                          preferences.localModelId.set(model.id)
-                          isDownloading = true
-                          downloadProgress = null
-                          scope.launch {
-                              aiService.downloadLocalModel(model.id)
-                                  .onSuccess {
-                                      downloadProgress = DownloadProgress(isComplete = true)
-                                      Toast.makeText(context, "模型下载成功", Toast.LENGTH_SHORT).show()
-                                      if (model.supportsThinking) {
-                                          preferences.showThinking.set(true)
-                                      }
-                                  }
-                                  .onFailure { e ->
-                                      downloadProgress = DownloadProgress(error = e.message)
-                                      Toast.makeText(context, "下载失败: ${e.message}", Toast.LENGTH_LONG).show()
-                                  }
-                              isDownloading = false
-                          }
-                      },
-                      onDelete = {
-                          if (aiService.deleteLocalModel(model.id)) {
-                              Toast.makeText(context, "模型已删除", Toast.LENGTH_SHORT).show()
-                          }
-                      },
-                      onSelect = {
-                          preferences.localModelId.set(model.id)
-                          if (model.supportsThinking) {
-                              preferences.showThinking.set(true)
-                          }
-                          Toast.makeText(context, "正在使用 ${model.displayName}", Toast.LENGTH_SHORT).show()
-                      },
-                      onBenchmark = {
-                          benchmarkingModelId = model.id
-                          scope.launch {
-                              aiService.benchmarkLocalModel(model.id)
-                                  .onSuccess {
-                                      benchmarks = aiService.getLocalModelBenchmarks()
-                                      Toast.makeText(context, "基准测试已保存: ${it.speedLabel}", Toast.LENGTH_SHORT).show()
-                                  }
-                                  .onFailure { e ->
-                                      Toast.makeText(context, "基准测试失败: ${e.message}", Toast.LENGTH_LONG).show()
-                                  }
-                              benchmarkingModelId = null
-                          }
-                      }
-                  )
+                OfflineModelCard(
+                  model = model,
+                  isDownloaded = isDownloaded,
+                  isSelected = isSelected,
+                  isDownloading = isThisDownloading,
+                  isBenchmarking = benchmarkingModelId == model.id,
+                  isRecommended = recommendedModelIds.contains(model.id),
+                  benchmark = benchmark,
+                  downloadProgress = if (isThisDownloading) downloadProgress else null,
+                  onDownload = {
+                    preferences.localModelId.set(model.id)
+                    isDownloading = true
+                    downloadProgress = null
+                    scope.launch {
+                      aiService
+                        .downloadLocalModel(model.id)
+                        .onSuccess {
+                          downloadProgress = DownloadProgress(isComplete = true)
+                          Toast
+                            .makeText(
+                              context,
+                              context.getString(app.gyrolet.mpvrx.R.string.pref_model_download_success),
+                              Toast.LENGTH_SHORT,
+                            ).show()
+                        }.onFailure { e ->
+                          downloadProgress = DownloadProgress(error = e.message)
+                          Toast
+                            .makeText(
+                              context,
+                              context.getString(
+                                R.string.pref_model_download_failed,
+                                e.message ?: context.getString(R.string.generic_unknown_error),
+                              ),
+                              Toast.LENGTH_LONG,
+                            ).show()
+                        }
+                      isDownloading = false
+                    }
+                  },
+                  onDelete = {
+                    if (aiService.deleteLocalModel(model.id)) {
+                      Toast
+                        .makeText(
+                          context,
+                          context.getString(app.gyrolet.mpvrx.R.string.pref_model_deleted),
+                          Toast.LENGTH_SHORT,
+                        ).show()
+                    }
+                  },
+                  onSelect = {
+                    preferences.localModelId.set(model.id)
+                    Toast
+                      .makeText(
+                        context,
+                        context.getString(R.string.pref_model_using, model.displayName),
+                        Toast.LENGTH_SHORT,
+                      ).show()
+                  },
+                  onBenchmark = {
+                    benchmarkingModelId = model.id
+                    scope.launch {
+                      aiService
+                        .benchmarkLocalModel(model.id)
+                        .onSuccess {
+                          benchmarks = aiService.getLocalModelBenchmarks()
+                          Toast
+                            .makeText(
+                              context,
+                              context.getString(R.string.pref_benchmark_saved, it.speedLabel),
+                              Toast.LENGTH_SHORT,
+                            ).show()
+                        }.onFailure { e ->
+                          Toast
+                            .makeText(
+                              context,
+                              context.getString(
+                                R.string.pref_benchmark_failed,
+                                e.message ?: context.getString(R.string.generic_unknown_error),
+                              ),
+                              Toast.LENGTH_LONG,
+                            ).show()
+                        }
+                      benchmarkingModelId = null
+                    }
+                  },
+                )
               }
-              
+
               item { Spacer(modifier = Modifier.height(16.dp)) }
             }
 
             if (provider != AiProvider.LOCAL) {
-              val apiKeyInfo = when (provider) {
-                AiProvider.OPENCODE -> ApiKeyInfo("OpenCode API 密钥", "从 opencode.ai/auth 获取密钥", "sk-...", openCodeKey, preferences.openCodeApiKey::set)
-                AiProvider.GROQ -> ApiKeyInfo("Groq API 密钥", "从 console.groq.com 获取密钥", "gsk_...", groqKey, preferences.groqApiKey::set)
-                AiProvider.OPENAI -> ApiKeyInfo("OpenAI API 密钥", "从 platform.openai.com/api-keys 获取密钥", "sk-...", openaiKey, preferences.openaiApiKey::set)
-                AiProvider.ANTHROPIC -> ApiKeyInfo("Anthropic API 密钥", "从 console.anthropic.com 获取密钥", "sk-ant-...", anthropicKey, preferences.anthropicApiKey::set)
-                AiProvider.OPENROUTER -> ApiKeyInfo("OpenRouter API 密钥", "从 openrouter.ai/keys 获取密钥", "sk-or-...", openrouterKey, preferences.openrouterApiKey::set)
-                AiProvider.TOGETHER -> ApiKeyInfo("Together API 密钥", "从 api.together.xyz/settings/api-keys 获取密钥", "...", togetherKey, preferences.togetherApiKey::set)
-                else -> null
-              }
+              val apiKeyInfo =
+                when (provider) {
+                  AiProvider.OPENCODE ->
+                    ApiKeyInfo(
+                      "OpenCode API 密钥",
+                      "前往 opencode.ai/auth 获取密钥",
+                      "sk-...",
+                      openCodeKey,
+                      preferences.openCodeApiKey::set,
+                    )
+                  AiProvider.GROQ ->
+                    ApiKeyInfo(
+                      "Groq API 密钥",
+                      "前往 console.groq.com 获取密钥",
+                      "gsk_...",
+                      groqKey,
+                      preferences.groqApiKey::set,
+                    )
+                  AiProvider.OPENAI ->
+                    ApiKeyInfo(
+                      "OpenAI API 密钥",
+                      "前往 platform.openai.com/api-keys 获取密钥",
+                      "sk-...",
+                      openaiKey,
+                      preferences.openaiApiKey::set,
+                    )
+                  AiProvider.ANTHROPIC ->
+                    ApiKeyInfo(
+                      "Anthropic API 密钥",
+                      "前往 console.anthropic.com 获取密钥",
+                      "sk-ant-...",
+                      anthropicKey,
+                      preferences.anthropicApiKey::set,
+                    )
+                  AiProvider.OPENROUTER ->
+                    ApiKeyInfo(
+                      "OpenRouter API 密钥",
+                      "前往 openrouter.ai/keys 获取密钥",
+                      "sk-or-...",
+                      openrouterKey,
+                      preferences.openrouterApiKey::set,
+                    )
+                  AiProvider.TOGETHER ->
+                    ApiKeyInfo(
+                      "Together API 密钥",
+                      "前往 api.together.xyz/settings/api-keys 获取密钥",
+                      "...",
+                      togetherKey,
+                      preferences.togetherApiKey::set,
+                    )
+                  else -> null
+                }
 
               if (apiKeyInfo != null) {
-                item { PreferenceSectionHeader(title = "API 配置") }
+                item { PreferenceSectionHeader(title = stringResource(R.string.pref_api_config_section)) }
 
                 item {
                   PreferenceCard {
@@ -439,12 +570,16 @@ object AiIntegrationScreen : Screen {
                         if (apiKeyInfo.apiKey.isBlank()) {
                           Text(apiKeyInfo.hint, color = MaterialTheme.colorScheme.error)
                         } else {
-                          Text("API 密钥已保存在设备上", color = MaterialTheme.colorScheme.outline)
+                          Text(
+                            androidx.compose.ui.res
+                              .stringResource(app.gyrolet.mpvrx.R.string.pref_api_key_saved),
+                            color = MaterialTheme.colorScheme.outline,
+                          )
                         }
                       },
                       textField = { value, onValueChange, _ ->
                         Column {
-                          Text("粘贴你的 ${apiKeyInfo.title}")
+                          Text(stringResource(R.string.pref_paste_api_key, apiKeyInfo.title))
                           TextField(
                             value = value,
                             onValueChange = onValueChange,
@@ -460,21 +595,31 @@ object AiIntegrationScreen : Screen {
                     PreferenceDivider()
 
                     Row(
-                      modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                      modifier =
+                        Modifier
+                          .fillMaxWidth()
+                          .padding(horizontal = 16.dp, vertical = 8.dp),
                       horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                       Button(
                         onClick = { showApiKey = !showApiKey },
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                          contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        ),
+                        colors =
+                          ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                          ),
                         shape = MaterialTheme.shapes.extraLarge,
                       ) {
-                        Text(if (showApiKey) "隐藏密钥" else "显示密钥")
+                        Text(
+                          if (showApiKey) {
+                            stringResource(
+                              R.string.pref_hide_key,
+                            )
+                          } else {
+                            stringResource(R.string.pref_show_key)
+                          },
+                        )
                       }
 
                       Button(
@@ -482,7 +627,8 @@ object AiIntegrationScreen : Screen {
                           scope.launch {
                             isVerifying = true
                             verifyResult = null
-                            aiService.verifyKey()
+                            aiService
+                              .verifyKey()
                               .onSuccess {
                                 verifyResult = it
                                 preferences.lastVerified.set(System.currentTimeMillis())
@@ -495,9 +641,10 @@ object AiIntegrationScreen : Screen {
                         },
                         modifier = Modifier.weight(1f),
                         enabled = !isVerifying && apiKeyInfo.apiKey.isNotBlank(),
-                        colors = ButtonDefaults.buttonColors(
-                          containerColor = MaterialTheme.colorScheme.primary,
-                        ),
+                        colors =
+                          ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                          ),
                         shape = MaterialTheme.shapes.extraLarge,
                       ) {
                         if (isVerifying) {
@@ -507,21 +654,25 @@ object AiIntegrationScreen : Screen {
                             color = MaterialTheme.colorScheme.onPrimary,
                           )
                         } else {
-                          Text("验证密钥")
+                          Text(
+                            androidx.compose.ui.res
+                              .stringResource(app.gyrolet.mpvrx.R.string.pref_verify_key),
+                          )
                         }
                       }
                     }
 
                     if (verifyResult != null) {
                       Row(
-                        modifier = Modifier
-                          .fillMaxWidth()
-                          .padding(horizontal = 16.dp, vertical = 4.dp),
+                        modifier =
+                          Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                       ) {
                         val isSuccess = verifyResult!!.contains("successfully") || verifyResult!!.contains("ready")
                         Icon(
-                          imageVector = if (isSuccess) Icons.Default.Check else Icons.Default.Warning,
+                          imageVector = if (isSuccess) Icons.RoundedFilled.Check else Icons.RoundedFilled.Warning,
                           contentDescription = null,
                           tint = if (isSuccess) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                           modifier = Modifier.size(18.dp),
@@ -537,28 +688,33 @@ object AiIntegrationScreen : Screen {
                   }
                 }
 
-                item { PreferenceSectionHeader(title = "模型") }
+                item { PreferenceSectionHeader(title = stringResource(R.string.pref_model_section)) }
 
                 item {
                   PreferenceCard {
                     Row(
-                      modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                      modifier =
+                        Modifier
+                          .fillMaxWidth()
+                          .padding(horizontal = 16.dp, vertical = 8.dp),
                       verticalAlignment = Alignment.CenterVertically,
                       horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                       Text(
-                        text = "可用模型",
+                        text =
+                          androidx.compose.ui.res.stringResource(
+                            app.gyrolet.mpvrx.R.string.pref_available_models_header,
+                          ),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                       )
                       Button(
                         onClick = { loadModels() },
                         enabled = !isLoadingModels && apiKeyInfo.apiKey.isNotBlank(),
-                        colors = ButtonDefaults.buttonColors(
-                          containerColor = MaterialTheme.colorScheme.primary,
-                        ),
+                        colors =
+                          ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                          ),
                         shape = MaterialTheme.shapes.extraLarge,
                       ) {
                         if (isLoadingModels) {
@@ -569,13 +725,19 @@ object AiIntegrationScreen : Screen {
                           )
                         } else {
                           Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Refresh",
+                            imageVector = Icons.RoundedFilled.Refresh,
+                            contentDescription =
+                              androidx.compose.ui.res.stringResource(
+                                app.gyrolet.mpvrx.R.string.ui_refresh,
+                              ),
                             modifier = Modifier.size(18.dp),
                           )
                         }
                         Spacer(modifier = Modifier.size(4.dp))
-                        Text("获取模型")
+                        Text(
+                          androidx.compose.ui.res
+                            .stringResource(app.gyrolet.mpvrx.R.string.pref_fetch_models),
+                        )
                       }
                     }
 
@@ -597,9 +759,10 @@ object AiIntegrationScreen : Screen {
                         onClick = { showModelDialog = true },
                         shape = MaterialTheme.shapes.medium,
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                        modifier = Modifier
-                          .fillMaxWidth()
-                          .padding(horizontal = 16.dp, vertical = 4.dp),
+                        modifier =
+                          Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
                       ) {
                         Row(
                           verticalAlignment = Alignment.CenterVertically,
@@ -607,14 +770,20 @@ object AiIntegrationScreen : Screen {
                         ) {
                           Column(modifier = Modifier.weight(1f)) {
                             Text(
-                              text = "模型",
+                              text =
+                                androidx.compose.ui.res.stringResource(
+                                  app.gyrolet.mpvrx.R.string.pref_model_section,
+                                ),
                               style = MaterialTheme.typography.labelLarge,
                               fontWeight = FontWeight.Bold,
                             )
                             Text(
-                              text = if (selectedModel.isNotBlank()) {
-                                modelDisplayNames[selectedModel] ?: selectedModel
-                              } else "点击选择模型",
+                              text =
+                                if (selectedModel.isNotBlank()) {
+                                  modelDisplayNames[selectedModel] ?: selectedModel
+                                } else {
+                                  "点击选择模型"
+                                },
                               style = MaterialTheme.typography.bodySmall,
                               color = MaterialTheme.colorScheme.outline,
                             )
@@ -627,7 +796,7 @@ object AiIntegrationScreen : Screen {
                             }
                           }
                           Icon(
-                            Icons.Default.ArrowDropDown,
+                            Icons.RoundedFilled.ArrowDropDown,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.outline,
                           )
@@ -638,7 +807,7 @@ object AiIntegrationScreen : Screen {
                         ModelSearchDialog(
                           models = models,
                           selectedModelId = selectedModel,
-                          onSelect = { preferences.selectedModel.set(it) },
+                          onSelect = { preferences.selectedModelFor(provider).set(it) },
                           onDismiss = { showModelDialog = false },
                         )
                       }
@@ -654,13 +823,17 @@ object AiIntegrationScreen : Screen {
                     PreferenceDivider()
 
                     Column(
-                      modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                      modifier =
+                        Modifier
+                          .fillMaxWidth()
+                          .padding(horizontal = 16.dp, vertical = 8.dp),
                       verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
                       Text(
-                        text = "验证模型",
+                        text =
+                          androidx.compose.ui.res.stringResource(
+                            app.gyrolet.mpvrx.R.string.pref_verify_model_header,
+                          ),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                       )
@@ -670,7 +843,8 @@ object AiIntegrationScreen : Screen {
                           scope.launch {
                             isVerifyingModel = true
                             verifyModelResult = null
-                            aiService.verifyModel()
+                            aiService
+                              .verifyModel()
                               .onSuccess { verifyModelResult = it }
                               .onFailure { e ->
                                 verifyModelResult = "Error: ${e.message}"
@@ -680,9 +854,10 @@ object AiIntegrationScreen : Screen {
                         },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !isVerifyingModel && selectedModel.isNotBlank(),
-                        colors = ButtonDefaults.buttonColors(
-                          containerColor = MaterialTheme.colorScheme.tertiary,
-                        ),
+                        colors =
+                          ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary,
+                          ),
                         shape = MaterialTheme.shapes.extraLarge,
                       ) {
                         if (isVerifyingModel) {
@@ -693,7 +868,10 @@ object AiIntegrationScreen : Screen {
                           )
                           Spacer(Modifier.width(8.dp))
                         }
-                        Text("检查模型访问权限")
+                        Text(
+                          androidx.compose.ui.res
+                            .stringResource(app.gyrolet.mpvrx.R.string.pref_check_model_access),
+                        )
                       }
 
                       if (verifyModelResult != null) {
@@ -708,29 +886,33 @@ object AiIntegrationScreen : Screen {
                             verticalArrangement = Arrangement.spacedBy(4.dp),
                           ) {
                             lines.forEach { line ->
-                              val isPositive = line.startsWith("Available") ||
-                                line.startsWith("Free") ||
-                                line.startsWith("API access working")
-                              val isWarning = line.startsWith("Quota") ||
-                                line.startsWith("Paid") ||
-                                line.startsWith("⚠")
+                              val isPositive =
+                                line.startsWith("Available") ||
+                                  line.startsWith("Free") ||
+                                  line.startsWith("API access working")
+                              val isWarning =
+                                line.startsWith("Quota") ||
+                                  line.startsWith("Paid") ||
+                                  line.startsWith("⚠")
                               Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                               ) {
                                 Icon(
-                                  imageVector = when {
-                                    isPositive -> Icons.Default.Check
-                                    isWarning -> Icons.Default.Warning
-                                    else -> Icons.Default.Close
-                                  },
+                                  imageVector =
+                                    when {
+                                      isPositive -> Icons.RoundedFilled.Check
+                                      isWarning -> Icons.RoundedFilled.Warning
+                                      else -> Icons.RoundedFilled.Close
+                                    },
                                   contentDescription = null,
                                   modifier = Modifier.size(16.dp),
-                                  tint = when {
-                                    isPositive -> MaterialTheme.colorScheme.primary
-                                    isWarning -> MaterialTheme.colorScheme.error
-                                    else -> MaterialTheme.colorScheme.error
-                                  },
+                                  tint =
+                                    when {
+                                      isPositive -> MaterialTheme.colorScheme.primary
+                                      isWarning -> MaterialTheme.colorScheme.error
+                                      else -> MaterialTheme.colorScheme.error
+                                    },
                                 )
                                 Text(
                                   text = line,
@@ -747,31 +929,23 @@ object AiIntegrationScreen : Screen {
               }
             }
 
-            item { PreferenceSectionHeader(title = "常规设置") }
-
-            item {
-              PreferenceCard {
-                SwitchPreference(
-                  value = preferences.showThinking.collectAsState().value,
-                  onValueChange = { preferences.showThinking.set(it) },
-                  title = { Text("显示 AI 推理过程（思考）") },
-                  summary = { Text("启用以查看支持模型的内部分析过程。") },
-                  icon = { Icon(Icons.Default.DeveloperBoard, contentDescription = null) }
-                )
-              }
-            }
-
-            item { PreferenceSectionHeader(title = "功能") }
+            item { PreferenceSectionHeader(title = stringResource(R.string.pref_ai_features_subsection)) }
 
             item {
               PreferenceCard {
                 SwitchPreference(
                   value = renameWithAi,
                   onValueChange = { preferences.renameWithAi.set(it) },
-                  title = { Text("AI 智能重命名") },
+                  title = {
+                    Text(
+                      androidx.compose.ui.res
+                        .stringResource(app.gyrolet.mpvrx.R.string.pref_ai_rename_title),
+                    )
+                  },
                   summary = {
                     Text(
-                      "使用 AI 为批量重命名操作生成简洁文件名",
+                      androidx.compose.ui.res
+                        .stringResource(app.gyrolet.mpvrx.R.string.pref_ai_rename_summary),
                       color = MaterialTheme.colorScheme.outline,
                     )
                   },
@@ -782,10 +956,16 @@ object AiIntegrationScreen : Screen {
                 SwitchPreference(
                   value = subtitleFormatWithAi,
                   onValueChange = { preferences.subtitleFormatWithAi.set(it) },
-                  title = { Text("AI 搜索") },
+                  title = {
+                    Text(
+                      androidx.compose.ui.res
+                        .stringResource(app.gyrolet.mpvrx.R.string.pref_ai_search_title),
+                    )
+                  },
                   summary = {
                     Text(
-                      "自动格式化视频标题以用于 Wyzie/SubHub 字幕搜索",
+                      androidx.compose.ui.res
+                        .stringResource(app.gyrolet.mpvrx.R.string.pref_ai_search_summary),
                       color = MaterialTheme.colorScheme.outline,
                     )
                   },
@@ -794,7 +974,7 @@ object AiIntegrationScreen : Screen {
             }
 
             if (provider != AiProvider.LOCAL) {
-              item { PreferenceSectionHeader(title = "语音转文本 [极度实验性]") }
+              item { PreferenceSectionHeader(title = stringResource(R.string.pref_stt_section)) }
 
               item {
                 PreferenceCard {
@@ -805,10 +985,16 @@ object AiIntegrationScreen : Screen {
                   SwitchPreference(
                     value = realtimeSubsEnabled,
                     onValueChange = { preferences.realtimeSubsEnabled.set(it) },
-                    title = { Text("实时字幕生成") },
+                    title = {
+                      Text(
+                        androidx.compose.ui.res
+                          .stringResource(app.gyrolet.mpvrx.R.string.pref_stt_title),
+                      )
+                    },
                     summary = {
                       Text(
-                        "播放视频时从音频生成字幕",
+                        androidx.compose.ui.res
+                          .stringResource(app.gyrolet.mpvrx.R.string.pref_stt_summary),
                         color = MaterialTheme.colorScheme.outline,
                       )
                     },
@@ -820,8 +1006,16 @@ object AiIntegrationScreen : Screen {
                     value = subtitleGenerationOutputFormat,
                     onValueChange = { preferences.subtitleGenerationOutputFormat.set(it) },
                     values = listOf("srt", "vtt"),
-                    valueToText = { androidx.compose.ui.text.AnnotatedString(it.uppercase()) },
-                    title = { Text("默认输出格式") },
+                    valueToText = {
+                      androidx.compose.ui.text
+                        .AnnotatedString(it.uppercase())
+                    },
+                    title = {
+                      Text(
+                        androidx.compose.ui.res
+                          .stringResource(app.gyrolet.mpvrx.R.string.pref_stt_output_format_title),
+                      )
+                    },
                     summary = {
                       Text(
                         subtitleGenerationOutputFormat.uppercase(),
@@ -839,11 +1033,20 @@ object AiIntegrationScreen : Screen {
                       preferences.sttModel.set("")
                     },
                     values = sttProviders,
-                    valueToText = { androidx.compose.ui.text.AnnotatedString(it.displayName) },
-                    title = { Text("语音转文本提供商") },
+                    valueToText = {
+                      androidx.compose.ui.text
+                        .AnnotatedString(it.displayName)
+                    },
+                    title = {
+                      Text(
+                        androidx.compose.ui.res
+                          .stringResource(app.gyrolet.mpvrx.R.string.pref_stt_provider_title),
+                      )
+                    },
                     summary = {
                       Text(
-                        "用于实时流式和批量字幕生成",
+                        androidx.compose.ui.res
+                          .stringResource(app.gyrolet.mpvrx.R.string.pref_stt_provider_summary),
                         color = MaterialTheme.colorScheme.outline,
                       )
                     },
@@ -863,21 +1066,58 @@ object AiIntegrationScreen : Screen {
                   ListPreference(
                     value = sttLanguage,
                     onValueChange = { preferences.sttLanguage.set(it) },
-                    values = listOf("", "en", "es", "fr", "de", "hi", "ja", "zh", "ko", "pt", "ru", "ar", "it", "nl", "pl", "tr", "vi", "th"),
+                    values =
+                      listOf(
+                        "",
+                        "en",
+                        "es",
+                        "fr",
+                        "de",
+                        "hi",
+                        "ja",
+                        "zh",
+                        "ko",
+                        "pt",
+                        "ru",
+                        "ar",
+                        "it",
+                        "nl",
+                        "pl",
+                        "tr",
+                        "vi",
+                        "th",
+                      ),
                     valueToText = { lang ->
                       androidx.compose.ui.text.AnnotatedString(
                         when (lang) {
                           "" -> "自动检测"
-                          "en" -> "英语"; "es" -> "西班牙语"
-                          "fr" -> "法语"; "de" -> "德语"; "hi" -> "印地语"; "ja" -> "日语"
-                          "zh" -> "中文"; "ko" -> "韩语"; "pt" -> "葡萄牙语"; "ru" -> "俄语"
-                          "ar" -> "阿拉伯语"; "it" -> "意大利语"; "nl" -> "荷兰语"; "pl" -> "波兰语"
-                          "tr" -> "土耳其语"; "vi" -> "越南语"; "th" -> "泰语"
+                          "en" -> "英语"
+                          "es" -> "西班牙语"
+                          "fr" -> "法语"
+                          "de" -> "德语"
+                          "hi" -> "印地语"
+                          "ja" -> "日语"
+                          "zh" -> "中文"
+                          "ko" -> "韩语"
+                          "pt" -> "葡萄牙语"
+                          "ru" -> "俄语"
+                          "ar" -> "阿拉伯语"
+                          "it" -> "意大利语"
+                          "nl" -> "荷兰语"
+                          "pl" -> "波兰语"
+                          "tr" -> "土耳其语"
+                          "vi" -> "越南语"
+                          "th" -> "泰语"
                           else -> lang
-                        }
+                        },
                       )
                     },
-                    title = { Text("音频语言") },
+                    title = {
+                      Text(
+                        androidx.compose.ui.res
+                          .stringResource(app.gyrolet.mpvrx.R.string.pref_audio_language_title),
+                      )
+                    },
                     summary = {
                       Text(
                         if (sttLanguage.isBlank()) "自动检测语音语言" else sttLanguage.uppercase(),
@@ -890,7 +1130,7 @@ object AiIntegrationScreen : Screen {
             }
 
             if (provider != AiProvider.LOCAL) {
-              item { PreferenceSectionHeader(title = "字幕翻译") }
+              item { PreferenceSectionHeader(title = stringResource(R.string.pref_translation_section)) }
 
               item {
                 PreferenceCard {
@@ -902,10 +1142,17 @@ object AiIntegrationScreen : Screen {
                         showSubtitleTranslationWarning = true
                       }
                     },
-                    title = { Text("启用翻译") },
+                    title = {
+                      Text(
+                        androidx.compose.ui.res
+                          .stringResource(app.gyrolet.mpvrx.R.string.pref_enable_translation_title),
+                      )
+                    },
                     summary = {
                       Text(
-                        "使用 AI 翻译外部字幕",
+                        androidx.compose.ui.res.stringResource(
+                          app.gyrolet.mpvrx.R.string.pref_enable_translation_summary,
+                        ),
                         color = MaterialTheme.colorScheme.outline,
                       )
                     },
@@ -921,18 +1168,26 @@ object AiIntegrationScreen : Screen {
               }
             }
 
-            item { PreferenceSectionHeader(title = "自定义提示词") }
+            item { PreferenceSectionHeader(title = stringResource(R.string.pref_custom_prompt_section)) }
 
             item {
               PreferenceCard {
                 SwitchPreference(
                   value = customPromptEnabled,
                   onValueChange = { preferences.customPromptEnabled.set(it) },
-                  title = { Text("覆盖默认指令") },
+                  title = {
+                    Text(
+                      androidx.compose.ui.res
+                        .stringResource(app.gyrolet.mpvrx.R.string.pref_override_instructions_title),
+                    )
+                  },
                   summary = {
                     Text(
-                      if (customPromptEnabled) "将使用自定义提示词替代内置指令"
-                      else "将使用内置 AI 指令",
+                      if (customPromptEnabled) {
+                        "将使用自定义提示词，而非内置指令"
+                      } else {
+                        "将使用内置 AI 指令"
+                      },
                       color = MaterialTheme.colorScheme.outline,
                     )
                   },
@@ -942,19 +1197,26 @@ object AiIntegrationScreen : Screen {
                   PreferenceDivider()
 
                   Column(
-                    modifier = Modifier
-                      .fillMaxWidth()
-                      .padding(16.dp),
+                    modifier =
+                      Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                   ) {
                     Text(
-                      text = "自定义提示词",
+                      text =
+                        androidx.compose.ui.res.stringResource(
+                          app.gyrolet.mpvrx.R.string.pref_custom_prompts_header,
+                        ),
                       style = MaterialTheme.typography.labelLarge,
                       fontWeight = FontWeight.Bold,
                     )
 
                     Text(
-                      text = "将字段留空以使用该任务的内置指令。如果你保存了旧的全局提示词，它将作为后备使用。",
+                      text =
+                        androidx.compose.ui.res.stringResource(
+                          app.gyrolet.mpvrx.R.string.pref_custom_prompts_description,
+                        ),
                       style = MaterialTheme.typography.bodySmall,
                       color = MaterialTheme.colorScheme.outline,
                     )
@@ -962,39 +1224,81 @@ object AiIntegrationScreen : Screen {
                     TextField(
                       value = customRenamePrompt,
                       onValueChange = { preferences.customRenamePrompt.set(it) },
-                      modifier = Modifier
-                        .fillMaxWidth()
-                        .height(140.dp),
-                      label = { Text("自定义重命名提示词") },
-                      placeholder = { Text("AI 文件重命名指令...") },
+                      modifier =
+                        Modifier
+                          .fillMaxWidth()
+                          .height(140.dp),
+                      label = {
+                        Text(
+                          androidx.compose.ui.res.stringResource(
+                            app.gyrolet.mpvrx.R.string.pref_custom_rename_prompt_label,
+                          ),
+                        )
+                      },
+                      placeholder = {
+                        Text(
+                          androidx.compose.ui.res.stringResource(
+                            app.gyrolet.mpvrx.R.string.ui_instructions_for_ai_file_renaming,
+                          ),
+                        )
+                      },
                       maxLines = 6,
                     )
 
                     TextField(
                       value = customSubtitleTranslationPrompt,
                       onValueChange = { preferences.customSubtitleTranslationPrompt.set(it) },
-                      modifier = Modifier
-                        .fillMaxWidth()
-                        .height(140.dp),
-                      label = { Text("自定义字幕翻译提示词") },
-                      placeholder = { Text("AI 字幕翻译指令...") },
+                      modifier =
+                        Modifier
+                          .fillMaxWidth()
+                          .height(140.dp),
+                      label = {
+                        Text(
+                          androidx.compose.ui.res.stringResource(
+                            app.gyrolet.mpvrx.R.string.pref_custom_translation_prompt_label,
+                          ),
+                        )
+                      },
+                      placeholder = {
+                        Text(
+                          androidx.compose.ui.res.stringResource(
+                            app.gyrolet.mpvrx.R.string.ui_instructions_for_ai_subtitle_translation,
+                          ),
+                        )
+                      },
                       maxLines = 6,
                     )
 
                     TextField(
                       value = customSubtitleFormatPrompt,
                       onValueChange = { preferences.customSubtitleFormatPrompt.set(it) },
-                      modifier = Modifier
-                        .fillMaxWidth()
-                        .height(140.dp),
-                      label = { Text("自定义字幕格式化提示词") },
-                      placeholder = { Text("格式化字幕搜索查询的指令...") },
+                      modifier =
+                        Modifier
+                          .fillMaxWidth()
+                          .height(140.dp),
+                      label = {
+                        Text(
+                          androidx.compose.ui.res.stringResource(
+                            app.gyrolet.mpvrx.R.string.pref_custom_format_prompt_label,
+                          ),
+                        )
+                      },
+                      placeholder = {
+                        Text(
+                          androidx.compose.ui.res.stringResource(
+                            app.gyrolet.mpvrx.R.string.ui_instructions_for_formatting_subtitle_search_queries,
+                          ),
+                        )
+                      },
                       maxLines = 6,
                     )
 
                     if (customPrompt.isNotBlank()) {
                       Text(
-                        text = "已保存旧的全局提示词。当任务特定提示词为空时将使用它。",
+                        text =
+                          androidx.compose.ui.res.stringResource(
+                            app.gyrolet.mpvrx.R.string.pref_legacy_prompt_info,
+                          ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.outline,
                       )
@@ -1002,39 +1306,49 @@ object AiIntegrationScreen : Screen {
                   }
                 }
               }
+            }
           }
         }
       }
-    }
 
-    if (showSubtitleTranslationWarning) {
-      AlertDialog(
-        onDismissRequest = {
-          showSubtitleTranslationWarning = false
-          preferences.subtitleTranslationFirstTime.set(false)
-        },
-        title = { Text("字幕翻译") },
-        text = {
-          Text(
-            "字幕翻译可能不太完美。" +
-            "为获得最佳效果，请使用更好的模型，如果字幕效果不理想请勿抱怨。"
-          )
-        },
-        confirmButton = {
-          TextButton(onClick = {
+      if (showSubtitleTranslationWarning) {
+        AlertDialog(
+          onDismissRequest = {
             showSubtitleTranslationWarning = false
             preferences.subtitleTranslationFirstTime.set(false)
-          }) {
-            Text("知道了")
-          }
-        }
-      )
+          },
+          title = {
+            Text(
+              androidx.compose.ui.res
+                .stringResource(app.gyrolet.mpvrx.R.string.pref_translation_section),
+            )
+          },
+          text = {
+            Text(
+              androidx.compose.ui.res.stringResource(
+                app.gyrolet.mpvrx.R.string.ui_subtitle_translation_can_be_a_bit_messy,
+              ) +
+                "For best results, use better models and don't rant that subs aren't working properly.",
+            )
+          },
+          confirmButton = {
+            TextButton(onClick = {
+              showSubtitleTranslationWarning = false
+              preferences.subtitleTranslationFirstTime.set(false)
+            }) {
+              Text(
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.got_it),
+              )
+            }
+          },
+        )
+      }
     }
   }
-}
 
-@Composable
-private fun OfflineModelCard(
+  @Composable
+  private fun OfflineModelCard(
     model: LocalModelInfo,
     isDownloaded: Boolean,
     isSelected: Boolean,
@@ -1047,446 +1361,532 @@ private fun OfflineModelCard(
     onDelete: () -> Unit,
     onSelect: () -> Unit,
     onBenchmark: () -> Unit,
-) {
+  ) {
     val cardColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
-    
+
     ElevatedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = cardColor,
-            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 16.dp, vertical = 4.dp),
+      shape = RoundedCornerShape(10.dp),
+      colors =
+        CardDefaults.elevatedCardColors(
+          containerColor = cardColor,
+          contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
         ),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+      elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    Text(
-                        text = model.displayName,
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.horizontalScroll(rememberScrollState()),
-                    ) {
-                        ModelChip(model.tier.label)
-                        ModelChip(model.sizeLabel)
-                        ModelChip("${model.minRamGb}GB RAM+")
-                    }
-                }
-                
-                if (isDownloaded && !isDownloading) {
-                    IconButton(onClick = onDelete) {
-                        Icon(
-                            Icons.Default.Delete, 
-                            contentDescription = "Delete", 
-                            tint = if (isSelected) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
-                        )
-                    }
-                }
-            }
-
-            Text(
-                text = model.description,
-                style = MaterialTheme.typography.bodySmall,
-                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.9f) else MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-            ) {
-                if (isRecommended) ModelChip("推荐")
-                ModelChip("速度 ${model.speedRank}")
-                ModelChip("翻译 ${model.translationRank}")
-                ModelChip(model.languageTier.label)
-            }
-
-            if (benchmark != null) {
-                Text(
-                    text = "${benchmark.speedLabel} - ${benchmark.loadLabel} - 加载时约 ${benchmark.memoryEstimateMb} MB",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
-            
-            if (isDownloading && downloadProgress != null) {
-                val percentage = downloadProgress.percentage
-                LinearProgressIndicator(
-                    progress = { percentage },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp)
-                        .clip(RoundedCornerShape(4.dp)),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                )
-                Text(
-                    text = "已下载 ${(percentage * 100).toInt()}%",
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(top = 4.dp),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            } else if (isDownloading) {
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                )
-            }
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                if (isDownloaded && !isDownloading) {
-                    OutlinedButton(
-                        onClick = onBenchmark,
-                        enabled = !isBenchmarking,
-                        shape = RoundedCornerShape(10.dp),
-                    ) {
-                        if (isBenchmarking) {
-                            CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
-                            Spacer(modifier = Modifier.width(6.dp))
-                        }
-                        Text(if (benchmark == null) "基准测试" else "重新测试")
-                    }
-                }
-                if (!isDownloaded && !isDownloading) {
-                    Button(
-                        onClick = onDownload, 
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        )
-                    ) {
-                        Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("下载")
-                    }
-                } else if (isDownloaded && !isSelected && !isDownloading) {
-                    Button(
-                        onClick = onSelect, 
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    ) {
-                        Text("使用模型")
-                    }
-                } else if (isSelected && isDownloaded && !isDownloading) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), 
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                Icons.Default.Check, 
-                                contentDescription = null, 
-                                modifier = Modifier.size(16.dp), 
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                "已激活", 
-                                style = MaterialTheme.typography.labelLarge, 
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-private data class ApiKeyInfo(
-  val title: String,
-  val hint: String,
-  val placeholder: String,
-  val apiKey: String,
-  val onChange: (String) -> Unit,
-)
-
-@Composable
-private fun ModelChip(text: String) {
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f),
-        shape = RoundedCornerShape(8.dp),
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
-            style = MaterialTheme.typography.labelSmall,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
-}
-
-@Composable
-private fun SttModelSelector(
-  sttProvider: AiProvider,
-  sttModel: String,
-  onSelectModel: (String) -> Unit,
-) {
-  val aiService = koinInject<AiService>()
-  val context = LocalContext.current
-  var showDialog by remember { mutableStateOf(false) }
-  var sttModels by remember { mutableStateOf<List<AiModelInfo>>(emptyList()) }
-  var isLoadingStt by remember { mutableStateOf(false) }
-  val scope = rememberCoroutineScope()
-
-  val modelKey = "${sttProvider.name}_stt"
-  val cachedModels = remember(modelKey) { mutableStateOf<List<AiModelInfo>?>(null) }
-
-    Surface(
-    onClick = {
-      val cached = cachedModels.value
-      if (cached != null) {
-        sttModels = cached
-        showDialog = true
-      } else {
-        isLoadingStt = true
-        scope.launch {
-          aiService.fetchModelsForProvider(sttProvider)
-            .onSuccess { allModels ->
-              val sttOnly = allModels.filter { model ->
-                model.id.contains("whisper", ignoreCase = true) ||
-                  model.id.contains("flash", ignoreCase = true)
-              }.ifEmpty {
-                allModels.take(5)
-              }
-              cachedModels.value = sttOnly
-              sttModels = sttOnly
-              showDialog = true
-            }
-            .onFailure { e ->
-              Toast.makeText(context, "加载模型失败: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-          isLoadingStt = false
-        }
-      }
-    },
-    shape = MaterialTheme.shapes.medium,
-    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(horizontal = 16.dp, vertical = 4.dp),
-  ) {
-    Row(
-      verticalAlignment = Alignment.CenterVertically,
-      modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-    ) {
-      Column(modifier = Modifier.weight(1f)) {
-        Text(
-          text = "实时模型",
-          style = MaterialTheme.typography.labelLarge,
-          fontWeight = FontWeight.Bold,
-        )
-        Text(
-          text = if (sttModel.isNotBlank()) sttModel
-                 else if (isLoadingStt) "加载中..."
-                 else "点击选择 STT 模型",
-          style = MaterialTheme.typography.bodySmall,
-          color = MaterialTheme.colorScheme.outline,
-        )
-      }
-      if (isLoadingStt) {
-        CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
-      } else {
-        Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = MaterialTheme.colorScheme.outline)
-      }
-    }
-  }
-
-  if (showDialog) {
-    ModelSearchDialog(
-      models = sttModels,
-      selectedModelId = sttModel,
-      onSelect = onSelectModel,
-      onDismiss = { showDialog = false },
-    )
-  }
-}
-
-@Composable
-private fun AutoTranslateLanguageConfig(
-  languages: String,
-  onLanguagesChange: (String) -> Unit,
-) {
-  val selectedCodes = remember(languages) { languages.split(",").filter { it.isNotBlank() }.toMutableSet() }
-  var adding by remember { mutableStateOf(false) }
-  var addingSearch by remember { mutableStateOf("") }
-
-  Column(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(16.dp),
-    verticalArrangement = Arrangement.spacedBy(8.dp),
-  ) {
-    Text(
-      text = "自动翻译目标语言",
-      style = MaterialTheme.typography.labelLarge,
-      fontWeight = FontWeight.Bold,
-    )
-    Text(
-      text = "翻译字幕时，若配置 1 种语言则直接翻译；若配置 2 种及以上，将弹出选择器。",
-      style = MaterialTheme.typography.bodySmall,
-      color = MaterialTheme.colorScheme.outline,
-    )
-
-    if (selectedCodes.isEmpty()) {
-      Text(
-        text = "未配置目标语言",
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
-      )
-    } else {
-      Row(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = Modifier.horizontalScroll(rememberScrollState()),
+      Column(
+        modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
       ) {
-        selectedCodes.forEach { code ->
-          val langName = allLanguages[code] ?: code.uppercase()
-          Surface(
-            shape = RoundedCornerShape(20.dp),
-            color = MaterialTheme.colorScheme.primary,
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
           ) {
+            Text(
+              text = model.displayName,
+              style = MaterialTheme.typography.titleSmall,
+              fontWeight = FontWeight.Bold,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+            )
             Row(
-              verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.padding(start = 10.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+              horizontalArrangement = Arrangement.spacedBy(6.dp),
+              modifier = Modifier.horizontalScroll(rememberScrollState()),
             ) {
-              Text(
-                text = langName,
-                style = MaterialTheme.typography.labelSmall,
-                maxLines = 1,
-                color = MaterialTheme.colorScheme.onPrimary,
+              ModelChip(model.tier.label)
+              ModelChip(model.sizeLabel)
+              ModelChip("${model.minRamGb}GB RAM+")
+            }
+          }
+
+          if (isDownloaded && !isDownloading) {
+            IconButton(onClick = onDelete) {
+              Icon(
+                Icons.RoundedFilled.Delete,
+                contentDescription =
+                  androidx.compose.ui.res.stringResource(
+                    app.gyrolet.mpvrx.R.string.delete,
+                  ),
+                tint =
+                  if (isSelected) {
+                    MaterialTheme.colorScheme.error
+                  } else {
+                    MaterialTheme.colorScheme.error
+                      .copy(
+                        alpha = 0.8f,
+                      )
+                  },
               )
-              Spacer(modifier = Modifier.width(4.dp))
-              IconButton(
-                onClick = {
-                  selectedCodes.remove(code)
-                  onLanguagesChange(selectedCodes.joinToString(","))
-                },
-                modifier = Modifier.size(20.dp),
-              ) {
-                Icon(
-                  Icons.Default.Close,
-                  contentDescription = "Remove $langName",
-                  modifier = Modifier.size(14.dp),
-                  tint = MaterialTheme.colorScheme.onPrimary,
-                )
-              }
             }
           }
         }
-      }
-    }
 
-    Spacer(modifier = Modifier.height(4.dp))
-
-    if (adding) {
-      TextField(
-        value = addingSearch,
-        onValueChange = { addingSearch = it },
-        modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text("搜索语言...") },
-        singleLine = true,
-        shape = RoundedCornerShape(12.dp),
-      )
-
-      val filtered = allLanguages.filter { (_, name) ->
-        addingSearch.isBlank() || name.contains(addingSearch, ignoreCase = true)
-      }.toList().sortedBy { it.second }
-
-      Column(
-        modifier = Modifier
-          .heightIn(max = 200.dp)
-          .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-      ) {
-        filtered.forEach { (code, name) ->
-          Surface(
-            onClick = {
-              selectedCodes.add(code)
-              onLanguagesChange(selectedCodes.joinToString(","))
-              addingSearch = ""
+        Text(
+          text = model.description,
+          style = MaterialTheme.typography.bodySmall,
+          color =
+            if (isSelected) {
+              MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                alpha = 0.9f,
+              )
+            } else {
+              MaterialTheme.colorScheme.onSurfaceVariant
             },
-            shape = RoundedCornerShape(8.dp),
-            color = if (selectedCodes.contains(code)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-          ) {
-            Row(
-              verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+          maxLines = 2,
+          overflow = TextOverflow.Ellipsis,
+        )
+
+        Row(
+          horizontalArrangement = Arrangement.spacedBy(6.dp),
+          modifier =
+            Modifier
+              .fillMaxWidth()
+              .horizontalScroll(rememberScrollState()),
+        ) {
+          if (isRecommended) ModelChip("推荐")
+          ModelChip("速度 ${model.speedRank}")
+          ModelChip("翻译 ${model.translationRank}")
+          ModelChip(model.languageTier.label)
+        }
+
+        if (benchmark != null) {
+          Text(
+            text = "${benchmark.speedLabel} - ${benchmark.loadLabel} - about ${benchmark.memoryEstimateMb} MB while loaded",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.primary,
+          )
+        }
+
+        if (isDownloading && downloadProgress != null) {
+          val percentage = downloadProgress.percentage
+          LinearProgressIndicator(
+            progress = { percentage },
+            modifier =
+              Modifier
+                .fillMaxWidth()
+                .height(8.dp)
+                .clip(RoundedCornerShape(4.dp)),
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+          )
+          Text(
+            text = "${(percentage * 100).toInt()}% downloaded",
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(top = 4.dp),
+            color = MaterialTheme.colorScheme.primary,
+          )
+        } else if (isDownloading) {
+          LinearProgressIndicator(
+            modifier =
+              Modifier
+                .fillMaxWidth()
+                .height(8.dp)
+                .clip(RoundedCornerShape(4.dp)),
+          )
+        }
+
+        Row(
+          horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+          verticalAlignment = Alignment.CenterVertically,
+          modifier = Modifier.fillMaxWidth(),
+        ) {
+          if (isDownloaded && !isDownloading) {
+            OutlinedButton(
+              onClick = onBenchmark,
+              enabled = !isBenchmarking,
+              shape = RoundedCornerShape(10.dp),
             ) {
-              val isSelected = selectedCodes.contains(code)
-              Checkbox(
-                checked = isSelected,
-                onCheckedChange = {
-                  if (isSelected) selectedCodes.remove(code)
-                  else selectedCodes.add(code)
-                  onLanguagesChange(selectedCodes.joinToString(","))
+              if (isBenchmarking) {
+                CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                Spacer(modifier = Modifier.width(6.dp))
+              }
+              Text(
+                if (benchmark ==
+                  null
+                ) {
+                  stringResource(R.string.pref_benchmark)
+                } else {
+                  stringResource(R.string.pref_retest)
                 },
               )
+            }
+          }
+          if (!isDownloaded && !isDownloading) {
+            Button(
+              onClick = onDownload,
+              shape = RoundedCornerShape(10.dp),
+              colors =
+                ButtonDefaults.buttonColors(
+                  containerColor = MaterialTheme.colorScheme.primary,
+                ),
+            ) {
+              Icon(Icons.RoundedFilled.Download, contentDescription = null, modifier = Modifier.size(18.dp))
               Spacer(modifier = Modifier.width(8.dp))
               Text(
-                text = name,
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.ui_download),
               )
-              Spacer(modifier = Modifier.weight(1f))
+            }
+          } else if (isDownloaded && !isSelected && !isDownloading) {
+            Button(
+              onClick = onSelect,
+              shape = RoundedCornerShape(10.dp),
+              colors =
+                ButtonDefaults.buttonColors(
+                  containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                  contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                ),
+            ) {
               Text(
-                text = code.uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                color = if (isSelected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.outline,
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.ui_use_model),
               )
+            }
+          } else if (isSelected && isDownloaded && !isDownloading) {
+            Surface(
+              color = MaterialTheme.colorScheme.primary,
+              shape = RoundedCornerShape(10.dp),
+            ) {
+              Row(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Icon(
+                  Icons.RoundedFilled.Check,
+                  contentDescription = null,
+                  modifier = Modifier.size(16.dp),
+                  tint = MaterialTheme.colorScheme.onPrimary,
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                  androidx.compose.ui.res
+                    .stringResource(app.gyrolet.mpvrx.R.string.ui_active),
+                  style = MaterialTheme.typography.labelLarge,
+                  color = MaterialTheme.colorScheme.onPrimary,
+                  fontWeight = FontWeight.Bold,
+                )
+              }
             }
           }
         }
       }
     }
+  }
 
-    Button(
-      onClick = { adding = !adding },
-      modifier = Modifier.fillMaxWidth(),
-      shape = RoundedCornerShape(12.dp),
-      colors = ButtonDefaults.buttonColors(
-        containerColor = if (adding) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer,
-        contentColor = if (adding) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSecondaryContainer,
-      ),
+  private data class ApiKeyInfo(
+    val title: String,
+    val hint: String,
+    val placeholder: String,
+    val apiKey: String,
+    val onChange: (String) -> Unit,
+  )
+
+  @Composable
+  private fun ModelChip(text: String) {
+    Surface(
+      color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f),
+      shape = RoundedCornerShape(8.dp),
     ) {
-      Icon(
-        imageVector = if (adding) Icons.Default.Check else Icons.Default.Add,
-        contentDescription = null,
-        modifier = Modifier.size(18.dp),
+      Text(
+        text = text,
+        modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+        style = MaterialTheme.typography.labelSmall,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
       )
-      Spacer(modifier = Modifier.width(6.dp))
-      Text(if (adding) "完成" else "添加语言")
     }
   }
-}
+
+  @Composable
+  private fun SttModelSelector(
+    sttProvider: AiProvider,
+    sttModel: String,
+    onSelectModel: (String) -> Unit,
+  ) {
+    val aiService = koinInject<AiService>()
+    val context = LocalContext.current
+    var showDialog by remember { mutableStateOf(false) }
+    var sttModels by remember { mutableStateOf<List<AiModelInfo>>(emptyList()) }
+    var isLoadingStt by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    val modelKey = "${sttProvider.name}_stt"
+    val cachedModels = remember(modelKey) { mutableStateOf<List<AiModelInfo>?>(null) }
+
+    Surface(
+      onClick = {
+        val cached = cachedModels.value
+        if (cached != null) {
+          sttModels = cached
+          showDialog = true
+        } else {
+          isLoadingStt = true
+          scope.launch {
+            aiService
+              .fetchSpeechModelsForProvider(sttProvider)
+              .onSuccess { sttOnly ->
+                cachedModels.value = sttOnly
+                sttModels = sttOnly
+                showDialog = true
+              }.onFailure { e ->
+                Toast
+                  .makeText(
+                    context,
+                    context.getString(
+                      R.string.toast_failed_to_load_models,
+                      e.message ?: context.getString(R.string.generic_unknown_error),
+                    ),
+                    Toast.LENGTH_SHORT,
+                  ).show()
+              }
+            isLoadingStt = false
+          }
+        }
+      },
+      shape = MaterialTheme.shapes.medium,
+      color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 16.dp, vertical = 4.dp),
+    ) {
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+      ) {
+        Column(modifier = Modifier.weight(1f)) {
+          Text(
+            text =
+              androidx.compose.ui.res
+                .stringResource(app.gyrolet.mpvrx.R.string.ui_real_time_model),
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
+          )
+          Text(
+            text =
+              if (sttModel.isNotBlank()) {
+                sttModel
+              } else if (isLoadingStt) {
+                "加载中..."
+              } else {
+                "点击选择 STT 模型"
+              },
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.outline,
+          )
+        }
+        if (isLoadingStt) {
+          CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+        } else {
+          Icon(Icons.RoundedFilled.ArrowDropDown, contentDescription = null, tint = MaterialTheme.colorScheme.outline)
+        }
+      }
+    }
+
+    if (showDialog) {
+      ModelSearchDialog(
+        models = sttModels,
+        selectedModelId = sttModel,
+        onSelect = onSelectModel,
+        onDismiss = { showDialog = false },
+      )
+    }
+  }
+
+  @Composable
+  private fun AutoTranslateLanguageConfig(
+    languages: String,
+    onLanguagesChange: (String) -> Unit,
+  ) {
+    val selectedCodes = remember(languages) { languages.split(",").filter { it.isNotBlank() }.toMutableSet() }
+    var adding by remember { mutableStateOf(false) }
+    var addingSearch by remember { mutableStateOf("") }
+
+    Column(
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .padding(16.dp),
+      verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+      Text(
+        text =
+          androidx.compose.ui.res
+            .stringResource(app.gyrolet.mpvrx.R.string.ui_auto_translate_target_languages),
+        style = MaterialTheme.typography.labelLarge,
+        fontWeight = FontWeight.Bold,
+      )
+      Text(
+        text =
+          androidx.compose.ui.res.stringResource(
+            app.gyrolet.mpvrx.R.string.ui_when_translating_subtitles_if_1_language_is_configured_it_transl,
+          ),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.outline,
+      )
+
+      if (selectedCodes.isEmpty()) {
+        Text(
+          text =
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.ui_no_target_languages_configured),
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
+        )
+      } else {
+        Row(
+          horizontalArrangement = Arrangement.spacedBy(6.dp),
+          modifier = Modifier.horizontalScroll(rememberScrollState()),
+        ) {
+          selectedCodes.forEach { code ->
+            val langName = allLanguages[code] ?: code.uppercase()
+            Surface(
+              shape = RoundedCornerShape(20.dp),
+              color = MaterialTheme.colorScheme.primary,
+            ) {
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(start = 10.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+              ) {
+                Text(
+                  text = langName,
+                  style = MaterialTheme.typography.labelSmall,
+                  maxLines = 1,
+                  color = MaterialTheme.colorScheme.onPrimary,
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                IconButton(
+                  onClick = {
+                    selectedCodes.remove(code)
+                    onLanguagesChange(selectedCodes.joinToString(","))
+                  },
+                  modifier = Modifier.size(20.dp),
+                ) {
+                  Icon(
+                    Icons.RoundedFilled.Close,
+                    contentDescription = "移除 $langName",
+                    modifier = Modifier.size(14.dp),
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                  )
+                }
+              }
+            }
+          }
+        }
+      }
+
+      Spacer(modifier = Modifier.height(4.dp))
+
+      if (adding) {
+        TextField(
+          value = addingSearch,
+          onValueChange = { addingSearch = it },
+          modifier = Modifier.fillMaxWidth(),
+          placeholder = {
+            Text(
+              androidx.compose.ui.res
+                .stringResource(app.gyrolet.mpvrx.R.string.ui_search_languages),
+            )
+          },
+          singleLine = true,
+          shape = RoundedCornerShape(12.dp),
+        )
+
+        val filtered =
+          allLanguages
+            .filter { (_, name) ->
+              addingSearch.isBlank() || name.contains(addingSearch, ignoreCase = true)
+            }.toList()
+            .sortedBy { it.second }
+
+        Column(
+          modifier =
+            Modifier
+              .heightIn(max = 200.dp)
+              .verticalScroll(rememberScrollState()),
+          verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+          filtered.forEach { (code, name) ->
+            Surface(
+              onClick = {
+                selectedCodes.add(code)
+                onLanguagesChange(selectedCodes.joinToString(","))
+                addingSearch = ""
+              },
+              shape = RoundedCornerShape(8.dp),
+              color =
+                if (selectedCodes.contains(
+                    code,
+                  )
+                ) {
+                  MaterialTheme.colorScheme.primary
+                } else {
+                  MaterialTheme.colorScheme.surface
+                },
+            ) {
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+              ) {
+                val isSelected = selectedCodes.contains(code)
+                Checkbox(
+                  checked = isSelected,
+                  onCheckedChange = {
+                    if (isSelected) {
+                      selectedCodes.remove(code)
+                    } else {
+                      selectedCodes.add(code)
+                    }
+                    onLanguagesChange(selectedCodes.joinToString(","))
+                  },
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                  text = name,
+                  style = MaterialTheme.typography.bodyMedium,
+                  color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                  text = code.uppercase(),
+                  style = MaterialTheme.typography.labelSmall,
+                  color =
+                    if (isSelected) {
+                      MaterialTheme.colorScheme.onPrimary.copy(
+                        alpha = 0.8f,
+                      )
+                    } else {
+                      MaterialTheme.colorScheme.outline
+                    },
+                )
+              }
+            }
+          }
+        }
+      }
+
+      Button(
+        onClick = { adding = !adding },
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors =
+          ButtonDefaults.buttonColors(
+            containerColor = if (adding) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = if (adding) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSecondaryContainer,
+          ),
+      ) {
+        Icon(
+          imageVector = if (adding) Icons.RoundedFilled.Check else Icons.RoundedFilled.Add,
+          contentDescription = null,
+          modifier = Modifier.size(18.dp),
+        )
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(if (adding) stringResource(R.string.ui_done) else stringResource(R.string.pref_add_language))
+      }
+    }
+  }
 }

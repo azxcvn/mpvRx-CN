@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.browser.states
 
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -52,13 +59,15 @@ fun EmptyState(
 
   Box(
     modifier = modifier.fillMaxSize(),
-    contentAlignment = Alignment.Center
+    contentAlignment = Alignment.Center,
   ) {
     Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 48.dp)
-        .padding(bottom = 80.dp), // Account for bottom navigation bar
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 48.dp)
+          .padding(bottom = 80.dp),
+      // Account for bottom navigation bar
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center,
     ) {
@@ -104,4 +113,3 @@ fun EmptyState(
     }
   }
 }
-

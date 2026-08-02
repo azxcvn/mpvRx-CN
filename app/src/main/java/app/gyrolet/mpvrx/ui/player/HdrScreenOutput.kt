@@ -1,5 +1,14 @@
+﻿/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.player
 
+import androidx.annotation.StringRes
+import app.gyrolet.mpvrx.R
 import app.gyrolet.mpvrx.domain.hdr.HdrToysProfile
 import `is`.xyz.mpv.MPVLib
 
@@ -16,46 +25,48 @@ import `is`.xyz.mpv.MPVLib
  * [defaultEnabledMode].  The HDR panel only exposes [selectableModes].
  */
 enum class HdrScreenMode(
-  val title: String,
-  val shortTitle: String,
-  val description: String,
+  @StringRes val titleRes: Int,
+  @StringRes val shortTitleRes: Int,
+  @StringRes val descriptionRes: Int,
   val hdrToysProfile: HdrToysProfile? = null,
 ) {
   OFF(
-    title = "关闭",
-    shortTitle = "关闭",
-    description = "普通 SDR 输出",
+    titleRes = R.string.hdr_mode_off,
+    shortTitleRes = R.string.hdr_mode_off,
+    descriptionRes = R.string.hdr_mode_off_description,
   ),
   BT_2100_PQ(
-    title = "BT.2100 PQ",
-    shortTitle = "PQ",
-    description = "HDR10 风格 PQ，带 Astra 色调映射和 Bottosson 色域映射",
+    titleRes = R.string.hdr_mode_bt2100_pq,
+    shortTitleRes = R.string.hdr_mode_pq_short,
+    descriptionRes = R.string.hdr_mode_bt2100_pq_description,
     hdrToysProfile = HdrToysProfile.BT_2100_PQ,
   ),
   BT_2100_HLG(
-    title = "BT.2100 HLG",
-    shortTitle = "HLG",
-    description = "通过 hdr-toys Astra 和 Bottosson 着色器链实现的 HLG HDR",
+    titleRes = R.string.hdr_mode_bt2100_hlg,
+    shortTitleRes = R.string.hdr_mode_hlg_short,
+    descriptionRes = R.string.hdr_mode_bt2100_hlg_description,
     hdrToysProfile = HdrToysProfile.BT_2100_HLG,
   ),
   BT_2020(
-    title = "BT.2020",
-    shortTitle = "BT.2020",
-    description = "使用 hdr-toys 色域映射进行 BT.2020/BT.1886 转换",
+    titleRes = R.string.hdr_mode_bt2020,
+    shortTitleRes = R.string.hdr_mode_bt2020,
+    descriptionRes = R.string.hdr_mode_bt2020_description,
     hdrToysProfile = HdrToysProfile.BT_2020,
   ),
   LINEAR(
-    title = "线性 HDR",
-    shortTitle = "线性",
-    description = "高质量 mpv HDR 输出，不使用 hdr-toys 着色器",
-  );
+    titleRes = R.string.hdr_mode_linear,
+    shortTitleRes = R.string.hdr_mode_linear_short,
+    descriptionRes = R.string.hdr_mode_linear_description,
+  ),
+  ;
 
   companion object {
     /** Modes shown in the HDR panel (excludes OFF — that is handled by the toggle button). */
     val selectableModes = listOf(BT_2100_PQ, BT_2100_HLG, BT_2020, LINEAR)
 
     /** Mode activated when the user first enables HDR from the toggle button. */
-    val defaultEnabledMode = LINEAR
+    // The lightest hdr-toys profile; it also works on the legacy GPU renderer.
+    val defaultEnabledMode = BT_2020
   }
 }
 
@@ -78,43 +89,50 @@ internal fun hdrScreenOutputSettings(
   }
 }
 
-private fun offSettings(): List<Pair<String, String>> = listOf(
-  "target-colorspace-hint-mode" to "target",
-  "inverse-tone-mapping"        to "no",
-  "tone-mapping"                to "auto",
-  "gamut-mapping-mode"          to "auto",
-  "hdr-compute-peak"            to "no",
-  "hdr-reference-white"         to "203",
-  "tone-mapping-visualize"      to "no",
-  "glsl-shader-opts"            to "",        // clear any hdr-toys shader options
-)
+private fun offSettings(): List<Pair<String, String>> =
+  listOf(
+    "target-colorspace-hint" to "auto",
+    "target-colorspace-hint-mode" to "target",
+    "target-prim" to "auto",
+    "target-trc" to "auto",
+    "target-peak" to "auto",
+    "inverse-tone-mapping" to "auto",
+    "tone-mapping" to "auto",
+    "gamut-mapping-mode" to "auto",
+    "hdr-compute-peak" to "auto",
+    "hdr-reference-white" to "203",
+    "tone-mapping-visualize" to "no",
+    "glsl-shader-opts" to "",
+  )
 
-private fun hdrToysSettings(profile: HdrToysProfile): List<Pair<String, String>> = listOf(
-  // Disable mpv's built-in colorspace management so hdr-toys shaders have full control.
-  "target-colorspace-hint"      to "no",
-  "target-colorspace-hint-mode" to "target",
-  "target-prim"                 to profile.targetPrim,
-  "target-trc"                  to profile.targetTrc,
-  "target-peak"                 to "auto",
-  "inverse-tone-mapping"        to "no",
-  "tone-mapping"                to "clip",    // hdr-toys handles tone-mapping in GLSL
-  "gamut-mapping-mode"          to "clip",    // hdr-toys handles gamut-mapping in GLSL
-  "hdr-compute-peak"            to "no",
-  "hdr-reference-white"         to "203",
-  "tone-mapping-visualize"      to "no",
-  "glsl-shader-opts"            to profile.shaderOptionsValue,
-)
+private fun hdrToysSettings(profile: HdrToysProfile): List<Pair<String, String>> =
+  listOf(
+    // Disable mpv's built-in colorspace management so hdr-toys shaders have full control.
+    "target-colorspace-hint" to "no",
+    "target-colorspace-hint-mode" to "target",
+    "target-prim" to profile.targetPrim,
+    "target-trc" to profile.targetTrc,
+    "target-peak" to "auto",
+    "inverse-tone-mapping" to "no",
+    "tone-mapping" to "clip", // hdr-toys handles tone-mapping in GLSL
+    "gamut-mapping-mode" to "clip", // hdr-toys handles gamut-mapping in GLSL
+    "hdr-compute-peak" to "no",
+    "hdr-reference-white" to "203",
+    "tone-mapping-visualize" to "no",
+    "glsl-shader-opts" to profile.shaderOptionsValue,
+  )
 
-private fun linearHdrSettings(hdrEnabled: Boolean): List<Pair<String, String>> = listOf(
-  "target-colorspace-hint"      to if (hdrEnabled) "yes" else "no",
-  "tone-mapping-visualize"      to "no",
-  "inverse-tone-mapping"        to if (hdrEnabled) "yes" else "no",
-  "tone-mapping"                to "clip",
-  "gamut-mapping-mode"          to if (hdrEnabled) "clip" else "auto",
-  "hdr-compute-peak"            to if (hdrEnabled) "yes" else "auto",
-  "hdr-reference-white"         to "203",
-  "glsl-shader-opts"            to "",
-)
+private fun linearHdrSettings(hdrEnabled: Boolean): List<Pair<String, String>> =
+  listOf(
+    "target-colorspace-hint" to if (hdrEnabled) "yes" else "no",
+    "tone-mapping-visualize" to "no",
+    "inverse-tone-mapping" to if (hdrEnabled) "yes" else "no",
+    "tone-mapping" to "clip",
+    "gamut-mapping-mode" to if (hdrEnabled) "clip" else "auto",
+    "hdr-compute-peak" to if (hdrEnabled) "yes" else "auto",
+    "hdr-reference-white" to "203",
+    "glsl-shader-opts" to "",
+  )
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Public apply helpers

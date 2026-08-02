@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.browser.filesystem
 
 import android.app.Application
@@ -16,10 +23,10 @@ import app.gyrolet.mpvrx.utils.media.MediaLibraryEvents
 import app.gyrolet.mpvrx.utils.media.MetadataRetrieval
 import app.gyrolet.mpvrx.utils.media.PlaybackStateEvents
 import app.gyrolet.mpvrx.utils.sort.SortUtils
+import app.gyrolet.mpvrx.utils.storage.FileTypeUtils
 import app.gyrolet.mpvrx.utils.storage.FolderViewScanner
 import app.gyrolet.mpvrx.utils.storage.TreeViewScanner
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -146,12 +153,11 @@ class FileSystemBrowserViewModel(
     // Refresh on global media library changes
     // Similar to Fossify's media scan completion listener
     viewModelScope.launch(Dispatchers.IO) {
-        MediaLibraryEvents.changes.collectLatest {
-          // Clear cache when media library changes
-          MediaFileRepository.clearCache()
-          loadCurrentDirectory()
-        }
+      MediaLibraryEvents.changes.collectLatest {
+        MediaFileRepository.invalidateTreeCache()
+        loadCurrentDirectory()
       }
+    }
 
     viewModelScope.launch(Dispatchers.IO) {
       PlaybackStateEvents.changes.collectLatest {
@@ -184,11 +190,18 @@ class FileSystemBrowserViewModel(
         appearancePreferences.unplayedOldVideoDays.changes(),
       ) { showLabels, thresholdDays ->
         showLabels to thresholdDays
-      }
-        .drop(1)
+      }.drop(1)
         .collectLatest {
           loadCurrentDirectory()
         }
+    }
+
+    // The cached media topology is reusable; only the visible flatten depth changes.
+    viewModelScope.launch {
+      browserPreferences.treeFlattenDepth
+        .changes()
+        .drop(1)
+        .collectLatest { loadCurrentDirectory() }
     }
   }
 
@@ -229,11 +242,26 @@ class FileSystemBrowserViewModel(
 
       if (folder.exists() && folder.isDirectory) {
         // Scan all video files in the folder
-        val videoFiles = folder.listFiles { file ->
-          file.isFile && file.extension.lowercase() in listOf(
-            "mp4", "mkv", "avi", "mov", "wmv", "flv", "webm", "m4v", "3gp", "mpg", "mpeg", "ts", "m2ts"
-          )
-        }
+        val videoFiles =
+          folder.listFiles { file ->
+            file.isFile &&
+              file.extension.lowercase() in
+              listOf(
+                "mp4",
+                "mkv",
+                "avi",
+                "mov",
+                "wmv",
+                "flv",
+                "webm",
+                "m4v",
+                "3gp",
+                "mpg",
+                "mpeg",
+                "ts",
+                "m2ts",
+              )
+          }
 
         if (!videoFiles.isNullOrEmpty()) {
           val filePaths = videoFiles.map { it.absolutePath }.toTypedArray()
@@ -281,18 +309,51 @@ class FileSystemBrowserViewModel(
   fun deleteFolders(folders: List<FileSystemItem.Folder>): Pair<Int, Int> {
     var successCount = 0
     var failureCount = 0
+    val deleteAll = browserPreferences.deleteFolderAllContents.get()
+    val includeAudio = browserPreferences.includeAudioBrowser.get()
 
-    Log.d(TAG, "Deleting ${folders.size} folders")
+    Log.d(TAG, "Deleting ${folders.size} folders (deleteAll=$deleteAll, includeAudio=$includeAudio)")
 
     folders.forEach { folder ->
       try {
         val dir = File(folder.path)
-        if (dir.exists() && dir.deleteRecursively()) {
-          successCount++
-          Log.d(TAG, "Successfully deleted folder: ${folder.path}")
-        } else {
+        if (!dir.exists()) {
           failureCount++
-          Log.w(TAG, "Failed to delete folder: ${folder.path}")
+          Log.w(TAG, "Folder does not exist: ${folder.path}")
+          return@forEach
+        }
+
+        if (deleteAll) {
+          if (dir.deleteRecursively()) {
+            successCount++
+            Log.d(TAG, "Successfully deleted folder (all contents): ${folder.path}")
+          } else {
+            failureCount++
+            Log.w(TAG, "Failed to delete folder: ${folder.path}")
+          }
+        } else {
+          var deletedAny = false
+          dir.listFiles()?.forEach { file ->
+            if (file.isFile) {
+              val ext = file.extension.lowercase()
+              val isVideo = ext in FileTypeUtils.VIDEO_EXTENSIONS
+              val isAudio = includeAudio && ext in FileTypeUtils.AUDIO_EXTENSIONS
+              if (isVideo || isAudio) {
+                if (file.delete()) deletedAny = true
+              }
+            }
+          }
+          // Remove empty subdirectories
+          dir.listFiles()?.forEach { file ->
+            if (file.isDirectory) file.delete()
+          }
+          if (deletedAny) {
+            successCount++
+            Log.d(TAG, "Deleted media files from folder: ${folder.path}")
+          } else {
+            failureCount++
+            Log.w(TAG, "No media files found in folder: ${folder.path}")
+          }
         }
       } catch (e: Exception) {
         Log.e(TAG, "Exception deleting folder: ${folder.path}", e)
@@ -300,10 +361,8 @@ class FileSystemBrowserViewModel(
       }
     }
 
-    // Set flag if any deletions were successful
     if (successCount > 0) {
       _itemsWereDeletedOrMoved.value = true
-      // Notify that media library has changed
       MediaLibraryEvents.notifyChanged()
     }
 
@@ -339,7 +398,10 @@ class FileSystemBrowserViewModel(
     return super.renameVideo(video, newDisplayName)
   }
 
-  suspend fun renameFolder(folder: FileSystemItem.Folder, newName: String): Boolean {
+  suspend fun renameFolder(
+    folder: FileSystemItem.Folder,
+    newName: String,
+  ): Boolean {
     val src = File(folder.path)
     val dst = File(src.parent ?: return false, newName)
     if (dst.exists()) return false
@@ -389,8 +451,7 @@ class FileSystemBrowserViewModel(
               path,
               showAllFileTypes = false,
               forceFileSystemCheck = forceFileSystemCheck,
-            )
-            .onSuccess { items ->
+            ).onSuccess { items ->
               // Get previous count for this path
               val previousCount = itemCountByPath[path] ?: 0
 
@@ -413,35 +474,37 @@ class FileSystemBrowserViewModel(
               Log.d(TAG, "Loaded directory: $path with $folderCount folders, $videoCount videos")
 
               // Enrich videos with metadata if chips are enabled
-              val enrichedItems = if (MetadataRetrieval.isVideoMetadataNeeded(browserPreferences)) {
-                Log.d(TAG, "Metadata chips enabled, enriching $videoCount videos")
-                val videoFiles = items.filterIsInstance<FileSystemItem.VideoFile>()
-                val videos = videoFiles.map { it.video }
-                val enrichedVideos = MetadataRetrieval.enrichVideosIfNeeded(
-                  context = getApplication(),
-                  videos = videos,
-                  browserPreferences = browserPreferences,
-                  metadataCache = metadataCache
-                )
-                
-                // Replace videos in items with enriched versions
-                val enrichedVideoMap = enrichedVideos.associateBy { it.id }
-                items.map { item ->
-                  when (item) {
-                    is FileSystemItem.VideoFile -> {
-                      val enrichedVideo = enrichedVideoMap[item.video.id]
-                      if (enrichedVideo != null) {
-                        item.copy(video = enrichedVideo)
-                      } else {
-                        item
+              val enrichedItems =
+                if (MetadataRetrieval.isVideoMetadataNeeded(browserPreferences)) {
+                  Log.d(TAG, "Metadata chips enabled, enriching $videoCount videos")
+                  val videoFiles = items.filterIsInstance<FileSystemItem.VideoFile>()
+                  val videos = videoFiles.map { it.video }
+                  val enrichedVideos =
+                    MetadataRetrieval.enrichVideosIfNeeded(
+                      context = getApplication(),
+                      videos = videos,
+                      browserPreferences = browserPreferences,
+                      metadataCache = metadataCache,
+                    )
+
+                  // Replace videos in items with enriched versions
+                  val enrichedVideoMap = enrichedVideos.associateBy { it.id }
+                  items.map { item ->
+                    when (item) {
+                      is FileSystemItem.VideoFile -> {
+                        val enrichedVideo = enrichedVideoMap[item.video.id]
+                        if (enrichedVideo != null) {
+                          item.copy(video = enrichedVideo)
+                        } else {
+                          item
+                        }
                       }
+                      else -> item
                     }
-                    else -> item
                   }
+                } else {
+                  items
                 }
-              } else {
-                items
-              }
 
               _unsortedItems.value = enrichedItems
 
@@ -510,4 +573,3 @@ class FileSystemBrowserViewModel(
     Log.d(TAG, "Loaded playback info for ${playbackMap.size} videos with progress")
   }
 }
-

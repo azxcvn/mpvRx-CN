@@ -1,11 +1,16 @@
-﻿package app.gyrolet.mpvrx.ui.browser.dialogs
+﻿/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
+package app.gyrolet.mpvrx.ui.browser.dialogs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
@@ -15,7 +20,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import app.gyrolet.mpvrx.ui.icons.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -29,7 +33,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -38,6 +41,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import app.gyrolet.mpvrx.preferences.AiPreferences
 import app.gyrolet.mpvrx.repository.ai.AiService
+import app.gyrolet.mpvrx.ui.icons.Icon
 import app.gyrolet.mpvrx.ui.icons.Icons
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -110,7 +114,13 @@ fun RenameDialog(
             Modifier
               .fillMaxWidth()
               .focusRequester(focusRequester),
-          label = { Text("新名称", fontWeight = FontWeight.Medium) },
+          label = {
+            Text(
+              androidx.compose.ui.res
+                .stringResource(app.gyrolet.mpvrx.R.string.ui_new_name),
+              fontWeight = FontWeight.Medium,
+            )
+          },
           singleLine = false,
           maxLines = 5,
           isError = isError.value,
@@ -141,11 +151,11 @@ fun RenameDialog(
             onClick = {
               scope.launch {
                 isAiLoading = true
-                aiService.renameWithAi(currentName, extension)
+                aiService
+                  .renameWithAi(currentName, extension)
                   .onSuccess { aiName ->
                     baseName.value = aiName.removeSuffix(extension ?: "")
-                  }
-                  .onFailure { _ ->
+                  }.onFailure { _ ->
                     isError.value = true
                     errorMessage.value = "AI 重命名失败，请检查 API 密钥和模型。"
                   }
@@ -162,15 +172,22 @@ fun RenameDialog(
                 strokeWidth = 2.dp,
               )
               Spacer(modifier = Modifier.width(8.dp))
-              Text("AI 思考中...")
+              Text(
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.ui_ai_is_thinking),
+              )
             } else {
               Icon(
-                imageVector = Icons.Default.AutoAwesome,
+                imageVector = Icons.RoundedFilled.AutoAwesome,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp),
               )
               Spacer(modifier = Modifier.width(8.dp))
-              Text("AI 重命名", fontWeight = FontWeight.Medium)
+              Text(
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.ui_ai_rename),
+                fontWeight = FontWeight.Medium,
+              )
             }
           }
         }
@@ -187,7 +204,9 @@ fun RenameDialog(
         shape = MaterialTheme.shapes.extraLarge,
       ) {
         Text(
-          text = "重命名",
+          text =
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.rename),
           fontWeight = FontWeight.Bold,
         )
       }
@@ -197,7 +216,11 @@ fun RenameDialog(
         onClick = onDismiss,
         shape = MaterialTheme.shapes.extraLarge,
       ) {
-        Text("取消", fontWeight = FontWeight.Medium)
+        Text(
+          androidx.compose.ui.res
+            .stringResource(app.gyrolet.mpvrx.R.string.generic_cancel),
+          fontWeight = FontWeight.Medium,
+        )
       }
     },
     containerColor = MaterialTheme.colorScheme.surface,

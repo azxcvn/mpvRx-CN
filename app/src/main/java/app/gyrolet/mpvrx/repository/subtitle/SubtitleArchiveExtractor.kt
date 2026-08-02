@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.repository.subtitle
 
 import java.io.ByteArrayInputStream
@@ -45,8 +52,13 @@ object SubtitleArchiveExtractor {
                 ),
               score =
                 ArchiveEntryScore(
-                  preferredNameMatch = preferredFileName != null && fileName.lowercase(Locale.ROOT) == preferredFileName,
-                  preferredEpisodeMatch = preferredEpisode != null && fileName.episodeNumbers().contains(preferredEpisode),
+                  preferredNameMatch =
+                    preferredFileName != null &&
+                      fileName.lowercase(
+                        Locale.ROOT,
+                      ) == preferredFileName,
+                  preferredEpisodeMatch =
+                    preferredEpisode != null && fileName.episodeNumbers().contains(preferredEpisode),
                   extensionPriority = extensionPriority[extension] ?: Int.MAX_VALUE,
                   size = payload.size,
                 ),
@@ -64,11 +76,13 @@ object SubtitleArchiveExtractor {
         candidates
       }
 
-    return filteredCandidates.minWithOrNull(compareBy<Candidate> { !it.score.preferredEpisodeMatch }
-      .thenBy { !it.score.preferredNameMatch }
-      .thenBy { it.score.extensionPriority }
-      .thenByDescending { it.score.size })
-      ?.subtitle
+    return filteredCandidates
+      .minWithOrNull(
+        compareBy<Candidate> { !it.score.preferredEpisodeMatch }
+          .thenBy { !it.score.preferredNameMatch }
+          .thenBy { it.score.extensionPriority }
+          .thenByDescending { it.score.size },
+      )?.subtitle
   }
 
   fun extensionFromName(value: String?): String? =
@@ -102,7 +116,8 @@ object SubtitleArchiveExtractor {
     return sample.startsWith("<!doctype html") ||
       sample.startsWith("<html") ||
       sample.startsWith("<style") ||
-      sample.contains("<head>") && sample.contains("<body")
+      sample.contains("<head>") &&
+      sample.contains("<body")
   }
 
   private fun String.isJunkArchiveEntry(): Boolean {

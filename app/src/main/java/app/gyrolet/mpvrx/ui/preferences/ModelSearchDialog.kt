@@ -1,12 +1,17 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.preferences
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -14,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
@@ -43,11 +47,15 @@ fun ModelSearchDialog(
 ) {
   var searchQuery by remember { mutableStateOf("") }
 
-  val sortedFiltered = remember(models, searchQuery) {
-    models
-      .filter { searchQuery.isBlank() || it.displayName.contains(searchQuery, ignoreCase = true) || it.id.contains(searchQuery, ignoreCase = true) }
-      .sortedWith(compareByDescending<AiModelInfo> { it.isFree }.thenBy { it.displayName })
-  }
+  val sortedFiltered =
+    remember(models, searchQuery) {
+      models
+        .filter {
+          searchQuery.isBlank() ||
+            it.displayName.contains(searchQuery, ignoreCase = true) ||
+            it.id.contains(searchQuery, ignoreCase = true)
+        }.sortedWith(compareByDescending<AiModelInfo> { it.isFree }.thenBy { it.displayName })
+    }
 
   AlertDialog(
     onDismissRequest = onDismiss,
@@ -56,12 +64,18 @@ fun ModelSearchDialog(
         value = searchQuery,
         onValueChange = { searchQuery = it },
         modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text("Search models...") },
+        placeholder = {
+          Text(
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.ui_search_models),
+          )
+        },
         singleLine = true,
-        colors = TextFieldDefaults.colors(
-          focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-          unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-        ),
+        colors =
+          TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+          ),
         shape = RoundedCornerShape(12.dp),
       )
     },
@@ -100,7 +114,10 @@ fun ModelSearchDialog(
     },
     confirmButton = {
       TextButton(onClick = onDismiss) {
-        Text("Cancel")
+        Text(
+          androidx.compose.ui.res
+            .stringResource(app.gyrolet.mpvrx.R.string.generic_cancel),
+        )
       }
     },
   )
@@ -115,7 +132,14 @@ private fun ModelSearchItem(
   Surface(
     onClick = onClick,
     shape = RoundedCornerShape(10.dp),
-    color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surface,
+    color =
+      if (isSelected) {
+        MaterialTheme.colorScheme.primaryContainer.copy(
+          alpha = 0.5f,
+        )
+      } else {
+        MaterialTheme.colorScheme.surface
+      },
     modifier = Modifier.fillMaxWidth(),
   ) {
     Row(
@@ -158,7 +182,9 @@ fun FreeTag() {
     color = MaterialTheme.colorScheme.primary,
   ) {
     Text(
-      text = "FREE",
+      text =
+        androidx.compose.ui.res
+          .stringResource(app.gyrolet.mpvrx.R.string.pref_player_orientation_free),
       modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
       color = MaterialTheme.colorScheme.onPrimary,
       style = MaterialTheme.typography.labelSmall,

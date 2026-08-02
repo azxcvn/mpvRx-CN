@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.player.controls.components
 
 import androidx.compose.animation.core.Animatable
@@ -7,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import kotlinx.coroutines.isActive
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -16,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import app.gyrolet.mpvrx.ui.icons.Icon
 import app.gyrolet.mpvrx.ui.icons.Icons
+import kotlinx.coroutines.isActive
 
 /**
  * View that shows the arrows animation when double tapping to seek
@@ -65,7 +72,7 @@ fun DoubleTapSeekTriangles(
 @Composable
 private fun DoubleTapArrow(alpha: Float) {
   Icon(
-    imageVector = Icons.Default.PlayArrow,
+    imageVector = Icons.RoundedFilled.PlayArrow,
     contentDescription = null,
     modifier =
       Modifier
@@ -74,4 +81,3 @@ private fun DoubleTapArrow(alpha: Float) {
     tint = Color.White,
   )
 }
-

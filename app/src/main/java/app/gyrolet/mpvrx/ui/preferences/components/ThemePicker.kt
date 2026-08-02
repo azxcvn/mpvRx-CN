@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.ui.preferences.components
 
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.gyrolet.mpvrx.R
@@ -26,48 +34,46 @@ import app.gyrolet.mpvrx.ui.theme.AppTheme
  */
 @Composable
 fun ThemePicker(
-    currentTheme: AppTheme,
-    isDarkMode: Boolean,
-    onThemeSelected: (AppTheme) -> Unit,
-    modifier: Modifier = Modifier,
+  currentTheme: AppTheme,
+  isDarkMode: Boolean,
+  onThemeSelected: (AppTheme, Offset) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
-    val listState = rememberLazyListState()
-    
-    LaunchedEffect(Unit) {
-        val index = AppTheme.entries.indexOf(currentTheme)
-        if (index >= 0) {
-            listState.animateScrollToItem(maxOf(0, index - 1))
-        }
-    }
+  val listState = rememberLazyListState()
 
-    Column(
-        modifier = modifier.fillMaxWidth()
+  LaunchedEffect(Unit) {
+    val index = AppTheme.entries.indexOf(currentTheme)
+    if (index >= 0) {
+      listState.animateScrollToItem(maxOf(0, index - 1))
+    }
+  }
+
+  Column(
+    modifier = modifier.fillMaxWidth(),
+  ) {
+    Text(
+      text = stringResource(R.string.pref_appearance_theme_picker_label),
+      style = MaterialTheme.typography.labelMedium,
+      color = MaterialTheme.colorScheme.primary,
+      modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
+    )
+
+    LazyRow(
+      modifier = Modifier.fillMaxWidth(),
+      state = listState,
+      contentPadding = PaddingValues(horizontal = 12.dp),
+      horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Text(
-            text = stringResource(R.string.pref_appearance_theme_picker_label),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+      items(AppTheme.entries) { theme ->
+        ThemePreviewCard(
+          theme = theme,
+          isSelected = theme == currentTheme,
+          isDarkMode = isDarkMode,
+          onClick = { position -> onThemeSelected(theme, position) },
         )
-        
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            state = listState,
-            contentPadding = PaddingValues(horizontal = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            items(AppTheme.entries) { theme ->
-                ThemePreviewCard(
-                    theme = theme,
-                    isSelected = theme == currentTheme,
-                    isDarkMode = isDarkMode,
-                    onClick = { onThemeSelected(theme) },
-                )
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(8.dp))
+      }
     }
+
+    Spacer(modifier = Modifier.height(8.dp))
+  }
 }
-
-

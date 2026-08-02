@@ -1,7 +1,14 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.repository.ai
 
-import java.io.File
 import kotlinx.serialization.Serializable
+import java.io.File
 
 @Serializable
 data class SpeechSegment(
@@ -21,5 +28,6 @@ interface SpeechToTextClient {
     apiKey: String,
     audioFile: File,
     language: String?,
+    model: String? = null,
   ): Result<SpeechTranscript>
 }

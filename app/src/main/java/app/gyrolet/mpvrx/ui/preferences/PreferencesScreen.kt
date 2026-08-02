@@ -1,8 +1,11 @@
-package app.gyrolet.mpvrx.ui.preferences
+﻿/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.AppIcon
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.preferences
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,7 +26,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,29 +33,38 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.navigation3.runtime.NavBackStack
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.key
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.rememberNavBackStack
 import app.gyrolet.mpvrx.R
+import app.gyrolet.mpvrx.preferences.SecureFolderPreferences
+import app.gyrolet.mpvrx.preferences.preference.collectAsState
 import app.gyrolet.mpvrx.presentation.Screen
+import app.gyrolet.mpvrx.ui.icons.AppIcon
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
+import app.gyrolet.mpvrx.ui.securefolder.SecureFolderGateScreen
 import app.gyrolet.mpvrx.ui.theme.LocalEmphasizedTypography
 import app.gyrolet.mpvrx.ui.utils.LocalBackStack
+import app.gyrolet.mpvrx.ui.utils.LocalShowSettingsBackArrow
 import app.gyrolet.mpvrx.ui.utils.popSafely
 import kotlinx.serialization.Serializable
+import org.koin.compose.koinInject
 
 private data class SettingsDestination(
   val title: String,
@@ -88,20 +99,21 @@ object PreferencesScreen : Screen {
           SettingsPane(
             sections = sections,
             selectedScreen = selectedScreen,
-            onScreenSelected = { selectedScreen = it }
+            onScreenSelected = { selectedScreen = it },
           )
         }
         VerticalDivider(
           modifier = Modifier.fillMaxHeight(),
           color = colorScheme.outlineVariant.copy(alpha = 0.5f),
-          thickness = 1.dp
+          thickness = 1.dp,
         )
         Box(modifier = Modifier.weight(0.6f)) {
           key(selectedScreen) {
             @Suppress("UNCHECKED_CAST")
             val detailBackstack = rememberNavBackStack(selectedScreen) as NavBackStack<Screen>
             CompositionLocalProvider(
-              LocalBackStack provides detailBackstack
+              LocalBackStack provides detailBackstack,
+              LocalShowSettingsBackArrow provides (detailBackstack.size > 1),
             ) {
               val activeScreen = detailBackstack.lastOrNull() ?: selectedScreen
               key(activeScreen) {
@@ -115,7 +127,7 @@ object PreferencesScreen : Screen {
       SettingsPane(
         sections = sections,
         selectedScreen = null,
-        onScreenSelected = { backstack.add(it) }
+        onScreenSelected = { backstack.add(it) },
       )
     }
   }
@@ -143,7 +155,7 @@ object PreferencesScreen : Screen {
           navigationIcon = {
             IconButton(onClick = { backstack.popSafely() }) {
               Icon(
-                Icons.Outlined.ArrowBack,
+                Icons.RoundedFilled.ArrowBack,
                 contentDescription = null,
                 tint = colorScheme.secondary,
               )
@@ -153,9 +165,10 @@ object PreferencesScreen : Screen {
       },
     ) { padding ->
       LazyColumn(
-        modifier = Modifier
-          .fillMaxSize()
-          .padding(padding),
+        modifier =
+          Modifier
+            .fillMaxSize()
+            .padding(padding),
         contentPadding = PaddingValues(bottom = 28.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
       ) {
@@ -180,120 +193,140 @@ object PreferencesScreen : Screen {
   @Composable
   private fun settingsSections(): List<SettingsSection> {
     val colorScheme = MaterialTheme.colorScheme
+    val secureFolderPreferences = koinInject<SecureFolderPreferences>()
+    val isSecureFolderEntryHidden by secureFolderPreferences.isEntryPointHidden.collectAsState()
     return listOf(
       SettingsSection(
         title = stringResource(R.string.pref_section_appearance),
         tint = colorScheme.onSurfaceVariant,
-        items = listOf(
-          SettingsDestination(
-            title = stringResource(R.string.pref_appearance_title),
-            summary = stringResource(R.string.pref_appearance_summary),
-            icon = Icons.Outlined.Palette,
-            screen = AppearancePreferencesScreen,
+        items =
+          listOf(
+            SettingsDestination(
+              title = stringResource(R.string.pref_appearance_title),
+              summary = stringResource(R.string.pref_appearance_summary),
+              icon = Icons.RoundedFilled.Palette,
+              screen = AppearancePreferencesScreen,
+            ),
           ),
-        ),
       ),
       SettingsSection(
         title = stringResource(R.string.pref_section_playback),
         tint = colorScheme.onSurfaceVariant,
-        items = listOf(
-          SettingsDestination(
-            title = stringResource(R.string.pref_player),
-            summary = stringResource(R.string.pref_player_summary),
-            icon = Icons.Default.Slideshow,
-            screen = PlayerPreferencesScreen,
+        items =
+          listOf(
+            SettingsDestination(
+              title = stringResource(R.string.pref_player),
+              summary = stringResource(R.string.pref_player_summary),
+              icon = Icons.RoundedFilled.Slideshow,
+              screen = PlayerPreferencesScreen,
+            ),
+            SettingsDestination(
+              title = stringResource(R.string.pref_decoder),
+              summary = stringResource(R.string.pref_decoder_summary),
+              icon = Icons.RoundedFilled.DeveloperBoard,
+              screen = DecoderPreferencesScreen,
+            ),
+            SettingsDestination(
+              title = stringResource(R.string.pref_audio),
+              summary = stringResource(R.string.pref_audio_summary),
+              icon = Icons.RoundedFilled.Audiotrack,
+              screen = AudioPreferencesScreen,
+            ),
           ),
-          SettingsDestination(
-            title = stringResource(R.string.pref_decoder),
-            summary = stringResource(R.string.pref_decoder_summary),
-            icon = Icons.Default.DeveloperBoard,
-            screen = DecoderPreferencesScreen,
-          ),
-          SettingsDestination(
-            title = stringResource(R.string.pref_audio),
-            summary = stringResource(R.string.pref_audio_summary),
-            icon = Icons.Outlined.Audiotrack,
-            screen = AudioPreferencesScreen,
-          ),
-        ),
       ),
       SettingsSection(
         title = stringResource(R.string.pref_section_gestures_controls),
         tint = colorScheme.onSurfaceVariant,
-        items = listOf(
-          SettingsDestination(
-            title = stringResource(R.string.pref_gesture),
-            summary = stringResource(R.string.pref_gesture_summary),
-            icon = Icons.Outlined.Gesture,
-            screen = GesturePreferencesScreen,
+        items =
+          listOf(
+            SettingsDestination(
+              title = stringResource(R.string.pref_gesture),
+              summary = stringResource(R.string.pref_gesture_summary),
+              icon = Icons.RoundedFilled.Gesture,
+              screen = GesturePreferencesScreen,
+            ),
+            SettingsDestination(
+              title = stringResource(R.string.pref_layout_title),
+              summary = stringResource(R.string.pref_layout_summary),
+              icon = Icons.RoundedFilled.GridView,
+              screen = PlayerControlsPreferencesScreen,
+            ),
           ),
-          SettingsDestination(
-            title = stringResource(R.string.pref_layout_title),
-            summary = stringResource(R.string.pref_layout_summary),
-            icon = Icons.Default.GridView,
-            screen = PlayerControlsPreferencesScreen,
-          ),
-        ),
       ),
       SettingsSection(
         title = stringResource(R.string.pref_section_subtitles),
         tint = colorScheme.onSurfaceVariant,
-        items = listOf(
-          SettingsDestination(
-            title = stringResource(R.string.pref_subtitles),
-            summary = stringResource(R.string.pref_subtitles_summary),
-            icon = Icons.Outlined.Subtitles,
-            screen = SubtitlesPreferencesScreen,
+        items =
+          listOf(
+            SettingsDestination(
+              title = stringResource(R.string.pref_subtitles),
+              summary = stringResource(R.string.pref_subtitles_summary),
+              icon = Icons.RoundedFilled.Subtitles,
+              screen = SubtitlesPreferencesScreen,
+            ),
           ),
-        ),
       ),
       SettingsSection(
         title = stringResource(R.string.pref_section_storage),
         tint = colorScheme.onSurfaceVariant,
-        items = listOf(
-          SettingsDestination(
-            title = stringResource(R.string.pref_folders_title),
-            summary = "媒体库文件夹、隐藏路径、字体和字幕目录。",
-            icon = Icons.Outlined.Folder,
-            screen = FoldersPreferencesScreen,
+        items =
+          listOfNotNull(
+            SettingsDestination(
+              title = stringResource(R.string.pref_folders_title),
+              summary = "Media library folders, hidden paths, fonts, and subtitle directories.",
+              icon = Icons.RoundedFilled.Folder,
+              screen = FoldersPreferencesScreen,
+            ),
+            if (!isSecureFolderEntryHidden) {
+              SettingsDestination(
+                title = stringResource(R.string.secure_folder_title),
+                summary = stringResource(R.string.secure_folder_summary),
+                icon = Icons.RoundedFilled.Lock,
+                screen = SecureFolderGateScreen,
+              )
+            } else {
+              null
+            },
           ),
-        ),
       ),
       SettingsSection(
         title = stringResource(R.string.pref_section_ai),
         tint = colorScheme.onSurfaceVariant,
-        items = listOf(
-          SettingsDestination(
-            title = stringResource(R.string.pref_section_ai_title),
-            summary = "提供商、模型、API 密钥、重命名工具、翻译和离线模型。",
-            icon = Icons.Default.AutoAwesome,
-            screen = AiIntegrationScreen,
+        items =
+          listOf(
+            SettingsDestination(
+              title = stringResource(R.string.pref_section_ai_title),
+              summary = "Provider, model, API keys, rename tools, translation, and offline models.",
+              icon = Icons.RoundedFilled.AutoAwesome,
+              screen = AiIntegrationScreen,
+            ),
           ),
-        ),
       ),
       SettingsSection(
         title = stringResource(R.string.pref_section_advanced),
         tint = colorScheme.onSurfaceVariant,
-        items = listOf(
-          SettingsDestination(
-            title = stringResource(R.string.pref_advanced),
-            summary = stringResource(R.string.pref_advanced_summary),
-            icon = Icons.Alternatives.AdvancedSettings,
-            screen = AdvancedPreferencesScreen,
+        items =
+          listOf(
+            SettingsDestination(
+              title = stringResource(R.string.pref_advanced),
+              summary = stringResource(R.string.pref_advanced_summary),
+              icon = Icons.Alternatives.AdvancedSettings,
+              screen = AdvancedPreferencesScreen,
+            ),
           ),
-        ),
       ),
       SettingsSection(
         title = stringResource(R.string.pref_section_about),
         tint = colorScheme.onSurfaceVariant,
-        items = listOf(
-          SettingsDestination(
-            title = stringResource(R.string.pref_about_title),
-            summary = stringResource(R.string.pref_about_summary),
-            icon = Icons.Outlined.Info,
-            screen = AboutScreen,
+        items =
+          listOf(
+            SettingsDestination(
+              title = stringResource(R.string.pref_about_title),
+              summary = stringResource(R.string.pref_about_summary),
+              icon = Icons.RoundedFilled.Info,
+              screen = AboutScreen,
+            ),
           ),
-        ),
       ),
     )
   }
@@ -305,22 +338,24 @@ private fun SettingsSearchEntry(
   modifier: Modifier = Modifier,
 ) {
   Surface(
-    modifier = modifier
-      .fillMaxWidth()
-      .clickable(onClick = onClick),
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .clickable(onClick = onClick),
     shape = MaterialTheme.shapes.extraExtraLarge,
     color = MaterialTheme.colorScheme.secondaryContainer,
     tonalElevation = 1.dp,
     shadowElevation = 1.dp,
   ) {
     Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 18.dp, vertical = 16.dp),
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 18.dp, vertical = 16.dp),
       verticalAlignment = Alignment.CenterVertically,
     ) {
       Icon(
-        imageVector = Icons.Outlined.Search,
+        imageVector = Icons.RoundedFilled.Search,
         contentDescription = null,
         modifier = Modifier.size(28.dp),
         tint = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -335,7 +370,7 @@ private fun SettingsSearchEntry(
         )
       }
       Icon(
-        imageVector = Icons.Default.ChevronRight,
+        imageVector = Icons.RoundedFilled.ChevronRight,
         contentDescription = null,
         modifier = Modifier.size(24.dp),
         tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.72f),
@@ -353,9 +388,10 @@ private fun SettingsSectionBlock(
   val emphasizedTypography = LocalEmphasizedTypography.current
 
   Column(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(top = 10.dp, bottom = 14.dp),
+    modifier =
+      Modifier
+        .fillMaxWidth()
+        .padding(top = 10.dp, bottom = 14.dp),
   ) {
     Column(
       modifier = Modifier.padding(horizontal = 24.dp),
@@ -417,17 +453,19 @@ private fun SettingsDestinationRow(
   isSelected: Boolean,
   onClick: () -> Unit,
 ) {
-  val rowBgColor = if (isSelected) {
-    MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-  } else {
-    Color.Transparent
-  }
+  val rowBgColor =
+    if (isSelected) {
+      MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+    } else {
+      Color.Transparent
+    }
   Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .background(rowBgColor)
-      .clickable(onClick = onClick)
-      .padding(horizontal = 14.dp, vertical = 13.dp),
+    modifier =
+      Modifier
+        .fillMaxWidth()
+        .background(rowBgColor)
+        .clickable(onClick = onClick)
+        .padding(horizontal = 14.dp, vertical = 13.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
     Surface(
@@ -470,7 +508,7 @@ private fun SettingsDestinationRow(
     Spacer(modifier = Modifier.width(10.dp))
 
     Icon(
-      imageVector = Icons.Default.ChevronRight,
+      imageVector = Icons.RoundedFilled.ChevronRight,
       contentDescription = null,
       modifier = Modifier.size(24.dp),
       tint = MaterialTheme.colorScheme.outline,

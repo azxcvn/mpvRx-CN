@@ -1,7 +1,11 @@
-package app.gyrolet.mpvrx.ui.player.controls.components.sheets
+﻿/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.player.controls.components.sheets
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +38,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import app.gyrolet.mpvrx.presentation.components.PlayerSheet
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
 import app.gyrolet.mpvrx.ui.theme.spacing
 
 data class AspectRatio(
@@ -73,7 +79,9 @@ fun AspectRatioSheet(
           .padding(vertical = MaterialTheme.spacing.medium),
     ) {
       Text(
-        text = "宽高比",
+        text =
+          androidx.compose.ui.res
+            .stringResource(app.gyrolet.mpvrx.R.string.ui_aspect_ratio),
         style = MaterialTheme.typography.headlineSmall,
         modifier =
           Modifier
@@ -83,7 +91,9 @@ fun AspectRatioSheet(
 
       // Preset ratios
       Text(
-        text = "预设",
+        text =
+          androidx.compose.ui.res
+            .stringResource(app.gyrolet.mpvrx.R.string.ui_presets),
         style = MaterialTheme.typography.titleSmall,
         modifier =
           Modifier
@@ -109,7 +119,9 @@ fun AspectRatioSheet(
       // Custom ratios
       if (customRatios.isNotEmpty()) {
         Text(
-          text = "自定义",
+          text =
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.pref_gesture_double_tap_custom),
           style = MaterialTheme.typography.titleSmall,
           modifier =
             Modifier
@@ -129,7 +141,7 @@ fun AspectRatioSheet(
               leadingIcon = null,
               trailingIcon = {
                 Icon(
-                  Icons.Default.Close,
+                  Icons.RoundedFilled.Close,
                   null,
                   modifier = Modifier.clickable { onDeleteCustomRatio(ratio) },
                 )
@@ -166,7 +178,9 @@ private fun AddCustomRatioRow(
         .padding(horizontal = MaterialTheme.spacing.medium),
   ) {
     Text(
-      text = "添加自定义比例（如 16:9）",
+      text =
+        androidx.compose.ui.res
+          .stringResource(app.gyrolet.mpvrx.R.string.ui_add_custom_ratio_e_g_16_9),
       style = MaterialTheme.typography.titleSmall,
       modifier = Modifier.padding(bottom = MaterialTheme.spacing.small),
     )
@@ -183,7 +197,12 @@ private fun AddCustomRatioRow(
           widthText = it.filter { char -> char.isDigit() || char == '.' }
           errorMessage = null
         },
-        label = { Text("宽度") },
+        label = {
+          Text(
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.ui_width),
+          )
+        },
         isError = errorMessage != null,
         keyboardOptions =
           KeyboardOptions(
@@ -209,7 +228,12 @@ private fun AddCustomRatioRow(
           heightText = it.filter { char -> char.isDigit() || char == '.' }
           errorMessage = null
         },
-        label = { Text("高度") },
+        label = {
+          Text(
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.ui_height),
+          )
+        },
         isError = errorMessage != null,
         keyboardOptions =
           KeyboardOptions(
@@ -244,11 +268,16 @@ private fun AddCustomRatioRow(
             heightText = ""
             keyboardController?.hide()
           } else {
-            errorMessage = "Invalid"
+            errorMessage = "无效"
           }
         },
       ) {
-        Icon(Icons.Default.Add, contentDescription = "添加")
+        Icon(
+          Icons.RoundedFilled.Add,
+          contentDescription =
+            androidx.compose.ui.res
+              .stringResource(app.gyrolet.mpvrx.R.string.ui_add),
+        )
       }
     }
 
@@ -279,7 +308,3 @@ private fun calculateRatio(
 }
 
 private fun abs(value: Double): Double = if (value < 0) -value else value
-
-
-
-

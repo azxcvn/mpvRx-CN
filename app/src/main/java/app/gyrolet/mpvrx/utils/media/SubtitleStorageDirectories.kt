@@ -1,7 +1,13 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.utils.media
 
 import android.content.Context
-import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 
 private const val SUBTITLES_DIRECTORY_NAME = "Subtitles"
@@ -37,13 +43,14 @@ fun resolveSubtitleLookupDirectories(
     return listOf(root)
   }
 
-  val directories = buildList {
-    runCatching { root.findFile(SUBTITLES_DIRECTORY_NAME) }
-      .getOrNull()
-      ?.takeIf { it.exists() && it.isDirectory }
-      ?.let(::add)
-    add(root)
-  }
+  val directories =
+    buildList {
+      runCatching { root.findFile(SUBTITLES_DIRECTORY_NAME) }
+        .getOrNull()
+        ?.takeIf { it.exists() && it.isDirectory }
+        ?.let(::add)
+      add(root)
+    }
 
   return directories.distinctBy { it.uri.toString() }
 }

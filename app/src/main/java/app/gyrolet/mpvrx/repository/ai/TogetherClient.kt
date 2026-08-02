@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.repository.ai
 
 import kotlinx.coroutines.Dispatchers
@@ -15,14 +22,10 @@ import java.util.concurrent.TimeUnit
 @Serializable
 private data class TogModel(
   val id: String,
+  val type: String? = null,
   val display_name: String? = null,
   val displayName: String? = null,
   val pricing: JsonObject? = null,
-)
-
-@Serializable
-private data class TogModelListResponse(
-  val data: List<TogModel>? = null,
 )
 
 @Serializable
@@ -32,20 +35,14 @@ private data class TogMessage(
 )
 
 @Serializable
-private data class TogChoice(
-  val message: TogMessage? = null,
+private data class TogErrorBody(
+  val error: TogErrorDetail? = null,
 )
 
 @Serializable
-private data class TogResponse(
-  val choices: List<TogChoice>? = null,
+private data class TogErrorDetail(
+  val message: String? = null,
 )
-
-@Serializable
-private data class TogErrorBody(val error: TogErrorDetail? = null)
-
-@Serializable
-private data class TogErrorDetail(val message: String? = null)
 
 @Serializable
 private data class TogChatRequest(
@@ -60,56 +57,65 @@ class TogetherClient(
   private val json: Json,
 ) : AiClient {
   companion object {
-    private const val TAG = "TogetherClient"
     private const val BASE_URL = "https://api.together.xyz/v1"
     private val JSON_MEDIA_TYPE = "application/json".toMediaType()
   }
 
   private val apiClient: OkHttpClient =
-    client.newBuilder()
+    client
+      .newBuilder()
       .connectTimeout(60, TimeUnit.SECONDS)
       .readTimeout(120, TimeUnit.SECONDS)
       .writeTimeout(60, TimeUnit.SECONDS)
       .build()
 
-  override suspend fun fetchModels(apiKey: String): Result<List<AiModelInfo>> = withContext(Dispatchers.IO) {
-    runCatching {
-      val request = Request.Builder()
-        .url("$BASE_URL/models")
-        .header("Authorization", "Bearer $apiKey")
-        .get()
-        .build()
+  override suspend fun fetchModels(apiKey: String): Result<List<AiModelInfo>> =
+    withContext(Dispatchers.IO) {
+      runCatching {
+        val request =
+          Request
+            .Builder()
+            .url("$BASE_URL/models")
+            .header("Authorization", "Bearer $apiKey")
+            .get()
+            .build()
 
-      val response = apiClient.newCall(request).execute()
-      val body = response.body.string()
+        val response = apiClient.newCall(request).execute()
+        val body = response.body.string()
 
-      if (!response.isSuccessful) throw Exception("Together API error ${response.code}: ${parseError(body)}")
+        if (!response.isSuccessful) throw Exception("Together API error ${response.code}: ${parseError(body)}")
 
-      val parsed = json.decodeFromString<TogModelListResponse>(body)
-      val models = parsed.data ?: emptyList()
-      models.map { model ->
-        AiModelInfo(
-          id = model.id,
-          displayName = model.displayName ?: model.display_name ?: model.id,
-          isFree = AiModelPricing.isZeroCost(model.pricing),
-        )
+        AiResponseParser
+          .modelArray(json, body, "Together")
+          .mapNotNull { element ->
+            runCatching { json.decodeFromJsonElement(TogModel.serializer(), element) }.getOrNull()
+          }.filter { it.type == null || it.type == "chat" || it.type == "language" }
+          .map { model ->
+            AiModelInfo(
+              id = model.id,
+              displayName = model.displayName ?: model.display_name ?: model.id,
+              isFree = AiModelPricing.isZeroCost(model.pricing),
+            )
+          }
       }
     }
-  }
 
-  override suspend fun verifyKey(apiKey: String): Result<String> = withContext(Dispatchers.IO) {
-    runCatching {
-      val request = Request.Builder()
-        .url("$BASE_URL/models")
-        .header("Authorization", "Bearer $apiKey")
-        .get()
-        .build()
+  override suspend fun verifyKey(apiKey: String): Result<String> =
+    withContext(Dispatchers.IO) {
+      runCatching {
+        val request =
+          Request
+            .Builder()
+            .url("$BASE_URL/models")
+            .header("Authorization", "Bearer $apiKey")
+            .get()
+            .build()
 
-      val response = apiClient.newCall(request).execute()
-      if (!response.isSuccessful) throw Exception("Invalid API key: ${response.code}")
-      "API key verified successfully"
+        val response = apiClient.newCall(request).execute()
+        if (!response.isSuccessful) throw Exception("Invalid API key: ${response.code}")
+        "API key verified successfully"
+      }
     }
-  }
 
   override suspend fun generateContent(
     apiKey: String,
@@ -117,42 +123,46 @@ class TogetherClient(
     instruction: String,
     userInput: String,
     options: AiGenerationOptions,
-  ): Result<String> = withContext(Dispatchers.IO) {
-    runCatching {
-      val requestBody = json.encodeToString(
-        TogChatRequest.serializer(),
-        TogChatRequest(
-          model = model,
-          messages = listOf(
-            TogMessage(role = "system", content = instruction),
-            TogMessage(role = "user", content = userInput),
-          ),
-          temperature = options.temperature,
-          maxTokens = options.maxTokens,
-        ),
-      )
+  ): Result<AiGeneratedContent> =
+    withContext(Dispatchers.IO) {
+      runCatching {
+        val requestBody =
+          json.encodeToString(
+            TogChatRequest.serializer(),
+            TogChatRequest(
+              model = model,
+              messages =
+                listOf(
+                  TogMessage(role = "system", content = instruction),
+                  TogMessage(role = "user", content = userInput),
+                ),
+              temperature = options.temperature,
+              maxTokens = options.maxTokens,
+            ),
+          )
 
-      val request = Request.Builder()
-        .url("$BASE_URL/chat/completions")
-        .header("Authorization", "Bearer $apiKey")
-        .post(requestBody.toRequestBody(JSON_MEDIA_TYPE))
-        .build()
+        val request =
+          Request
+            .Builder()
+            .url("$BASE_URL/chat/completions")
+            .header("Authorization", "Bearer $apiKey")
+            .post(requestBody.toRequestBody(JSON_MEDIA_TYPE))
+            .build()
 
-      val response = apiClient.newCall(request).execute()
-      val body = response.body.string()
+        val response = apiClient.newCall(request).execute()
+        val body = response.body.string()
 
-      if (!response.isSuccessful) throw Exception("Together generate error ${response.code}: ${parseError(body)}")
+        if (!response.isSuccessful) throw Exception("Together generate error ${response.code}: ${parseError(body)}")
 
-      val parsed = json.decodeFromString<TogResponse>(body)
-      parsed.choices?.firstOrNull()?.message?.content?.trim()
-        ?: throw Exception("No response from Together")
+        AiResponseParser.openAiCompatible(json, body, "Together")
+      }
     }
-  }
 
-  private fun parseError(body: String): String = try {
-    val error = json.decodeFromString<TogErrorBody>(body)
-    error.error?.message ?: body
-  } catch (_: Exception) {
-    body.take(200)
-  }
+  private fun parseError(body: String): String =
+    try {
+      val error = json.decodeFromString<TogErrorBody>(body)
+      error.error?.message ?: body
+    } catch (_: Exception) {
+      body.take(200)
+    }
 }

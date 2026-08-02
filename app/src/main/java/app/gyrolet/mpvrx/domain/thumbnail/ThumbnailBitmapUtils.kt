@@ -1,9 +1,17 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.domain.thumbnail
 
 import android.graphics.Bitmap
 import kotlin.math.abs
 
 internal const val MAX_THUMBNAIL_SIZE = 512
+internal const val THUMBNAIL_JPEG_QUALITY = 90
 
 internal fun calculateThumbnailSampleSize(
   width: Int,

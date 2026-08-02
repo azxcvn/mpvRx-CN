@@ -1,13 +1,26 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -20,7 +33,6 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import app.gyrolet.mpvrx.ui.theme.AppMotion
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -31,10 +43,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
@@ -43,22 +57,25 @@ import androidx.navigation3.ui.NavDisplay
 import app.gyrolet.mpvrx.preferences.AppearancePreferences
 import app.gyrolet.mpvrx.preferences.PlayerPreferences
 import app.gyrolet.mpvrx.preferences.preference.collectAsState
-import app.gyrolet.mpvrx.ui.player.NavigationAnimStyle
 import app.gyrolet.mpvrx.presentation.Screen
-import app.gyrolet.mpvrx.repository.NetworkRepository
-import app.gyrolet.mpvrx.utils.update.UpdateDialog
-import app.gyrolet.mpvrx.utils.update.UpdateViewModel
 import app.gyrolet.mpvrx.repository.NetworkLifecycleObserver
+import app.gyrolet.mpvrx.repository.NetworkRepository
 import app.gyrolet.mpvrx.ui.browser.MainScreen
+import app.gyrolet.mpvrx.ui.player.NavigationAnimStyle
+import app.gyrolet.mpvrx.ui.theme.AppMotion
 import app.gyrolet.mpvrx.ui.theme.DarkMode
 import app.gyrolet.mpvrx.ui.theme.MpvrxTheme
+import app.gyrolet.mpvrx.ui.theme.rememberThemeTransitionState
 import app.gyrolet.mpvrx.ui.utils.LocalBackStack
 import app.gyrolet.mpvrx.ui.utils.popSafely
 import app.gyrolet.mpvrx.utils.permission.PermissionUtils
+import app.gyrolet.mpvrx.utils.update.UpdateDialog
+import app.gyrolet.mpvrx.utils.update.UpdateViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
@@ -74,39 +91,97 @@ private fun screenNavTransition(
       EnterTransition.None togetherWith ExitTransition.None
 
     NavigationAnimStyle.Minimal ->
-      fadeIn(spring(dampingRatio = AppMotion.Spatial.Standard.dampingRatio, stiffness = AppMotion.Spatial.Standard.stiffness)) togetherWith fadeOut(spring(stiffness = AppMotion.Spatial.Standard.stiffness))
+      fadeIn(
+        spring(
+          dampingRatio = AppMotion.Spatial.Standard.dampingRatio,
+          stiffness = AppMotion.Spatial.Standard.stiffness,
+        ),
+      ) togetherWith
+        fadeOut(spring(stiffness = AppMotion.Spatial.Standard.stiffness))
 
     NavigationAnimStyle.FlipFade ->
-      (scaleIn(spring(dampingRatio = AppMotion.Spatial.Expressive.dampingRatio, stiffness = AppMotion.Spatial.Expressive.stiffness), initialScale = 0.94f) + fadeIn(spring(dampingRatio = AppMotion.Spatial.Expressive.dampingRatio, stiffness = AppMotion.Spatial.Expressive.stiffness))) togetherWith
-        (scaleOut(spring(stiffness = AppMotion.Spatial.Standard.stiffness), targetScale = 1.06f) + fadeOut(spring(stiffness = AppMotion.Spatial.Standard.stiffness)))
+      (
+        scaleIn(
+          spring(
+            dampingRatio = AppMotion.Spatial.Expressive.dampingRatio,
+            stiffness = AppMotion.Spatial.Expressive.stiffness,
+          ),
+          initialScale = 0.94f,
+        ) +
+          fadeIn(
+            spring(
+              dampingRatio = AppMotion.Spatial.Expressive.dampingRatio,
+              stiffness = AppMotion.Spatial.Expressive.stiffness,
+            ),
+          )
+      ) togetherWith
+        (
+          scaleOut(spring(stiffness = AppMotion.Spatial.Standard.stiffness), targetScale = 1.06f) +
+            fadeOut(spring(stiffness = AppMotion.Spatial.Standard.stiffness))
+        )
 
     NavigationAnimStyle.Depth ->
-      (slideInHorizontally(spring(dampingRatio = AppMotion.Spatial.Standard.dampingRatio, stiffness = AppMotion.Spatial.Standard.stiffness)) { it * dir } +
-        fadeIn(spring(dampingRatio = AppMotion.Spatial.Standard.dampingRatio, stiffness = AppMotion.Spatial.Standard.stiffness))) togetherWith
-        (slideOutHorizontally(spring(stiffness = AppMotion.Spatial.Standard.stiffness)) { (-it * 0.25f * dir).toInt() } +
-          scaleOut(spring(stiffness = AppMotion.Spatial.Standard.stiffness), targetScale = 0.92f) +
-          fadeOut(spring(stiffness = AppMotion.Spatial.Standard.stiffness)))
+      (
+        slideInHorizontally(
+          spring(
+            dampingRatio = AppMotion.Spatial.Standard.dampingRatio,
+            stiffness = AppMotion.Spatial.Standard.stiffness,
+          ),
+        ) {
+          it * dir
+        } +
+          fadeIn(
+            spring(
+              dampingRatio = AppMotion.Spatial.Standard.dampingRatio,
+              stiffness = AppMotion.Spatial.Standard.stiffness,
+            ),
+          )
+      ) togetherWith
+        (
+          slideOutHorizontally(
+            spring(stiffness = AppMotion.Spatial.Standard.stiffness),
+          ) { (-it * 0.25f * dir).toInt() } +
+            scaleOut(spring(stiffness = AppMotion.Spatial.Standard.stiffness), targetScale = 0.92f) +
+            fadeOut(spring(stiffness = AppMotion.Spatial.Standard.stiffness))
+        )
 
     NavigationAnimStyle.Elastic ->
-      (slideInHorizontally(
-        spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = 380f),
-      ) { it * dir } + fadeIn(spring(stiffness = AppMotion.Spatial.Snappy.stiffness))) togetherWith
-        (slideOutHorizontally(spring(stiffness = AppMotion.Spatial.Standard.stiffness)) { (-it / 3 * dir) } + fadeOut(spring(stiffness = AppMotion.Spatial.Standard.stiffness)))
+      (
+        slideInHorizontally(
+          spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = 380f),
+        ) { it * dir } + fadeIn(spring(stiffness = AppMotion.Spatial.Snappy.stiffness))
+      ) togetherWith
+        (
+          slideOutHorizontally(spring(stiffness = AppMotion.Spatial.Standard.stiffness)) { (-it / 3 * dir) } +
+            fadeOut(spring(stiffness = AppMotion.Spatial.Standard.stiffness))
+        )
 
     NavigationAnimStyle.Default ->
       if (forward) {
         slideInHorizontally(
-          spring(dampingRatio = AppMotion.Spatial.Expressive.dampingRatio, stiffness = AppMotion.Spatial.Expressive.stiffness),
+          spring(
+            dampingRatio = AppMotion.Spatial.Expressive.dampingRatio,
+            stiffness = AppMotion.Spatial.Expressive.stiffness,
+          ),
         ) { it } togetherWith
           slideOutHorizontally(
-            spring(dampingRatio = AppMotion.Spatial.Standard.dampingRatio, stiffness = AppMotion.Spatial.Standard.stiffness),
+            spring(
+              dampingRatio = AppMotion.Spatial.Standard.dampingRatio,
+              stiffness = AppMotion.Spatial.Standard.stiffness,
+            ),
           ) { -it / 8 }
       } else {
         slideInHorizontally(
-          spring(dampingRatio = AppMotion.Spatial.Expressive.dampingRatio, stiffness = AppMotion.Spatial.Expressive.stiffness),
+          spring(
+            dampingRatio = AppMotion.Spatial.Expressive.dampingRatio,
+            stiffness = AppMotion.Spatial.Expressive.stiffness,
+          ),
         ) { -it / 5 } togetherWith
           slideOutHorizontally(
-            spring(dampingRatio = AppMotion.Spatial.Standard.dampingRatio, stiffness = AppMotion.Spatial.Standard.stiffness),
+            spring(
+              dampingRatio = AppMotion.Spatial.Standard.dampingRatio,
+              stiffness = AppMotion.Spatial.Standard.stiffness,
+            ),
           ) { it }
       }
   }
@@ -115,7 +190,7 @@ private fun screenNavTransition(
 /**
  * Main entry point for the application
  */
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
   private val appearancePreferences by inject<AppearancePreferences>()
   private val playerPreferences by inject<PlayerPreferences>()
   private val networkRepository by inject<NetworkRepository>()
@@ -133,11 +208,12 @@ class MainActivity : ComponentActivity() {
   private val activityScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
   // Register the ActivityResultLauncher at class level
-  private val mediaAccessLauncher = registerForActivityResult(
-    ActivityResultContracts.StartIntentSenderForResult()
-  ) { result ->
-    PermissionUtils.handleMediaAccessResult(result.resultCode)
-  }
+  private val mediaAccessLauncher =
+    registerForActivityResult(
+      ActivityResultContracts.StartIntentSenderForResult(),
+    ) { result ->
+      PermissionUtils.handleMediaAccessResult(result.resultCode)
+    }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -146,26 +222,39 @@ class MainActivity : ComponentActivity() {
 
     val networkStreamingEnabled = appearancePreferences.showNetworkTab.get()
     if (networkStreamingEnabled) {
-      lifecycle.addObserver(app.gyrolet.mpvrx.ui.browser.networkstreaming.proxy.ProxyLifecycleObserver())
+      lifecycle.addObserver(
+        app.gyrolet.mpvrx.data.network.proxy
+          .ProxyLifecycleObserver(),
+      )
     }
     lifecycle.addObserver(NetworkLifecycleObserver(networkRepository))
 
     applyEdgeToEdge(
-      isDarkMode = resolveIsDarkMode(
-        darkMode = appearancePreferences.darkMode.get(),
-        isSystemInDarkTheme = isSystemInDarkThemeFromResources(),
-      ),
+      isDarkMode =
+        resolveIsDarkMode(
+          darkMode = appearancePreferences.darkMode.get(),
+          isSystemInDarkTheme = isSystemInDarkThemeFromResources(),
+        ),
     )
 
     setContent {
       // Set up theme and edge-to-edge display
       val dark by appearancePreferences.darkMode.collectAsState()
       val isSystemInDarkTheme = isSystemInDarkTheme()
-      val isDarkMode = remember(dark, isSystemInDarkTheme) {
-        dark == DarkMode.Dark || (dark == DarkMode.System && isSystemInDarkTheme)
-      }
+      val isDarkMode =
+        remember(dark, isSystemInDarkTheme) {
+          dark == DarkMode.Dark || (dark == DarkMode.System && isSystemInDarkTheme)
+        }
+      val themeTransitionState = rememberThemeTransitionState()
 
       LaunchedEffect(isDarkMode) {
+        if (themeTransitionState.isAnimating) {
+          snapshotFlow {
+            themeTransitionState.animationProgress.value to themeTransitionState.isAnimating
+          }.first { (progress, isAnimating) ->
+            !isAnimating || progress >= SYSTEM_BAR_THEME_SWITCH_PROGRESS
+          }
+        }
         applyEdgeToEdge(isDarkMode)
       }
 
@@ -184,7 +273,7 @@ class MainActivity : ComponentActivity() {
         }
       }
 
-      MpvrxTheme {
+      MpvrxTheme(transitionState = themeTransitionState) {
         Surface(modifier = Modifier.fillMaxSize()) {
           Navigator()
         }
@@ -200,11 +289,12 @@ class MainActivity : ComponentActivity() {
     }
   }
 
+
+
   private fun resolveIsDarkMode(
     darkMode: DarkMode,
     isSystemInDarkTheme: Boolean,
-  ): Boolean =
-    darkMode == DarkMode.Dark || (darkMode == DarkMode.System && isSystemInDarkTheme)
+  ): Boolean = darkMode == DarkMode.Dark || (darkMode == DarkMode.System && isSystemInDarkTheme)
 
   private fun isSystemInDarkThemeFromResources(): Boolean =
     (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
@@ -212,13 +302,23 @@ class MainActivity : ComponentActivity() {
   private fun applyEdgeToEdge(isDarkMode: Boolean) {
     if (appliedEdgeToEdgeDarkMode == isDarkMode) return
 
-    enableEdgeToEdge(
+    val synchronizedBarStyle =
       SystemBarStyle.auto(
-        lightScrim = Color.White.toArgb(),
-        darkScrim = Color.Transparent.toArgb(),
-      ) { isDarkMode },
+        lightScrim = Color(0xFFF7F5F8).toArgb(),
+        darkScrim = Color(0xFF161217).toArgb(),
+      ) { isDarkMode }
+    enableEdgeToEdge(
+      statusBarStyle = synchronizedBarStyle,
+      navigationBarStyle = synchronizedBarStyle,
     )
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      window.isNavigationBarContrastEnforced = false
+    }
     appliedEdgeToEdgeDarkMode = isDarkMode
+  }
+
+  private companion object {
+    const val SYSTEM_BAR_THEME_SWITCH_PROGRESS = 0.55f
   }
 
   /**
@@ -236,13 +336,13 @@ class MainActivity : ComponentActivity() {
           withContext(Dispatchers.Main) {
             Log.d("MainActivity", "Auto-connecting to: ${connection.name}")
           }
-          networkRepository.connect(connection)
+          networkRepository
+            .connect(connection)
             .onSuccess {
               withContext(Dispatchers.Main) {
                 Log.d("MainActivity", "Auto-connected successfully: ${connection.name}")
               }
-            }
-            .onFailure { e ->
+            }.onFailure { e ->
               withContext(Dispatchers.Main) {
                 Log.e("MainActivity", "Auto-connect failed for ${connection.name}: ${e.message}")
               }
@@ -273,20 +373,25 @@ class MainActivity : ComponentActivity() {
     val currentVersion = BuildConfig.VERSION_NAME.replace("-dev", "")
 
     // Conditionally initialize update feature based on build config
-    val updateViewModel: UpdateViewModel? = if (BuildConfig.ENABLE_UPDATE_FEATURE) {
-      viewModel(context as ComponentActivity)
-    } else {
-      null
-    }
-    val updateState by (updateViewModel?.updateState ?: MutableStateFlow(UpdateViewModel.UpdateState.Idle)).collectAsState()
+    val updateViewModel: UpdateViewModel? =
+      if (BuildConfig.ENABLE_UPDATE_FEATURE) {
+        viewModel(context as ComponentActivity)
+      } else {
+        null
+      }
+    val updateState by (
+      updateViewModel?.updateState ?: MutableStateFlow(
+        UpdateViewModel.UpdateState.Idle,
+      )
+    ).collectAsState()
     val isDownloading by (updateViewModel?.isDownloading ?: MutableStateFlow(false)).collectAsState()
     val downloadProgress by (updateViewModel?.downloadProgress ?: MutableStateFlow(0f)).collectAsState()
 
     // Provide both LocalBackStack and the LazyList/Grid states to all screens
     CompositionLocalProvider(
-      LocalBackStack provides typedBackstack
+      LocalBackStack provides typedBackstack,
     ) {
-      val hasNavEntries = typedBackstack.size > 0
+      val hasNavEntries = typedBackstack.isNotEmpty()
 
       LaunchedEffect(hasNavEntries) {
         if (!hasNavEntries) {
@@ -316,7 +421,9 @@ class MainActivity : ComponentActivity() {
           sizeTransform = null,
           transitionSpec = { screenNavTransition(forward = true, style = appNavStyle, speed = animSpeed) },
           popTransitionSpec = { screenNavTransition(forward = false, style = appNavStyle, speed = animSpeed) },
-          predictivePopTransitionSpec = { _: Int -> screenNavTransition(forward = false, style = appNavStyle, speed = animSpeed) },
+          predictivePopTransitionSpec = { _: Int ->
+            screenNavTransition(forward = false, style = appNavStyle, speed = animSpeed)
+          },
         )
       }
 
@@ -329,11 +436,11 @@ class MainActivity : ComponentActivity() {
               release = release,
               isDownloading = isDownloading,
               progress = downloadProgress,
-              actionLabel = if (isDownloading) "Downloading..." else "Download",
+              actionLabel = if (isDownloading) "下载中..." else "下载",
               currentVersion = currentVersion,
               onDismiss = { updateViewModel.dismiss() },
               onAction = { updateViewModel.downloadUpdate(release) },
-              onIgnore = { updateViewModel.ignoreVersion(release.tagName.removePrefix("v")) }
+              onIgnore = { updateViewModel.ignoreVersion(release.tagName.removePrefix("v")) },
             )
           }
           is UpdateViewModel.UpdateState.ReadyToInstall -> {
@@ -342,11 +449,11 @@ class MainActivity : ComponentActivity() {
               release = release,
               isDownloading = isDownloading,
               progress = downloadProgress,
-              actionLabel = "Install",
+              actionLabel = "安装",
               currentVersion = currentVersion,
               onDismiss = { updateViewModel.dismiss() },
               onAction = { updateViewModel.installUpdate(release) },
-              onIgnore = { updateViewModel.ignoreVersion(release.tagName.removePrefix("v")) }
+              onIgnore = { updateViewModel.ignoreVersion(release.tagName.removePrefix("v")) },
             )
           }
           else -> {}
@@ -355,5 +462,3 @@ class MainActivity : ComponentActivity() {
     }
   }
 }
-
-

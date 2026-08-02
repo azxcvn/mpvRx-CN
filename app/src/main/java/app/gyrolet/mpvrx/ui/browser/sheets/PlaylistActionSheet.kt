@@ -1,7 +1,11 @@
-﻿package app.gyrolet.mpvrx.ui.browser.sheets
+﻿/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.browser.sheets
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -42,6 +46,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,7 +55,9 @@ import kotlinx.coroutines.launch
 fun PlaylistActionSheet(
   isOpen: Boolean,
   onDismiss: () -> Unit,
-  repository: app.gyrolet.mpvrx.database.repository.PlaylistRepository,
+  onCreatePlaylist: suspend (String) -> Long,
+  onCreateM3UPlaylistFromFile: suspend (Uri) -> Result<Long>,
+  onCreateM3UPlaylist: suspend (String, String?) -> Result<Long>,
   context: android.content.Context,
   modifier: Modifier = Modifier,
 ) {
@@ -76,7 +84,9 @@ fun PlaylistActionSheet(
     ) {
       // Title
       Text(
-        text = "播放列表选项",
+        text =
+          androidx.compose.ui.res
+            .stringResource(app.gyrolet.mpvrx.R.string.ui_playlist_options),
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Medium,
         color = MaterialTheme.colorScheme.onSurface,
@@ -90,31 +100,37 @@ fun PlaylistActionSheet(
           showCreateDialog = true
         },
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-          containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
+        colors =
+          CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+          ),
       ) {
         Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+          modifier =
+            Modifier
+              .fillMaxWidth()
+              .padding(16.dp),
           horizontalArrangement = Arrangement.spacedBy(16.dp),
           verticalAlignment = Alignment.CenterVertically,
         ) {
           Icon(
-            imageVector = Icons.Filled.PlaylistAdd,
+            imageVector = Icons.RoundedFilled.PlaylistAdd,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(24.dp),
           )
           Column(modifier = Modifier.weight(1f)) {
             Text(
-              text = "创建空白播放列表",
+              text =
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.playlist_create_empty),
               style = MaterialTheme.typography.bodyLarge,
               fontWeight = FontWeight.Medium,
             )
             Text(
-              text = "创建新的空白播放列表",
+              text =
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.ui_create_a_new_blank_playlist),
               style = MaterialTheme.typography.bodySmall,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -127,31 +143,38 @@ fun PlaylistActionSheet(
           showM3UDialog = true
         },
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-          containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
+        colors =
+          CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+          ),
       ) {
         Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+          modifier =
+            Modifier
+              .fillMaxWidth()
+              .padding(16.dp),
           horizontalArrangement = Arrangement.spacedBy(16.dp),
           verticalAlignment = Alignment.CenterVertically,
         ) {
           Icon(
-            imageVector = Icons.Filled.Link,
+            imageVector = Icons.RoundedFilled.Link,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(24.dp),
           )
           Column(modifier = Modifier.weight(1f)) {
             Text(
-              text = "从 URL 添加 M3U 播放列表",
+              text =
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.ui_add_m3u_playlist_from_url),
               style = MaterialTheme.typography.bodyLarge,
               fontWeight = FontWeight.Medium,
             )
             Text(
-              text = "从网页 URL 导入播放列表",
+              text =
+                androidx.compose.ui.res.stringResource(
+                  app.gyrolet.mpvrx.R.string.ui_import_a_playlist_from_a_web_url,
+                ),
               style = MaterialTheme.typography.bodySmall,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -170,9 +193,10 @@ fun PlaylistActionSheet(
 
     Dialog(onDismissRequest = { showCreateDialog = false }) {
       Card(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(16.dp),
+        modifier =
+          Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         shape = MaterialTheme.shapes.extraLarge,
       ) {
         Column(
@@ -180,13 +204,20 @@ fun PlaylistActionSheet(
           verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
           Text(
-            text = "创建播放列表",
+            text =
+              androidx.compose.ui.res
+                .stringResource(app.gyrolet.mpvrx.R.string.ui_create_playlist),
             style = MaterialTheme.typography.headlineSmall,
           )
           OutlinedTextField(
             value = playlistName,
             onValueChange = { playlistName = it },
-            label = { Text("播放列表名称") },
+            label = {
+              Text(
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.ui_playlist_name),
+              )
+            },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
           )
@@ -198,7 +229,10 @@ fun PlaylistActionSheet(
               onClick = { showCreateDialog = false },
               shape = MaterialTheme.shapes.extraLarge,
             ) {
-              Text("取消")
+              Text(
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.generic_cancel),
+              )
             }
             Spacer(modifier = Modifier.width(8.dp))
             Button(
@@ -206,19 +240,21 @@ fun PlaylistActionSheet(
                 if (playlistName.isNotBlank()) {
                   coroutineScope.launch {
                     try {
-                      repository.createPlaylist(playlistName.trim())
-                      android.widget.Toast.makeText(
-                        context,
-                        "播放列表创建成功",
-                        android.widget.Toast.LENGTH_SHORT
-                      ).show()
+                      onCreatePlaylist(playlistName.trim())
+                      android.widget.Toast
+                        .makeText(
+                          context,
+                          context.getString(app.gyrolet.mpvrx.R.string.ui_playlist_created_successfully),
+                          android.widget.Toast.LENGTH_SHORT,
+                        ).show()
                       showCreateDialog = false
                     } catch (e: Exception) {
-                      android.widget.Toast.makeText(
-                        context,
-                        "创建播放列表失败: ${e.message}",
-                        android.widget.Toast.LENGTH_LONG
-                      ).show()
+                      android.widget.Toast
+                        .makeText(
+                          context,
+                          "Failed to create playlist: ${e.message}",
+                          android.widget.Toast.LENGTH_LONG,
+                        ).show()
                     }
                   }
                 }
@@ -226,7 +262,10 @@ fun PlaylistActionSheet(
               enabled = playlistName.isNotBlank(),
               shape = MaterialTheme.shapes.extraLarge,
             ) {
-              Text("Create")
+              Text(
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.ui_create),
+              )
             }
           }
         }
@@ -242,37 +281,49 @@ fun PlaylistActionSheet(
     val coroutineScope = rememberCoroutineScope()
 
     // File picker launcher
-    val filePickerLauncher = rememberLauncherForActivityResult(
-      contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-      uri?.let {
-        isLoading = true
-        coroutineScope.launch {
-          val result = repository.createM3UPlaylistFromFile(context, it)
-          result.onSuccess {
-            android.widget.Toast.makeText(
-              context,
-              "M3U 播放列表添加成功",
-              android.widget.Toast.LENGTH_SHORT
-            ).show()
-          }.onFailure { error ->
-            android.widget.Toast.makeText(
-              context,
-              "添加 M3U 播放列表失败: ${error.message}",
-              android.widget.Toast.LENGTH_LONG
-            ).show()
+    val filePickerLauncher =
+      rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+      ) { uri: Uri? ->
+        uri?.let {
+          isLoading = true
+          coroutineScope.launch {
+            val result = onCreateM3UPlaylistFromFile(it)
+            result
+              .onSuccess {
+                android.widget.Toast
+                  .makeText(
+                    context,
+                    context.getString(app.gyrolet.mpvrx.R.string.playlist_add_success),
+                    android.widget.Toast.LENGTH_SHORT,
+                  ).show()
+              }.onFailure { error ->
+                android.widget.Toast
+                  .makeText(
+                    context,
+                    "Failed to add M3U playlist: ${error.message}",
+                    android.widget.Toast.LENGTH_LONG,
+                  ).show()
+              }
+            isLoading = false
+            showM3UDialog = false
           }
-          isLoading = false
-          showM3UDialog = false
         }
       }
-    }
 
-    Dialog(onDismissRequest = if (isLoading) { {} } else { onDismiss }) {
+    Dialog(
+      onDismissRequest =
+        if (isLoading) {
+          {}
+        } else {
+          onDismiss
+        },
+    ) {
       Card(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(16.dp),
+        modifier =
+          Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         shape = MaterialTheme.shapes.extraLarge,
       ) {
         Column(
@@ -280,7 +331,9 @@ fun PlaylistActionSheet(
           verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
           Text(
-            text = "添加 M3U 播放列表",
+            text =
+              androidx.compose.ui.res
+                .stringResource(app.gyrolet.mpvrx.R.string.playlist_add_m3u_title),
             style = MaterialTheme.typography.headlineSmall,
           )
 
@@ -288,33 +341,45 @@ fun PlaylistActionSheet(
             OutlinedTextField(
               value = playlistUrl,
               onValueChange = { playlistUrl = it },
-              label = { Text("播放列表 URL") },
+              label = {
+                Text(
+                  androidx.compose.ui.res
+                    .stringResource(app.gyrolet.mpvrx.R.string.playlist_url_label),
+                )
+              },
               singleLine = false,
               maxLines = 3,
               modifier = Modifier.fillMaxWidth(),
-              enabled = !isLoading
+              enabled = !isLoading,
             )
 
             OutlinedTextField(
               value = playlistUserAgent,
               onValueChange = { playlistUserAgent = it },
-              label = { Text("自定义 User-Agent（可选）") },
+              label = {
+                Text(
+                  androidx.compose.ui.res
+                    .stringResource(app.gyrolet.mpvrx.R.string.ui_custom_user_agent_optional),
+                )
+              },
               singleLine = true,
               modifier = Modifier.fillMaxWidth(),
-              enabled = !isLoading
+              enabled = !isLoading,
             )
 
             // OR divider
             Row(
               modifier = Modifier.fillMaxWidth(),
               verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.spacedBy(8.dp)
+              horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
               androidx.compose.material3.HorizontalDivider(modifier = Modifier.weight(1f))
               Text(
-                text = "或",
+                text =
+                  androidx.compose.ui.res
+                    .stringResource(app.gyrolet.mpvrx.R.string.ui_or),
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
               )
               androidx.compose.material3.HorizontalDivider(modifier = Modifier.weight(1f))
             }
@@ -325,24 +390,27 @@ fun PlaylistActionSheet(
                 filePickerLauncher.launch("*/*")
               },
               enabled = !isLoading,
-              modifier = Modifier.fillMaxWidth()
+              modifier = Modifier.fillMaxWidth(),
             ) {
               Icon(
-                imageVector = Icons.Filled.FolderOpen,
+                imageVector = Icons.RoundedFilled.FolderOpen,
                 contentDescription = null,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(20.dp),
               )
               Spacer(modifier = Modifier.width(8.dp))
-              Text("选择本地 M3U 文件")
+              Text(
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.ui_choose_local_m3u_file),
+              )
             }
 
             if (isLoading) {
               Box(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
               ) {
                 androidx.compose.material3.CircularProgressIndicator(
-                  modifier = Modifier.size(32.dp)
+                  modifier = Modifier.size(32.dp),
                 )
               }
             }
@@ -357,7 +425,10 @@ fun PlaylistActionSheet(
               enabled = !isLoading,
               shape = MaterialTheme.shapes.extraLarge,
             ) {
-              Text("取消")
+              Text(
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.generic_cancel),
+              )
             }
             Spacer(modifier = Modifier.width(8.dp))
             Button(
@@ -366,23 +437,26 @@ fun PlaylistActionSheet(
                   isLoading = true
                   coroutineScope.launch {
                     val result =
-                      repository.createM3UPlaylist(
+                      onCreateM3UPlaylist(
                         playlistUrl.trim(),
                         playlistUserAgent.trim().takeIf { it.isNotEmpty() },
                       )
-                    result.onSuccess {
-                      android.widget.Toast.makeText(
-                        context,
-                        "M3U 播放列表添加成功",
-                        android.widget.Toast.LENGTH_SHORT
-                      ).show()
-                    }.onFailure { error ->
-                      android.widget.Toast.makeText(
-                        context,
-                        "添加 M3U 播放列表失败: ${error.message}",
-                        android.widget.Toast.LENGTH_LONG
-                      ).show()
-                    }
+                    result
+                      .onSuccess {
+                        android.widget.Toast
+                          .makeText(
+                            context,
+                            context.getString(app.gyrolet.mpvrx.R.string.playlist_add_success),
+                            android.widget.Toast.LENGTH_SHORT,
+                          ).show()
+                      }.onFailure { error ->
+                        android.widget.Toast
+                          .makeText(
+                            context,
+                            "Failed to add M3U playlist: ${error.message}",
+                            android.widget.Toast.LENGTH_LONG,
+                          ).show()
+                      }
                     isLoading = false
                     showM3UDialog = false
                   }
@@ -391,7 +465,10 @@ fun PlaylistActionSheet(
               enabled = playlistUrl.isNotBlank() && !isLoading,
               shape = MaterialTheme.shapes.extraLarge,
             ) {
-              Text("从 URL 添加")
+              Text(
+                androidx.compose.ui.res
+                  .stringResource(app.gyrolet.mpvrx.R.string.ui_add_from_url),
+              )
             }
           }
         }
@@ -399,7 +476,3 @@ fun PlaylistActionSheet(
     }
   }
 }
-
-
-
-

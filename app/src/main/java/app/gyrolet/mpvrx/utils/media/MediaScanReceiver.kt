@@ -1,3 +1,10 @@
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 package app.gyrolet.mpvrx.utils.media
 
 import android.content.BroadcastReceiver
@@ -10,22 +17,24 @@ import android.util.Log
  * Automatically notifies the app when new media files are added to the device
  */
 class MediaScanReceiver : BroadcastReceiver() {
-    companion object {
-        private const val TAG = "MediaScanReceiver"
-    }
+  companion object {
+    private const val TAG = "MediaScanReceiver"
+  }
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        if (context == null || intent == null) return
+  override fun onReceive(
+    context: Context?,
+    intent: Intent?,
+  ) {
+    if (context == null || intent == null) return
 
-        when (intent.action) {
-            Intent.ACTION_MEDIA_SCANNER_FINISHED -> {
-                val data = intent.data
-                Log.d(TAG, "Media scan event: ${intent.action}, data: $data")
-                
-                // Notify the app that media library has changed
-                MediaLibraryEvents.notifyChanged()
-            }
-        }
+    when (intent.action) {
+      Intent.ACTION_MEDIA_SCANNER_FINISHED -> {
+        val data = intent.data
+        Log.d(TAG, "Media scan event: ${intent.action}, data: $data")
+
+        // Notify the app that media library has changed
+        MediaLibraryEvents.notifyChanged()
+      }
     }
+  }
 }
-

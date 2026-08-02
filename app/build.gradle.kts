@@ -10,18 +10,20 @@ plugins {
   alias(libs.plugins.kotlinx.serialization)
   alias(libs.plugins.ksp)
   alias(libs.plugins.room)
+  alias(libs.plugins.ktlint)
 }
 
 android {
   namespace = "app.gyrolet.mpvrx"
   compileSdk = 37
+  ndkVersion = "27.3.13750724"
 
   defaultConfig {
     applicationId = "app.gyrolet.mpvrx"
     minSdk = 26
     targetSdk = 36
-    versionCode = 150
-    versionName = "1.5.0-preview.2"
+    versionCode = 200
+    versionName = "2.0.0"
 
     vectorDrawables {
       useSupportLibrary = true
@@ -77,7 +79,7 @@ android {
       isShrinkResources = true
       proguardFiles(
         getDefaultProguardFile("proguard-android-optimize.txt"),
-        "proguard-rules.pro"
+        "proguard-rules.pro",
       )
       ndk {
         debugSymbolLevel = "none"
@@ -94,7 +96,7 @@ android {
     named("debug") {
       applicationIdSuffix = ".debug"
       versionNameSuffix = "-${getCommitCount()}"
-      resValue("string", "app_name", "MpvRx-Debug")
+      resValue("string", "app_name", "mpvRx-Debug")
     }
   }
 
@@ -139,10 +141,11 @@ android {
 }
 
 androidComponents {
-  val abiCodes = mutableMapOf(
-    "armeabi-v7a" to 1,
-    "arm64-v8a" to 2
-  )
+  val abiCodes =
+    mutableMapOf(
+      "armeabi-v7a" to 1,
+      "arm64-v8a" to 2,
+    )
   if (enableX86) {
     abiCodes["x86"] = 3
     abiCodes["x86_64"] = 4
@@ -150,12 +153,13 @@ androidComponents {
 
   onVariants { variant ->
     variant.outputs.forEach { output ->
-      val abi = output.filters
-        .find { it.filterType == FilterConfiguration.FilterType.ABI }
-        ?.identifier
+      val abi =
+        output.filters
+          .find { it.filterType == FilterConfiguration.FilterType.ABI }
+          ?.identifier
 
       output.versionCode.set(
-        (output.versionCode.orNull ?: 0) * 10 + (abiCodes[abi] ?: 0)
+        (output.versionCode.orNull ?: 0) * 10 + (abiCodes[abi] ?: 0),
       )
     }
   }
@@ -168,7 +172,7 @@ kotlin {
       "-Xannotation-default-target=param-property",
       "-opt-in=com.google.accompanist.permissions.ExperimentalPermissionsApi",
       "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
-      "-opt-in=androidx.compose.material3.ExperimentalMaterial3ExpressiveApi"
+      "-opt-in=androidx.compose.material3.ExperimentalMaterial3ExpressiveApi",
     )
     jvmTarget.set(JvmTarget.JVM_17)
   }
@@ -203,7 +207,6 @@ dependencies {
   implementation(libs.androidx.compose.animation.graphics)
   implementation(libs.mediasession)
   implementation(libs.androidx.documentfile)
-  implementation(libs.bundles.coil)
 
   implementation(platform(libs.koin.bom))
   implementation(libs.bundles.koin)
@@ -235,9 +238,10 @@ dependencies {
   implementation(libs.truetype.parser)
   implementation(libs.fsaf)
   implementation(libs.mediainfo.lib)
-  implementation("com.llamatik:library:1.4.0")
+  implementation(libs.llamatik)
   implementation(libs.androidx.profileinstaller)
-  
+  implementation(libs.google.cast.framework)
+
   implementation(files("libs/mpvlib.aar"))
 
   // Network protocol libraries
@@ -249,27 +253,28 @@ dependencies {
   implementation(libs.nanohttpd)
   implementation(libs.lazycolumnscrollbar)
   implementation(libs.reorderable)
+  implementation(libs.androidx.biometric)
 }
 
-/* ---------------- Git helpers ---------------- */
+// ---------------- Git helpers ----------------
 
-fun getCommitCount(): String =
-  runCommand("git rev-list --count HEAD") ?: "0"
+fun getCommitCount(): String = runCommand("git rev-list --count HEAD") ?: "0"
 
-fun getCommitSha(): String =
-  runCommand("git rev-parse --short HEAD") ?: "unknown"
+fun getCommitSha(): String = runCommand("git rev-parse --short HEAD") ?: "unknown"
 
 fun runCommand(command: String): String? =
   try {
     val parts = command.split(' ')
-    val process = ProcessBuilder(parts)
-      .redirectErrorStream(true)
-      .start()
+    val process =
+      ProcessBuilder(parts)
+        .redirectErrorStream(true)
+        .start()
 
-    val output = process.inputStream
-      .bufferedReader()
-      .readText()
-      .trim()
+    val output =
+      process.inputStream
+        .bufferedReader()
+        .readText()
+        .trim()
 
     process.waitFor()
     output.ifEmpty { null }

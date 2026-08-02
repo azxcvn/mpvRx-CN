@@ -1,17 +1,17 @@
-package app.gyrolet.mpvrx.ui.player.controls.components
+/*
+ * SPDX-License-Identifier: CC-BY-NC-4.0
+ *
+ * This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International License.
+ * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
+ */
 
-import app.gyrolet.mpvrx.ui.icons.Icon
-import app.gyrolet.mpvrx.ui.icons.Icons
+package app.gyrolet.mpvrx.ui.player.controls.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import app.gyrolet.mpvrx.ui.theme.AppShapeScale
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,6 +27,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import app.gyrolet.mpvrx.R
+import app.gyrolet.mpvrx.ui.icons.Icon
+import app.gyrolet.mpvrx.ui.icons.Icons
+import app.gyrolet.mpvrx.ui.theme.AppShapeScale
 import app.gyrolet.mpvrx.ui.theme.spacing
 
 fun percentage(
@@ -62,7 +65,7 @@ fun VerticalSlider(
     val targetHeight by animateFloatAsState(
       percentage(coercedValue, range),
       animationSpec = spring(dampingRatio = 0.75f, stiffness = 300f),
-      label = "vsliderheight"
+      label = "vsliderheight",
     )
     Box(
       Modifier
@@ -110,7 +113,7 @@ fun VerticalSlider(
     val targetHeight by animateFloatAsState(
       percentage(coercedValue, range),
       animationSpec = spring(dampingRatio = 0.75f, stiffness = 300f),
-      label = "vsliderheight"
+      label = "vsliderheight",
     )
     Box(
       Modifier
@@ -159,7 +162,7 @@ fun BrightnessSlider(
         style = MaterialTheme.typography.titleSmall,
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,
-        modifier = Modifier.widthIn(min = 48.dp)
+        modifier = Modifier.widthIn(min = 48.dp),
       )
       VerticalSlider(
         coercedBrightness.coerceIn(0f, positiveRange.endInclusive),
@@ -171,10 +174,10 @@ fun BrightnessSlider(
       )
       Icon(
         when {
-          coercedBrightness < 0 -> Icons.Default.Brightness6
-          percentage(coercedBrightness, positiveRange) <= 0.3f -> Icons.Default.BrightnessLow
-          percentage(coercedBrightness, positiveRange) <= 0.6f -> Icons.Default.BrightnessMedium
-          else -> Icons.Default.BrightnessHigh
+          coercedBrightness < 0 -> Icons.RoundedFilled.Brightness6
+          percentage(coercedBrightness, positiveRange) <= 0.3f -> Icons.RoundedFilled.BrightnessLow
+          percentage(coercedBrightness, positiveRange) <= 0.6f -> Icons.RoundedFilled.BrightnessMedium
+          else -> Icons.RoundedFilled.BrightnessHigh
         },
         contentDescription = null,
         tint = MaterialTheme.colorScheme.primary,
@@ -212,7 +215,7 @@ fun VolumeSlider(
         style = MaterialTheme.typography.titleSmall,
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,
-        modifier = Modifier.widthIn(min = 48.dp)
+        modifier = Modifier.widthIn(min = 48.dp),
       )
       VerticalSlider(
         if (displayAsPercentage) percentage else volume,
@@ -224,11 +227,11 @@ fun VolumeSlider(
       )
       Icon(
         when (percentage) {
-          0 -> Icons.Default.VolumeOff
-          in 0..30 -> Icons.Default.VolumeMute
-          in 30..60 -> Icons.Default.VolumeDown
-          in 60..100 -> Icons.Default.VolumeUp
-          else -> Icons.Default.VolumeOff
+          0 -> Icons.RoundedFilled.VolumeOff
+          in 0..30 -> Icons.RoundedFilled.VolumeMute
+          in 30..60 -> Icons.RoundedFilled.VolumeDown
+          in 60..100 -> Icons.RoundedFilled.VolumeUp
+          else -> Icons.RoundedFilled.VolumeOff
         },
         contentDescription = null,
         tint = MaterialTheme.colorScheme.primary,
@@ -264,7 +267,3 @@ val getVolumeSliderText: @Composable (Int, Int, Int, Int, Boolean) -> String =
       }
     }
   }
-
-
-
-
