@@ -161,3 +161,6 @@ lint/tmp/
 
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 graft/
+
+# 本地附属内容（个人翻译备份，不入库）
+/附属内容/
