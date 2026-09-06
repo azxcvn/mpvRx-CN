@@ -31,6 +31,8 @@
   * 自 1.0.0 起至 2.5.0 最新版本的完整更新日志中文翻译。包含每个版本的详细特性迭代、功能改动以及问题修复记录。
 * 🛠️ **[Lua 与 JS 自定义脚本命令开发指南 (MPVRX_CUSTOM_COMMANDS)](docs/MPVRX_CUSTOM_COMMANDS-已翻译.md)**
   * 原版脚本扩展接口文档的完整中文翻译。供进阶用户和脚本开发者查阅 mpvRx 暴露的命令属性（`user-data/mpvrx/*`）、curl 异步网络请求桥接、原生控制面板 ID、自定义按钮交互逻辑及完整示例代码。
+* 📱 **[安装包版本与架构选择指南 (APK_SELECTION_GUIDE)](docs/APK_SELECTION_GUIDE-版本选择指南.md)**
+  * 针对 64位 (arm64-v8a)、32位 (armeabi-v7a)、universal (通用不分包)、x86_64、x86 等不同架构安装包的选包建议与详细区别解析，方便用户按设备快速选对版本。
 
 ---
 
