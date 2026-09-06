@@ -435,7 +435,7 @@ object NetworkStreamingScreen : Screen {
             ExtendedFloatingActionButton(
               onClick = { showAddMediaDialog = true },
               icon = { Icon(Icons.RoundedFilled.Add, contentDescription = null) },
-              text = { Text("Add Media") },
+              text = { Text("添加媒体") },
               modifier = Modifier.padding(bottom = navigationBarHeight),
             )
           }
@@ -687,15 +687,15 @@ private fun AddMediaDialog(
     text = {
       Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(
-          text = "Paste a torrent magnet link, direct video stream (HLS, MP4, MKV), or YouTube URL to save and play.",
+          text = "粘贴磁力链接、直连视频流（HLS、MP4、MKV）或 YouTube 链接以保存并播放。",
           style = MaterialTheme.typography.bodyMedium,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         OutlinedTextField(
           value = inputUrl,
           onValueChange = { inputUrl = it },
-          label = { Text("Stream or Magnet URL") },
-          placeholder = { Text("magnet:?xt=... or https://...") },
+          label = { Text("流媒体或磁力链接") },
+          placeholder = { Text("magnet:?xt=... 或 https://...") },
           modifier = Modifier.fillMaxWidth(),
           singleLine = true,
           trailingIcon = {
@@ -711,11 +711,11 @@ private fun AddMediaDialog(
                   }
                 },
               ) {
-                Icon(Icons.RoundedFilled.ContentPaste, contentDescription = "Paste")
+                Icon(Icons.RoundedFilled.ContentPaste, contentDescription = "粘贴")
               }
             } else {
               IconButton(onClick = { inputUrl = "" }) {
-                Icon(Icons.RoundedFilled.Close, contentDescription = "Clear")
+                Icon(Icons.RoundedFilled.Close, contentDescription = "清除")
               }
             }
           },
@@ -914,8 +914,8 @@ private fun MediaContent(
               verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
               TorrentSectionHeader(
-                title = "Continue Watching",
-                subtitle = "Resume your recent streams and torrents",
+                title = "继续观看",
+                subtitle = "继续播放您最近的流媒体和种子",
               )
               androidx.compose.foundation.lazy.LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -939,8 +939,8 @@ private fun MediaContent(
         // 3. Saved Links Section Header
         item {
           TorrentSectionHeader(
-            title = if (searchQuery.isNotBlank()) "Search Results (${mediaGroups.size})" else "Saved Links (${mediaGroups.size})",
-            subtitle = if (searchQuery.isNotBlank()) null else "Stream instantly with high-speed hardware acceleration",
+            title = if (searchQuery.isNotBlank()) "搜索结果 (${mediaGroups.size})" else "已保存的链接 (${mediaGroups.size})",
+            subtitle = if (searchQuery.isNotBlank()) null else "以高速硬件加速即时播放",
           )
         }
 

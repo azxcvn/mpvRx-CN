@@ -203,7 +203,7 @@ data object SecureFolderScreen : Screen {
               dateAdded = entity.dateHidden / 1000,
               mimeType = entity.mimeType,
               bucketId = "secure_folder",
-              bucketDisplayName = "Secure Folder",
+              bucketDisplayName = "安全文件夹",
               width = metadata?.width ?: 0,
               height = metadata?.height ?: 0,
               fps = metadata?.fps ?: 0f,
@@ -634,7 +634,7 @@ data object SecureFolderScreen : Screen {
 private enum class PendingAction { RESTORE, DELETE }
 
 private fun formatDuration(durationMs: Long): String {
-  if (durationMs <= 0) return "0s"
+  if (durationMs <= 0) return "0秒"
 
   val seconds = durationMs / 1000
   val hours = seconds / 3600
@@ -644,7 +644,7 @@ private fun formatDuration(durationMs: Long): String {
   return when {
     hours > 0 -> String.format(java.util.Locale.getDefault(), "%d:%02d:%02d", hours, minutes, secs)
     minutes > 0 -> String.format(java.util.Locale.getDefault(), "%d:%02d", minutes, secs)
-    else -> "${secs}s"
+    else -> "${secs}秒"
   }
 }
 

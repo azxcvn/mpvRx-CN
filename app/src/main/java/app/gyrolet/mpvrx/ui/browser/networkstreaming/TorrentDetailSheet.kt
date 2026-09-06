@@ -238,7 +238,7 @@ fun TorrentDetailSheet(
           ) {
             Icon(
               imageVector = Icons.RoundedFilled.Close,
-              contentDescription = "Close",
+              contentDescription = "关闭",
               modifier = Modifier.size(20.dp),
             )
           }
@@ -342,7 +342,7 @@ fun TorrentDetailSheet(
               color = MaterialTheme.colorScheme.surfaceContainerHigh,
             ) {
               Text(
-                text = "${group.files.size} Episodes",
+                text = "${group.files.size} 集",
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -373,7 +373,7 @@ fun TorrentDetailSheet(
               color = MaterialTheme.colorScheme.surfaceContainerHigh,
             ) {
               Text(
-                text = "Updated $relativeTime",
+                text = "更新于 $relativeTime",
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -417,7 +417,7 @@ fun TorrentDetailSheet(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                  text = if (viewedFileIndices.isEmpty()) "Watch Now" else "Resume Playback",
+                  text = if (viewedFileIndices.isEmpty()) "立即观看" else "继续播放",
                   style = MaterialTheme.typography.titleMedium,
                   fontWeight = FontWeight.Bold,
                 )
@@ -430,14 +430,14 @@ fun TorrentDetailSheet(
                 val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val clip = ClipData.newPlainText("Magnet URI", group.canonicalSourceUri)
                 clipboard.setPrimaryClip(clip)
-                Toast.makeText(context, "Magnet URL copied to clipboard", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "磁力链接已复制到剪贴板", Toast.LENGTH_SHORT).show()
               },
               modifier = Modifier.size(48.dp),
               shape = RoundedCornerShape(14.dp),
             ) {
               Icon(
                 imageVector = Icons.RoundedFilled.Share,
-                contentDescription = "Copy Magnet",
+                contentDescription = "复制磁力链接",
                 modifier = Modifier.size(20.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
               )
@@ -459,7 +459,7 @@ fun TorrentDetailSheet(
             ) {
               Icon(
                 imageVector = Icons.RoundedFilled.Delete,
-                contentDescription = "Delete Torrent",
+                contentDescription = "删除种子",
                 modifier = Modifier.size(20.dp),
               )
             }
@@ -480,7 +480,7 @@ fun TorrentDetailSheet(
                   modifier = Modifier.size(16.dp),
                 )
                 Spacer(modifier = Modifier.width(6.dp))
-                Text("Play from Beginning (Episode 1)", style = MaterialTheme.typography.labelMedium)
+                Text("从头播放（第 1 集）", style = MaterialTheme.typography.labelMedium)
               }
             }
           }
@@ -499,7 +499,7 @@ fun TorrentDetailSheet(
                 .clickable { isOverviewExpanded = !isOverviewExpanded },
           ) {
             Text(
-              text = "Storyline",
+              text = "剧情简介",
               style = MaterialTheme.typography.titleMedium,
               fontWeight = FontWeight.Bold,
               color = MaterialTheme.colorScheme.onSurface,
@@ -513,7 +513,7 @@ fun TorrentDetailSheet(
               overflow = TextOverflow.Ellipsis,
             )
             Text(
-              text = if (isOverviewExpanded) "Show less" else "Read more",
+              text = if (isOverviewExpanded) "收起" else "展开",
               style = MaterialTheme.typography.labelSmall,
               fontWeight = FontWeight.Bold,
               color = MaterialTheme.colorScheme.primary,
@@ -540,7 +540,7 @@ fun TorrentDetailSheet(
             verticalAlignment = Alignment.CenterVertically,
           ) {
             Text(
-              text = "Files & Episodes (${group.files.size})",
+              text = "文件与剧集 (${group.files.size})",
               style = MaterialTheme.typography.titleMedium,
               fontWeight = FontWeight.Bold,
               color = MaterialTheme.colorScheme.onSurface,
@@ -551,14 +551,14 @@ fun TorrentDetailSheet(
                 IconButton(onClick = { isSearchOpen = !isSearchOpen }) {
                   Icon(
                     imageVector = Icons.RoundedFilled.Search,
-                    contentDescription = "Search files",
+                    contentDescription = "搜索文件",
                     tint = if (isSearchOpen || searchQuery.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                   )
                 }
                 IconButton(onClick = { sortDescending = !sortDescending }) {
                   Icon(
                     imageVector = Icons.RoundedFilled.SwapVert,
-                    contentDescription = "Sort",
+                    contentDescription = "排序",
                     tint = if (sortDescending) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                   )
                 }
@@ -574,7 +574,7 @@ fun TorrentDetailSheet(
                 Modifier
                   .fillMaxWidth()
                   .padding(top = 8.dp),
-              placeholder = { Text("Filter episodes by name or number...") },
+              placeholder = { Text("按名称或集数筛选剧集...") },
               leadingIcon = {
                 Icon(
                   imageVector = Icons.RoundedFilled.Search,
@@ -587,7 +587,7 @@ fun TorrentDetailSheet(
                   IconButton(onClick = { searchQuery = "" }) {
                     Icon(
                       imageVector = Icons.RoundedFilled.Close,
-                      contentDescription = "Clear",
+                      contentDescription = "清除",
                       modifier = Modifier.size(18.dp),
                     )
                   }
@@ -611,7 +611,7 @@ fun TorrentDetailSheet(
             contentAlignment = Alignment.Center,
           ) {
             Text(
-              text = "No matching episodes found",
+              text = "未找到匹配的剧集",
               style = MaterialTheme.typography.bodyMedium,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -649,7 +649,7 @@ fun TorrentDetailSheet(
                   if (isViewed) {
                     Icon(
                       imageVector = Icons.RoundedFilled.Check,
-                      contentDescription = "Watched",
+                      contentDescription = "已观看",
                       modifier = Modifier.size(20.dp),
                       tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -692,7 +692,7 @@ fun TorrentDetailSheet(
               ) {
                 Icon(
                   imageVector = Icons.RoundedFilled.PlayArrow,
-                  contentDescription = "Play",
+                  contentDescription = "播放",
                   modifier = Modifier.size(20.dp),
                   tint = MaterialTheme.colorScheme.primary,
                 )
@@ -705,7 +705,7 @@ fun TorrentDetailSheet(
               ) {
                 Icon(
                   imageVector = Icons.RoundedFilled.Delete,
-                  contentDescription = "Remove from Media",
+                  contentDescription = "从媒体中移除",
                   modifier = Modifier.size(18.dp),
                   tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

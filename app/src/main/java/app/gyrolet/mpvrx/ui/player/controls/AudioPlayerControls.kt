@@ -640,7 +640,7 @@ fun AudioPlayerControls(
 
   val fullLosslessDetailString =
     remember(isHiRes, sampleRate, audioFormat, bitsPerSample, bitsPerSampleAlt, audioCodec, isLosslessCodecOrExt) {
-      val baseLabel = if (isHiRes) "HI-RES LOSSLESS" else "LOSSLESS"
+      val baseLabel = if (isHiRes) "高解析度无损" else "无损"
       val sr = sampleRate ?: 0
       val khzStr =
         if (sr > 0) {
@@ -720,7 +720,7 @@ fun AudioPlayerControls(
     mutableStateOf(
       currentItem?.title?.takeIf { it.isNotBlank() }?.stripAudioExtension()
         ?: mediaTitle?.takeIf { it.isNotBlank() }?.stripAudioExtension()
-        ?: "Audio Track",
+        ?: "音频曲目",
     )
   }
   LaunchedEffect(currentItem?.stableId, currentItem?.title, mediaTitle) {
@@ -741,7 +741,7 @@ fun AudioPlayerControls(
     remember(currentItem?.artist, rawArtist, rawArtistAlt, rawAlbumArtist, rawPerformer, retrievedArtist) {
       sequenceOf(currentItem?.artist, rawArtist, rawArtistAlt, rawAlbumArtist, rawPerformer, retrievedArtist)
         .filterNotNull()
-        .firstOrNull { it.isNotBlank() } ?: "Unknown Artist"
+        .firstOrNull { it.isNotBlank() } ?: "未知艺术家"
     }
 
   val audioPreferences = koinInject<AudioPreferences>()
@@ -1070,7 +1070,7 @@ fun AudioPlayerControls(
               if (showLosslessDetails && fullLosslessDetailString.isNotBlank()) {
                 fullLosslessDetailString
               } else {
-                if (isHiRes) "HI-RES LOSSLESS" else "LOSSLESS"
+                if (isHiRes) "高解析度无损" else "无损"
               },
             style =
               MaterialTheme.typography.labelSmall.copy(
@@ -1331,7 +1331,7 @@ fun AudioPlayerControls(
 
         // 3. Track Info | A-B Loop Control
         val playlistInfo = viewModel.getPlaylistInfo()
-        val trackText = if (playlistInfo != null) "Track $playlistInfo" else "Audio Media"
+        val trackText = if (playlistInfo != null) "曲目 $playlistInfo" else "音频媒体"
 
         Row(
           modifier = Modifier.fillMaxWidth(),
@@ -1436,7 +1436,7 @@ fun AudioPlayerControls(
                     Box(contentAlignment = Alignment.Center) {
                       Icon(
                         imageVector = Icons.RoundedFilled.Close,
-                        contentDescription = "Clear A-B Loop",
+                        contentDescription = "清除 A-B 循环",
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(16.dp),
                       )
@@ -1522,7 +1522,7 @@ fun AudioPlayerControls(
             ) {
               Icon(
                 imageVector = if (isCurrentTrackFavorite) Icons.RoundedFilled.Favorite else Icons.RoundedFilled.FavoriteBorder,
-                contentDescription = if (isCurrentTrackFavorite) "Remove from Favorites" else "Add to Favorites",
+                contentDescription = if (isCurrentTrackFavorite) "从收藏中移除" else "添加到收藏",
                 tint = if (isCurrentTrackFavorite) Color.White else MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(30.dp),
               )
@@ -1668,7 +1668,7 @@ fun AudioPlayerControls(
           Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
             Icon(
               imageVector = Icons.RoundedFilled.Equalizer,
-              contentDescription = "Equalizer",
+              contentDescription = "均衡器",
               tint = MaterialTheme.colorScheme.onSurface.copy(alpha = if (audioFiltersConfigOwned) 0.38f else 1f),
               modifier = Modifier.size(24.dp),
             )
@@ -1822,7 +1822,7 @@ fun AudioPlayerControls(
               ) {
                 Icon(
                   imageVector = Icons.RoundedFilled.Lyrics,
-                  contentDescription = "Lyrics",
+                  contentDescription = "歌词",
                   tint = if (showInPlaceLyrics) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
               }
@@ -1858,7 +1858,7 @@ fun AudioPlayerControls(
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
               Icon(
                 imageVector = Icons.RoundedFilled.QueueMusic,
-                contentDescription = "Playlist",
+                contentDescription = "播放列表",
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(24.dp),
               )
@@ -2136,7 +2136,7 @@ private fun UpNextPlaylistContent(
       horizontalArrangement = Arrangement.SpaceBetween,
     ) {
       Text(
-        text = "Coming up next",
+        text = "即将播放",
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.onSurface,
@@ -2146,7 +2146,7 @@ private fun UpNextPlaylistContent(
         color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f),
       ) {
         Text(
-          text = "${displayPlaylist.size} tracks",
+          text = "${displayPlaylist.size} 首曲目",
           style = MaterialTheme.typography.labelSmall,
           fontWeight = FontWeight.SemiBold,
           color = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -2161,7 +2161,7 @@ private fun UpNextPlaylistContent(
         contentAlignment = Alignment.Center,
       ) {
         Text(
-          text = "No songs in queue",
+          text = "队列中没有歌曲",
           style = MaterialTheme.typography.bodyMedium,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -2246,7 +2246,7 @@ private fun UpNextPlaylistItemRow(
       if (scope != null) {
         Icon(
           imageVector = Icons.RoundedFilled.DragHandle,
-          contentDescription = "Reorder",
+          contentDescription = "重新排序",
           tint = MaterialTheme.colorScheme.onSurfaceVariant,
           modifier = with(scope) {
             Modifier

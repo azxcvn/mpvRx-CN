@@ -49,24 +49,24 @@ import kotlinx.coroutines.delay
 enum class ControlsAnimationStyle(
   val displayName: String,
 ) {
-  Default("Default"),
-  Cinematic("Cinematic Scale"),
-  FluidExpand("Fluid Expand"),
-  SpringBounce("Gentle Bounce"),
-  Minimal("Minimal Fade"),
-  None("None"),
+  Default("默认"),
+  Cinematic("电影感缩放"),
+  FluidExpand("流体展开"),
+  SpringBounce("轻柔弹跳"),
+  Minimal("简洁淡出"),
+  None("无"),
 }
 
 /** Animation style when the video first opens. */
 enum class VideoOpenAnimation(
   val displayName: String,
 ) {
-  Default("Default"),
-  FadeDark("Fade from Black"),
-  ZoomBurst("Zoom Burst"),
-  SlideUp("Slide Up"),
-  CinemaBars("Cinema Bars"),
-  None("None"),
+  Default("默认"),
+  FadeDark("从黑场淡入"),
+  ZoomBurst("缩放爆发"),
+  SlideUp("向上滑动"),
+  CinemaBars("影院黑边"),
+  None("无"),
 }
 
 /** Tracks whether the selected open animation should still cover the player while media loads. */
@@ -79,12 +79,12 @@ data class VideoOpenAnimationState(
 enum class NavigationAnimStyle(
   val displayName: String,
 ) {
-  Default("Default"),
-  Elastic("Elastic Slide"),
-  Depth("Depth Zoom"),
-  FlipFade("Flip Fade"),
-  Minimal("Minimal Fade"),
-  None("None"),
+  Default("默认"),
+  Elastic("弹性滑动"),
+  Depth("景深缩放"),
+  FlipFade("翻转淡出"),
+  Minimal("简洁淡出"),
+  None("无"),
 }
 
 // ────────────────────────────────────────────────────────────────────────────

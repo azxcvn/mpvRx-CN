@@ -564,7 +564,7 @@ fun FileSystemBrowserScreen(path: String? = null) {
               if (isAtRoot) {
                 stringResource(app.gyrolet.mpvrx.R.string.app_name)
               } else {
-                breadcrumbs.lastOrNull()?.name ?: "Tree View"
+                breadcrumbs.lastOrNull()?.name ?: "树形视图"
               },
             isInSelectionMode = isInSelectionMode,
             selectedCount = selectedCount,
@@ -1418,7 +1418,7 @@ private fun FileSystemBrowserContent(
         EmptyState(
           icon = Icons.RoundedFilled.FolderOpen,
           title = stringResource(R.string.ui_empty_folder),
-          message = "This folder contains no videos or subfolders",
+          message = "此文件夹中没有任何视频或子文件夹",
         )
       }
     }
@@ -1876,7 +1876,7 @@ private fun FileSystemSearchContent(
           EmptyState(
             icon = Icons.RoundedFilled.Search,
             title = stringResource(R.string.ui_no_results_found),
-            message = "No files or folders match \"$searchQuery\"",
+            message = "没有与 \"$searchQuery\" 匹配的文件或文件夹",
           )
         }
       }

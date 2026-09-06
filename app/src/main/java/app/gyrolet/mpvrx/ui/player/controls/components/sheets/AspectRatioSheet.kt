@@ -69,7 +69,7 @@ fun AspectRatioSheet(
 ) {
   val presetRatios =
     listOf(
-      AspectRatio("Default", -1.0),
+      AspectRatio("默认", -1.0),
       AspectRatio("4:3", 4.0 / 3.0),
       AspectRatio("16:9", 16.0 / 9.0),
       AspectRatio("16:10", 16.0 / 10.0),
@@ -288,7 +288,7 @@ private fun AddCustomRatioRow(
                 heightText = ""
                 keyboardController?.hide()
               } else {
-                errorMessage = "Invalid"
+                errorMessage = "无效"
               }
             },
           ),
@@ -306,7 +306,7 @@ private fun AddCustomRatioRow(
             heightText = ""
             keyboardController?.hide()
           } else {
-            errorMessage = "Invalid"
+            errorMessage = "无效"
           }
         },
       ) {

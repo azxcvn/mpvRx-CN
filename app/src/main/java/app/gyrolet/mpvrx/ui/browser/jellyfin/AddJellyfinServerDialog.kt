@@ -136,13 +136,13 @@ fun AddJellyfinServerDialog(
       ) {
         Column(modifier = Modifier.weight(1f)) {
           Text(
-            text = "Add Jellyfin Server",
+            text = "添加 Jellyfin 服务器",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
           )
           Text(
-            text = "Enter your server address and account details",
+            text = "输入您的服务器地址和账户信息",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -153,7 +153,7 @@ fun AddJellyfinServerDialog(
         ) {
           Icon(
             imageVector = Icons.RoundedFilled.Close,
-            contentDescription = "Close",
+            contentDescription = "关闭",
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
           )
         }
@@ -163,7 +163,7 @@ fun AddJellyfinServerDialog(
       OutlinedTextField(
         value = serverUrl,
         onValueChange = { serverUrl = it },
-        label = { Text("Server Address") },
+        label = { Text("服务器地址") },
         placeholder = { Text("jellyfin.example.com or 192.168.1.100:8096") },
         leadingIcon = {
           Icon(
@@ -177,13 +177,13 @@ fun AddJellyfinServerDialog(
             IconButton(onClick = { serverUrl = "" }) {
               Icon(
                 imageVector = Icons.RoundedFilled.Close,
-                contentDescription = "Clear",
+                contentDescription = "清除",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
               )
             }
           }
         },
-        supportingText = { Text("HTTPS will be tried first automatically") },
+        supportingText = { Text("将自动优先尝试 HTTPS") },
         singleLine = true,
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth(),
@@ -198,8 +198,8 @@ fun AddJellyfinServerDialog(
       OutlinedTextField(
         value = serverName,
         onValueChange = { serverName = it },
-        label = { Text("Display Name (Optional)") },
-        placeholder = { Text("Home Jellyfin") },
+        label = { Text("显示名称（可选）") },
+        placeholder = { Text("家庭 Jellyfin") },
         leadingIcon = {
           Icon(
             imageVector = Icons.RoundedFilled.Edit,
@@ -220,7 +220,7 @@ fun AddJellyfinServerDialog(
       // Authentication Method Selector (M3 SingleChoiceSegmentedButtonRow)
       Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
-          text = "Authentication Method",
+          text = "认证方式",
           style = MaterialTheme.typography.labelLarge,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -240,7 +240,7 @@ fun AddJellyfinServerDialog(
               )
             },
           ) {
-            Text("Credentials")
+            Text("凭据")
           }
           SegmentedButton(
             selected = authMode == JellyfinAuthMode.TOKEN,
@@ -255,7 +255,7 @@ fun AddJellyfinServerDialog(
               )
             },
           ) {
-            Text("API Token")
+            Text("API 令牌")
           }
         }
       }
@@ -265,7 +265,7 @@ fun AddJellyfinServerDialog(
         OutlinedTextField(
           value = username,
           onValueChange = { username = it },
-          label = { Text("Username") },
+          label = { Text("用户名") },
           leadingIcon = {
             Icon(
               imageVector = Icons.RoundedFilled.Person,
@@ -286,7 +286,7 @@ fun AddJellyfinServerDialog(
         OutlinedTextField(
           value = password,
           onValueChange = { password = it },
-          label = { Text("Password") },
+          label = { Text("密码") },
           leadingIcon = {
             Icon(
               imageVector = Icons.RoundedFilled.Lock,
@@ -307,7 +307,7 @@ fun AddJellyfinServerDialog(
             IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
               Icon(
                 imageVector = if (isPasswordVisible) Icons.RoundedFilled.VisibilityOff else Icons.RoundedFilled.Visibility,
-                contentDescription = if (isPasswordVisible) "Hide password" else "Show password",
+                contentDescription = if (isPasswordVisible) "隐藏密码" else "显示密码",
               )
             }
           },
@@ -317,8 +317,8 @@ fun AddJellyfinServerDialog(
         OutlinedTextField(
           value = token,
           onValueChange = { token = it },
-          label = { Text("Access Token / API Key") },
-          placeholder = { Text("Paste token generated in Jellyfin Dashboard") },
+          label = { Text("访问令牌 / API 密钥") },
+          placeholder = { Text("粘贴在 Jellyfin 控制面板中生成的令牌") },
           leadingIcon = {
             Icon(
               imageVector = Icons.RoundedFilled.Security,
@@ -326,7 +326,7 @@ fun AddJellyfinServerDialog(
               tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
           },
-          supportingText = { Text("Dashboard -> API Keys") },
+          supportingText = { Text("控制面板 -> API 密钥") },
           singleLine = true,
           shape = RoundedCornerShape(16.dp),
           modifier = Modifier.fillMaxWidth(),
@@ -392,7 +392,7 @@ fun AddJellyfinServerDialog(
           )
           Spacer(modifier = Modifier.width(10.dp))
           Text(
-            text = "Connecting...",
+            text = "正在连接...",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
           )
@@ -404,7 +404,7 @@ fun AddJellyfinServerDialog(
           )
           Spacer(modifier = Modifier.width(8.dp))
           Text(
-            text = "Connect Server",
+            text = "连接服务器",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
           )
@@ -459,19 +459,19 @@ fun ManageJellyfinServersDialog(
       ) {
         Column(modifier = Modifier.weight(1f)) {
           Text(
-            text = "Jellyfin Servers",
+            text = "Jellyfin 服务器",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
           )
           Text(
-            text = "${servers.size} configured server${if (servers.size == 1) "" else "s"}",
+            text = "已配置 ${servers.size} 台服务器",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
         }
         TextButton(onClick = onDismiss) {
-          Text("Done")
+          Text("完成")
         }
       }
 
@@ -502,7 +502,7 @@ fun ManageJellyfinServersDialog(
                 modifier = Modifier.size(40.dp),
               )
               Text(
-                text = "No servers connected yet",
+                text = "尚未连接任何服务器",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
               )
@@ -616,7 +616,7 @@ fun ManageJellyfinServersDialog(
                 ) {
                   Icon(
                     imageVector = Icons.RoundedFilled.Delete,
-                    contentDescription = "Remove Server",
+                    contentDescription = "移除服务器",
                     tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(20.dp),
                   )
@@ -645,7 +645,7 @@ fun ManageJellyfinServersDialog(
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-          text = "Add Another Server",
+          text = "添加另一台服务器",
           style = MaterialTheme.typography.labelLarge,
         )
       }

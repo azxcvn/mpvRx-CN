@@ -323,7 +323,7 @@ fun M3UVideoCard(
           }
           if (isFavorite) {
             M3UMetadataChip(
-              text = "Saved",
+              text = "已保存",
               containerColor = MaterialTheme.colorScheme.primaryContainer,
               contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             )
@@ -336,7 +336,7 @@ fun M3UVideoCard(
           IconButton(onClick = onFavoriteClick) {
             Icon(
               imageVector = Icons.RoundedFilled.Bookmarks,
-              contentDescription = if (isFavorite) "Unsave stream" else "Save stream",
+              contentDescription = if (isFavorite) "取消保存流" else "保存流",
               tint =
                 if (isFavorite) {
                   MaterialTheme.colorScheme.primary

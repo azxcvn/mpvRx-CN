@@ -79,7 +79,7 @@ fun ExpressiveSwitch(
       modifier
         .semantics {
           role = Role.Switch
-          stateDescription = if (checked) "On" else "Off"
+          stateDescription = if (checked) "开" else "关"
         }.toggleable(
           value = checked,
           enabled = enabled,

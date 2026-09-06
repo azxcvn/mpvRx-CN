@@ -209,7 +209,7 @@ private fun JellyfinMusicHomeContent(
     if (uiState.musicJumpBackIn.isNotEmpty()) {
       item(key = "jump_back_in") {
         JellyfinCompactTrackGridSection(
-          title = "Jump back in",
+          title = "接着上次继续",
           tracks = uiState.musicJumpBackIn,
           server = server,
           onTrackClick = onItemClick,
@@ -220,7 +220,7 @@ private fun JellyfinMusicHomeContent(
     if (uiState.musicPlaylists.isNotEmpty()) {
       item(key = "music_playlists_row") {
         JellyfinPlaylistsRowSection(
-          title = "Playlists",
+          title = "播放列表",
           playlists = uiState.musicPlaylists,
           server = server,
           onPlaylistClick = onItemClick,
@@ -233,7 +233,7 @@ private fun JellyfinMusicHomeContent(
     if (uiState.musicRecentlyPlayedAlbums.isNotEmpty()) {
       item(key = "recently_played_albums") {
         JellyfinMusicAlbumRowSection(
-          title = "Recently played album",
+          title = "最近播放的专辑",
           albums = uiState.musicRecentlyPlayedAlbums,
           server = server,
           onAlbumClick = onItemClick,
@@ -292,7 +292,7 @@ fun JellyfinCompactTrackGridSection(
       )
       if (onSeeAllClick != null) {
         Text(
-          text = "See all",
+          text = "查看全部",
           style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
           color = MaterialTheme.colorScheme.primary,
           modifier = Modifier
@@ -402,7 +402,7 @@ fun JellyfinPlaylistsRowSection(
       )
       if (onSeeAllClick != null) {
         Text(
-          text = "See all",
+          text = "查看全部",
           style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
           color = MaterialTheme.colorScheme.primary,
           modifier = Modifier

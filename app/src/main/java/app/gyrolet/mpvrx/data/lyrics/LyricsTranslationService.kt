@@ -59,40 +59,40 @@ data class SupportedLanguage(
 
 object LyricsLanguageOptions {
   val ALL_LANGUAGES = listOf(
-    SupportedLanguage("en", "English"),
+    SupportedLanguage("en", "英语"),
     SupportedLanguage(
       "romaji",
-      "Romaji / Romanized (Pinyin, Academic)",
+      "罗马音 / 罗马化（拼音，学术）",
       isRomanization = true,
-      subtitle = "Pronunciation / Romaji / Pinyin",
+      subtitle = "发音 / 罗马音 / 拼音",
     ),
     SupportedLanguage(
       "hinglish_casual",
-      "Hinglish (Colloquial)",
+      "印地英语（口语）",
       isRomanization = true,
-      subtitle = "Casual spelling for Hindi, Punjabi, Bengali & more",
+      subtitle = "印地语、旁遮普语、孟加拉语等的口语拼写",
     ),
-    SupportedLanguage("hi", "Hindi (हिन्दी)"),
-    SupportedLanguage("es", "Spanish (Español)"),
-    SupportedLanguage("fr", "French (Français)"),
-    SupportedLanguage("de", "German (Deutsch)"),
-    SupportedLanguage("ja", "Japanese (日本語)"),
-    SupportedLanguage("ko", "Korean (한국어)"),
-    SupportedLanguage("zh-CN", "Chinese (Simplified)"),
-    SupportedLanguage("it", "Italian (Italiano)"),
-    SupportedLanguage("pt", "Portuguese (Português)"),
-    SupportedLanguage("ru", "Russian (Русский)"),
-    SupportedLanguage("ar", "Arabic (العربية)"),
-    SupportedLanguage("bn", "Bengali (বাংলা)"),
-    SupportedLanguage("ta", "Tamil (தமிழ்)"),
-    SupportedLanguage("te", "Telugu (తెలుగు)"),
-    SupportedLanguage("mr", "Marathi (मराठी)"),
-    SupportedLanguage("pa", "Punjabi (ਪੰਜਾਬੀ)"),
-    SupportedLanguage("ur", "Urdu (اردو)"),
+    SupportedLanguage("hi", "印地语 (हिन्दी)"),
+    SupportedLanguage("es", "西班牙语 (Español)"),
+    SupportedLanguage("fr", "法语 (Français)"),
+    SupportedLanguage("de", "德语 (Deutsch)"),
+    SupportedLanguage("ja", "日语 (日本語)"),
+    SupportedLanguage("ko", "韩语 (한국어)"),
+    SupportedLanguage("zh-CN", "中文 (简体)"),
+    SupportedLanguage("it", "意大利语 (Italiano)"),
+    SupportedLanguage("pt", "葡萄牙语 (Português)"),
+    SupportedLanguage("ru", "俄语 (Русский)"),
+    SupportedLanguage("ar", "阿拉伯语 (العربية)"),
+    SupportedLanguage("bn", "孟加拉语 (বাংলা)"),
+    SupportedLanguage("ta", "泰米尔语 (தமிழ்)"),
+    SupportedLanguage("te", "泰卢固语 (తెలుగు)"),
+    SupportedLanguage("mr", "马拉地语 (मराठी)"),
+    SupportedLanguage("pa", "旁遮普语 (ਪੰਜਾਬੀ)"),
+    SupportedLanguage("ur", "乌尔都语 (اردو)"),
   )
 
   fun getDisplayName(code: String): String {
-    if (code.equals("hinglish", ignoreCase = true)) return "Romaji / Romanized"
+    if (code.equals("hinglish", ignoreCase = true)) return "罗马音 / 罗马化"
     return ALL_LANGUAGES.firstOrNull { it.code.equals(code, ignoreCase = true) }?.displayName ?: code.uppercase()
   }
 }

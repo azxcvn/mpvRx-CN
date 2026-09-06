@@ -188,7 +188,7 @@ fun SeerrConnectionDialog(
               fontWeight = FontWeight.Bold,
             )
             Text(
-              text = if (isConnected) "Active Connection" else "Overseerr / Jellyseerr",
+              text = if (isConnected) "活动连接" else "Overseerr / Jellyseerr",
               style = MaterialTheme.typography.bodySmall,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -252,7 +252,7 @@ fun SeerrConnectionDialog(
 
             Column(modifier = Modifier.weight(1f)) {
               Text(
-                text = currentUser.displayName ?: currentUser.username ?: "Connected User",
+                text = currentUser.displayName ?: currentUser.username ?: "已连接用户",
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -271,7 +271,7 @@ fun SeerrConnectionDialog(
                   modifier = Modifier.padding(top = 4.dp),
                 ) {
                   Text(
-                    text = "Admin",
+                    text = "管理员",
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -287,7 +287,7 @@ fun SeerrConnectionDialog(
             ) {
               Icon(
                 Icons.RoundedFilled.Edit,
-                contentDescription = "Reconfigure Server",
+                contentDescription = "重新配置服务器",
                 tint = if (isEditingServer) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(20.dp),
               )
@@ -326,7 +326,7 @@ fun SeerrConnectionDialog(
           HorizontalDivider()
           Spacer(modifier = Modifier.height(16.dp))
           Text(
-            text = "Switch or Reconfigure Server",
+            text = "切换或重新配置服务器",
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
           )
@@ -358,7 +358,7 @@ fun SeerrConnectionDialog(
         FilterChip(
           selected = authType == SeerrAuthType.JELLYFIN,
           onClick = { authType = SeerrAuthType.JELLYFIN },
-          label = { Text("Jellyfin Auth") },
+          label = { Text("Jellyfin 认证") },
           shape = RoundedCornerShape(10.dp),
           colors = FilterChipDefaults.filterChipColors(
             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -368,7 +368,7 @@ fun SeerrConnectionDialog(
         FilterChip(
           selected = authType == SeerrAuthType.LOCAL,
           onClick = { authType = SeerrAuthType.LOCAL },
-          label = { Text("Local Account") },
+          label = { Text("本地账户") },
           shape = RoundedCornerShape(10.dp),
           colors = FilterChipDefaults.filterChipColors(
             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -378,7 +378,7 @@ fun SeerrConnectionDialog(
         FilterChip(
           selected = authType == SeerrAuthType.API_KEY,
           onClick = { authType = SeerrAuthType.API_KEY },
-          label = { Text("API Key") },
+          label = { Text("API 密钥") },
           shape = RoundedCornerShape(10.dp),
           colors = FilterChipDefaults.filterChipColors(
             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -413,7 +413,7 @@ fun SeerrConnectionDialog(
           value = username,
           onValueChange = { username = it },
           label = {
-            Text(if (authType == SeerrAuthType.JELLYFIN) "Jellyfin Username" else "Email / Username")
+            Text(if (authType == SeerrAuthType.JELLYFIN) "Jellyfin 用户名" else "电子邮箱 / 用户名")
           },
           leadingIcon = {
             Icon(Icons.RoundedFilled.Person, contentDescription = null)
@@ -513,7 +513,7 @@ fun SeerrConnectionDialog(
             modifier = Modifier.size(20.dp),
           )
           Spacer(modifier = Modifier.width(10.dp))
-          Text("Connecting…", fontWeight = FontWeight.Bold)
+          Text("正在连接…", fontWeight = FontWeight.Bold)
         } else {
           Icon(Icons.RoundedFilled.Link, contentDescription = null, modifier = Modifier.size(20.dp))
           Spacer(modifier = Modifier.width(8.dp))

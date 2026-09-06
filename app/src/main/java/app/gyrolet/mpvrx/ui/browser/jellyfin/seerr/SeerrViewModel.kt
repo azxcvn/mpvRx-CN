@@ -167,7 +167,7 @@ class SeerrViewModel(
           _uiState.update {
             it.copy(
               isConnecting = false,
-              connectionError = err.message ?: "Failed to connect to server",
+              connectionError = err.message ?: "无法连接到服务器",
             )
           }
         },
@@ -213,7 +213,7 @@ class SeerrViewModel(
           _uiState.update {
             it.copy(
               isConnecting = false,
-              connectionError = err.message ?: "Invalid API Key or Server URL",
+              connectionError = err.message ?: "API 密钥或服务器 URL 无效",
             )
           }
         },
@@ -445,7 +445,7 @@ class SeerrViewModel(
               selectedMediaDetails = newDetails ?: curDetails,
               selectedSearchItem = newSearchItem ?: curSearchItem,
               activeRequests = listOf(req) + state.activeRequests.filter { it.id != req.id },
-              actionMessage = "Request submitted successfully",
+              actionMessage = "请求已成功提交",
             )
           }
 
@@ -456,7 +456,7 @@ class SeerrViewModel(
           _uiState.update {
             it.copy(
               isRequesting = false,
-              actionMessage = "Failed: ${err.message}",
+              actionMessage = "失败：${err.message}",
             )
           }
         },
@@ -490,7 +490,7 @@ class SeerrViewModel(
     viewModelScope.launch {
       val res = seerrRepository.approveRequest(requestId)
       res.onSuccess { req ->
-        _uiState.update { it.copy(actionMessage = "Request approved") }
+        _uiState.update { it.copy(actionMessage = "请求已批准") }
         val tmdbId = req.media.tmdbId ?: req.media.id
         if (tmdbId > 0) {
           val mediaType = req.getMediaType()
@@ -506,7 +506,7 @@ class SeerrViewModel(
     viewModelScope.launch {
       val res = seerrRepository.declineRequest(requestId)
       res.onSuccess { req ->
-        _uiState.update { it.copy(actionMessage = "Request declined") }
+        _uiState.update { it.copy(actionMessage = "请求已拒绝") }
         val tmdbId = req.media.tmdbId ?: req.media.id
         if (tmdbId > 0) {
           val mediaType = req.getMediaType()
@@ -538,7 +538,7 @@ class SeerrViewModel(
               availableRequests = state.availableRequests.filter { it.id != requestId },
               selectedMediaDetails = newDetails,
               selectedSearchItem = newSearchItem,
-              actionMessage = "Request deleted",
+              actionMessage = "请求已删除",
             )
           }
           if (tmdbId != null && mediaType != null) {
@@ -549,7 +549,7 @@ class SeerrViewModel(
           loadDashboard()
         },
         onFailure = { err ->
-          _uiState.update { it.copy(actionMessage = "Failed to delete request: ${err.message}") }
+          _uiState.update { it.copy(actionMessage = "删除请求失败：${err.message}") }
         },
       )
     }
@@ -575,7 +575,7 @@ class SeerrViewModel(
               availableRequests = state.availableRequests.filter { it.media.id != mediaId },
               selectedMediaDetails = newDetails,
               selectedSearchItem = newSearchItem,
-              actionMessage = "Media deleted from Seerr",
+              actionMessage = "已从 Seerr 删除媒体",
             )
           }
           if (tmdbId != null && mediaType != null) {
@@ -586,7 +586,7 @@ class SeerrViewModel(
           loadDashboard()
         },
         onFailure = { err ->
-          _uiState.update { it.copy(actionMessage = "Failed to delete media: ${err.message}") }
+          _uiState.update { it.copy(actionMessage = "删除媒体失败：${err.message}") }
         },
       )
     }

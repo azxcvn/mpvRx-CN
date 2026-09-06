@@ -62,17 +62,17 @@ enum class EqualizerPreset(
   val displayName: String,
   val gains: List<Int>,
 ) {
-  FLAT("Flat", listOf(0, 0, 0, 0, 0)),
-  ROCK("Rock", listOf(4, 2, -1, 2, 4)),
-  POP("Pop", listOf(-1, 2, 4, 2, -1)),
-  JAZZ("Jazz", listOf(3, 2, -1, 2, 3)),
-  CLASSICAL("Classical", listOf(3, 1, -1, 2, 3)),
-  ELECTRONIC("Electronic", listOf(5, 3, 0, 2, 4)),
-  BASS_BOOST("Bass Boost", listOf(5, 3, 0, -1, -2)),
-  TREBLE_BOOST("Treble Boost", listOf(-2, -1, 0, 3, 5)),
-  VOICE_BOOST("Voice Boost", listOf(2, 4, 5, 3, 1)),
-  LOUDNESS("Loudness", listOf(4, 2, 0, 2, 4)),
-  CUSTOM("Custom", listOf(0, 0, 0, 0, 0)),
+  FLAT("平坦", listOf(0, 0, 0, 0, 0)),
+  ROCK("摇滚", listOf(4, 2, -1, 2, 4)),
+  POP("流行", listOf(-1, 2, 4, 2, -1)),
+  JAZZ("爵士", listOf(3, 2, -1, 2, 3)),
+  CLASSICAL("古典", listOf(3, 1, -1, 2, 3)),
+  ELECTRONIC("电子", listOf(5, 3, 0, 2, 4)),
+  BASS_BOOST("低音增强", listOf(5, 3, 0, -1, -2)),
+  TREBLE_BOOST("高音增强", listOf(-2, -1, 0, 3, 5)),
+  VOICE_BOOST("人声增强", listOf(2, 4, 5, 3, 1)),
+  LOUDNESS("响度", listOf(4, 2, 0, 2, 4)),
+  CUSTOM("自定义", listOf(0, 0, 0, 0, 0)),
   ;
 
   companion object {
@@ -140,7 +140,7 @@ fun EqualizerSheet(
         verticalAlignment = Alignment.CenterVertically,
       ) {
         Text(
-          text = "EQUALIZER",
+          text = "均衡器",
           style = MaterialTheme.typography.labelMedium,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
           letterSpacing = 2.sp,
@@ -213,7 +213,7 @@ fun EqualizerSheet(
         verticalAlignment = Alignment.CenterVertically,
       ) {
         Text(
-          text = "VOLUME BOOST",
+          text = "音量增强",
           style = MaterialTheme.typography.labelMedium,
           color =
             if (state.isEnabled) {
@@ -225,7 +225,7 @@ fun EqualizerSheet(
           fontWeight = FontWeight.SemiBold,
         )
         Text(
-          text = if (state.volumeBoostDb > 0) "+${state.volumeBoostDb} dB" else "Off",
+          text = if (state.volumeBoostDb > 0) "+${state.volumeBoostDb} dB" else "关闭",
           style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
           color =
             if (state.isEnabled) {

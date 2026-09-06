@@ -12,7 +12,7 @@ package app.gyrolet.mpvrx.ui.browser.playlist
 import app.gyrolet.mpvrx.database.entities.PlaylistEntity
 
 const val ALL_VIDEOS_PLAYLIST_ID = -2
-const val ALL_VIDEOS_PLAYLIST_NAME = "All Videos"
+const val ALL_VIDEOS_PLAYLIST_NAME = "全部视频"
 
 fun isAllVideosPlaylist(playlistId: Int): Boolean = playlistId == ALL_VIDEOS_PLAYLIST_ID
 

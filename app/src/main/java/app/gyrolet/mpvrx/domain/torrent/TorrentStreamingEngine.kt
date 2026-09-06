@@ -231,9 +231,9 @@ class TorrentStreamingEngine(
             when {
               selectedIndex != null ->
                 preparedSession.playableFiles.firstOrNull { it.index == selectedIndex }
-                  ?: throw streamError("The selected torrent file is not playable.")
+                  ?: throw streamError("所选种子文件无法播放。")
               preparedSession.playableFiles.size == 1 -> preparedSession.playableFiles.single()
-              else -> throw streamError("Choose an episode or movie before starting this torrent.")
+              else -> throw streamError("开始播放此种子前，请先选择剧集或影片。")
             }
 
           configureStreaming(preparedSession.handle, preparedSession.info, selected)
@@ -293,7 +293,7 @@ class TorrentStreamingEngine(
         } catch (error: Throwable) {
           proxy?.close()
           sessionToClean?.let(::cleanupPreparedSession)
-          val safe = (error as? TorrentStreamException) ?: streamError("Couldn't start torrent streaming.", error)
+          val safe = (error as? TorrentStreamException) ?: streamError("无法启动种子流媒体播放。", error)
           if (error is LinkageError) {
             Log.e(TAG, "Torrent native runtime is unavailable", error)
           } else {
@@ -311,22 +311,22 @@ class TorrentStreamingEngine(
     startGeneration: Long,
   ): PreparedSession {
     val source = sourceValue.trim()
-    if (source.isEmpty()) throw streamError("Torrent source is empty.")
+    if (source.isEmpty()) throw streamError("种子源为空。")
     if (hasV2OnlyMagnet(source)) {
-      throw streamError("BitTorrent v2-only torrents are not supported yet.")
+      throw streamError("尚不支持仅 v2 的 BitTorrent 种子。")
     }
     val normalized = normalizeTorrentSource(source)
-      ?: if (isMetadataUri(source)) source else throw streamError("Unsupported torrent source.")
+      ?: if (isMetadataUri(source)) source else throw streamError("不支持的种子源。")
 
     val cacheDir = File(appContext.cacheDir, "torrent_streaming/${UUID.randomUUID()}")
     if (!cacheDir.mkdirs() && !cacheDir.isDirectory) {
-      throw streamError("Couldn't create the torrent streaming cache.")
+      throw streamError("无法创建种子流媒体缓存。")
     }
 
     var session: SessionManager? = null
     var handle: TorrentHandle? = null
     try {
-      _state.value = TorrentStreamingState.Connecting("Starting Torrent Engine...")
+      _state.value = TorrentStreamingState.Connecting("正在启动种子引擎…")
       val startedSession = SessionManager()
       session = startedSession
       val settings =
@@ -353,7 +353,7 @@ class TorrentStreamingEngine(
           .sortedWith { f1, f2 ->
             MediaInfoParser.compareMediaFiles(f1.name, f1.index, f2.name, f2.index)
           }
-      if (playableFiles.isEmpty()) throw streamError("Torrent contains no playable audio or video files.")
+      if (playableFiles.isEmpty()) throw streamError("种子中不包含可播放的音频或视频文件。")
       val torrentName = safeDisplayName(torrent.info.name(), playableFiles.first().name)
 
       return PreparedSession(
@@ -374,7 +374,7 @@ class TorrentStreamingEngine(
       throw cancellation
     } catch (error: Throwable) {
       cleanupAfterPreparationFailure(session, handle, cacheDir)
-      val safe = (error as? TorrentStreamException) ?: streamError("Couldn't read torrent metadata.", error)
+      val safe = (error as? TorrentStreamException) ?: streamError("无法读取种子元数据。", error)
       if (error is LinkageError) {
         Log.e(TAG, "Torrent native runtime is unavailable", error)
       } else {
@@ -438,11 +438,11 @@ class TorrentStreamingEngine(
     explicitFileIndex: Int?,
     startGeneration: Long,
   ): PreparedTorrent {
-    val parsed = parseMagnet(source) ?: throw streamError("Magnet link does not contain a supported v1 info hash.")
+    val parsed = parseMagnet(source) ?: throw streamError("磁力链接不包含受支持的 v1 信息哈希。")
     val hash = runCatching { Sha1Hash.parseHex(parsed.infoHash) }.getOrNull()
-      ?: throw streamError("Magnet link contains an invalid v1 info hash.")
+      ?: throw streamError("磁力链接包含无效的 v1 信息哈希。")
 
-    _state.value = TorrentStreamingState.Connecting("Connecting to peers and fetching torrent metadata...")
+    _state.value = TorrentStreamingState.Connecting("正在连接节点并获取种子元数据…")
     return monitorTorrentErrors(session) { failure ->
       // Upload mode still permits metadata exchange but prevents unselected payload files from
       // racing onto disk before their paths and priorities have been validated.
@@ -455,9 +455,9 @@ class TorrentStreamingEngine(
         handle.forceReannounce()
       }
       val info = waitForMetadata(handle, startGeneration, failure)
-      if (!info.hasV1()) throw streamError("BitTorrent v2-only torrents are not supported yet.")
+      if (!info.hasV1()) throw streamError("尚不支持仅 v2 的 BitTorrent 种子。")
       if (!info.infoHash().toHex().equals(parsed.infoHash, ignoreCase = true)) {
-        throw streamError("Torrent metadata did not match the requested info hash.")
+        throw streamError("种子元数据与请求的信息哈希不匹配。")
       }
       PreparedTorrent(
         handle = handle,
@@ -476,16 +476,16 @@ class TorrentStreamingEngine(
     requestedFileIndex: Int?,
     startGeneration: Long,
   ): PreparedTorrent {
-    _state.value = TorrentStreamingState.Connecting("Reading torrent metadata...")
+    _state.value = TorrentStreamingState.Connecting("正在读取种子元数据…")
     val payload = readMetadata(source)
     val endpoints = runCatching { extractTorrentMetadataEndpoints(payload) }.getOrElse {
-      throw streamError("The selected file contains invalid torrent metadata.")
+      throw streamError("所选文件包含无效的种子元数据。")
     }
     val info = runCatching { TorrentInfo(payload) }.getOrElse {
-      throw streamError("The selected file is not valid torrent metadata.")
+      throw streamError("所选文件不是有效的种子元数据。")
     }
-    if (!info.isValid) throw streamError("The selected file is not valid torrent metadata.")
-    if (!info.hasV1()) throw streamError("BitTorrent v2-only torrents are not supported yet.")
+    if (!info.isValid) throw streamError("所选文件不是有效的种子元数据。")
+    if (!info.hasV1()) throw streamError("尚不支持仅 v2 的 BitTorrent 种子。")
     validateAndEnumerateFiles(info, cacheDir)
     val hashHex = info.infoHash().toHex().lowercase()
     val priorities = Array(info.files().numFiles()) { Priority.IGNORE }
@@ -497,7 +497,7 @@ class TorrentStreamingEngine(
       endpoints.webSeeds.forEach(handle::addUrlSeed)
       if (endpoints.trackers.isNotEmpty()) handle.forceReannounce()
       if (info.isPrivate && endpoints.trackers.isEmpty()) {
-        throw streamError("Private torrent metadata does not contain a supported tracker.")
+        throw streamError("私有种子元数据不包含受支持的 tracker。")
       }
       val durableSource =
         buildMagnetUri(
@@ -531,7 +531,7 @@ class TorrentStreamingEngine(
               else -> null
             } ?: return
           Log.w(TAG, "Native torrent operation failed (code ${errorCode.value})")
-          failure.compareAndSet(null, streamError("The torrent engine couldn't add this torrent."))
+          failure.compareAndSet(null, streamError("种子引擎无法添加此种子。"))
         }
       }
     session.addListener(listener)
@@ -555,7 +555,7 @@ class TorrentStreamingEngine(
       session.find(hash)?.takeIf { it.isValid }?.let { return it }
       delay(100L)
     }
-    throw streamError("Timed out while adding the torrent.")
+    throw streamError("添加种子超时。")
   }
 
   private suspend fun waitForMetadata(
@@ -567,13 +567,13 @@ class TorrentStreamingEngine(
     while (System.currentTimeMillis() < deadline) {
       ensureCurrent(startGeneration)
       failure.get()?.let { throw it }
-      if (!handle.isValid) throw streamError("Torrent session stopped before metadata was received.")
+      if (!handle.isValid) throw streamError("收到元数据前种子会话已停止。")
       handle.torrentFile()?.takeIf { it.isValid }?.let { return it }
       runCatching {
         val status = handle.status()
         _state.value =
           TorrentStreamingState.Connecting(
-            phase = if (status.numPeers() > 0) "Downloading torrent metadata..." else "Searching for torrent peers...",
+            phase = if (status.numPeers() > 0) "正在下载种子元数据…" else "正在搜索种子节点…",
             downloadSpeed = status.downloadPayloadRate().toLong(),
             uploadSpeed = status.uploadPayloadRate().toLong(),
             peers = status.numPeers(),
@@ -582,7 +582,7 @@ class TorrentStreamingEngine(
       }
       delay(250L)
     }
-    throw streamError("Timed out while fetching torrent metadata. Check that the torrent has active peers.")
+    throw streamError("获取种子元数据超时。请检查种子是否有活跃节点。")
   }
 
   private fun validateAndEnumerateFiles(
@@ -591,9 +591,9 @@ class TorrentStreamingEngine(
   ): List<TorrentFileItem> {
     val storage = info.files()
     val count = storage.numFiles()
-    if (count <= 0) throw streamError("Torrent contains no files.")
-    if (count > MAX_TORRENT_FILES) throw streamError("Torrent contains too many files.")
-    if (info.pieceLength() <= 0) throw streamError("Torrent metadata has an invalid piece size.")
+    if (count <= 0) throw streamError("种子中不包含文件。")
+    if (count > MAX_TORRENT_FILES) throw streamError("种子包含的文件过多。")
+    if (info.pieceLength() <= 0) throw streamError("种子元数据的分片大小无效。")
 
     return buildList(count) {
       for (index in 0 until count) {
@@ -602,7 +602,7 @@ class TorrentStreamingEngine(
         val size = storage.fileSize(index)
         val offset = storage.fileOffset(index)
         if (size < 0L || offset < 0L || (size > 0L && offset > Long.MAX_VALUE - size)) {
-          throw streamError("Torrent metadata contains an invalid file size.")
+          throw streamError("种子元数据包含无效的文件大小。")
         }
         val mimeType =
           if (storage.padFileAt(index) || size <= 0L) {
@@ -693,32 +693,32 @@ class TorrentStreamingEngine(
     val input =
       when (uri.scheme?.lowercase()) {
         "content" -> appContext.contentResolver.openInputStream(uri)
-          ?: throw streamError("Couldn't open the selected torrent metadata.")
+          ?: throw streamError("无法打开所选的种子元数据。")
         "file" -> {
-          val path = uri.path ?: throw streamError("Torrent metadata path is invalid.")
+          val path = uri.path ?: throw streamError("种子元数据路径无效。")
           FileInputStream(File(path))
         }
         "http", "https" -> return readRemoteMetadata(source)
-        else -> throw streamError("Only magnet links and content, file, HTTP or HTTPS torrent metadata are supported.")
+        else -> throw streamError("仅支持磁力链接以及 content、file、HTTP 或 HTTPS 种子元数据。")
       }
     return input.use { readBounded(it) }
   }
 
   private fun readRemoteMetadata(source: String): ByteArray {
     val request = runCatching { Request.Builder().url(source).get().build() }.getOrElse {
-      throw streamError("Torrent metadata URL is invalid.")
+      throw streamError("种子元数据 URL 无效。")
     }
     return try {
       httpClient.newCall(request).execute().use { response ->
-        if (!response.isSuccessful) throw streamError("Couldn't download torrent metadata (HTTP ${response.code}).")
+        if (!response.isSuccessful) throw streamError("无法下载种子元数据（HTTP ${response.code}）。")
         val body = response.body
-        if (body.contentLength() > MAX_METADATA_BYTES) throw streamError("Torrent metadata is too large.")
+        if (body.contentLength() > MAX_METADATA_BYTES) throw streamError("种子元数据过大。")
         body.byteStream().use { readBounded(it) }
       }
     } catch (error: TorrentStreamException) {
       throw error
     } catch (error: IOException) {
-      throw streamError("Couldn't download torrent metadata.", error)
+      throw streamError("无法下载种子元数据。", error)
     }
   }
 
@@ -730,10 +730,10 @@ class TorrentStreamingEngine(
       val read = input.read(buffer)
       if (read < 0) break
       total += read
-      if (total > MAX_METADATA_BYTES) throw streamError("Torrent metadata is too large.")
+      if (total > MAX_METADATA_BYTES) throw streamError("种子元数据过大。")
       output.write(buffer, 0, read)
     }
-    if (total == 0L) throw streamError("Torrent metadata is empty.")
+    if (total == 0L) throw streamError("种子元数据为空。")
     return output.toByteArray()
   }
 
@@ -747,7 +747,7 @@ class TorrentStreamingEngine(
       path.any { it == '\u0000' || it.isISOControl() } ||
       path.replace('\\', '/').split('/').any { it.isEmpty() || it == "." || it == ".." }
     ) {
-      throw streamError("Torrent metadata contains an unsafe file path.")
+      throw streamError("种子元数据包含不安全的文件路径。")
     }
     safeCacheFile(cacheDir, path)
   }
@@ -759,7 +759,7 @@ class TorrentStreamingEngine(
     val root = cacheDir.canonicalFile
     val candidate = File(root, path).canonicalFile
     val prefix = root.path + File.separator
-    if (!candidate.path.startsWith(prefix)) throw streamError("Torrent metadata contains an unsafe file path.")
+    if (!candidate.path.startsWith(prefix)) throw streamError("种子元数据包含不安全的文件路径。")
     return candidate
   }
 

@@ -50,8 +50,8 @@ fun FileOperationProgressDialog(
 
   val operationName =
     when (operationType) {
-      is CopyPasteOps.OperationType.Copy -> "Copying"
-      is CopyPasteOps.OperationType.Move -> "Moving"
+      is CopyPasteOps.OperationType.Copy -> "正在复制"
+      is CopyPasteOps.OperationType.Move -> "正在移动"
     }
 
   val isOperationComplete = progress.isComplete || progress.isCancelled || progress.error != null
@@ -64,7 +64,7 @@ fun FileOperationProgressDialog(
     },
     title = {
       Text(
-        text = "$operationName files",
+        text = "$operationName 文件",
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.Bold,
       )
@@ -85,14 +85,14 @@ fun FileOperationProgressDialog(
           }
           progress.isComplete -> {
             StatusCard(
-              message = "Operation completed successfully!",
+              message = "操作已成功完成！",
               containerColor = MaterialTheme.colorScheme.primaryContainer,
               contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             )
           }
           progress.isCancelled -> {
             StatusCard(
-              message = "Operation cancelled",
+              message = "操作已取消",
               containerColor = MaterialTheme.colorScheme.secondaryContainer,
               contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             )
@@ -105,7 +105,7 @@ fun FileOperationProgressDialog(
             // Current File Info
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
               Text(
-                text = "File ${progress.currentFileIndex} of ${progress.totalFiles}",
+                text = "第 ${progress.currentFileIndex} 个文件，共 ${progress.totalFiles} 个",
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -122,7 +122,7 @@ fun FileOperationProgressDialog(
 
             // Current File Progress
             ProgressSection(
-              label = "Current file",
+              label = "当前文件",
               progress = progress.currentFileProgress,
             )
 
@@ -149,11 +149,11 @@ fun FileOperationProgressDialog(
         if (isOperationComplete) {
           Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SummaryRow(
-              label = "Files processed",
+              label = "已处理文件",
               value = "${progress.currentFileIndex} / ${progress.totalFiles}",
             )
             SummaryRow(
-              label = "Total size",
+              label = "总大小",
               value = CopyPasteOps.formatBytes(progress.totalBytes),
             )
           }
@@ -207,7 +207,7 @@ fun FileOperationProgressDialog(
 @Composable
 fun LoadingDialog(
   isOpen: Boolean,
-  message: String = "Loading...",
+  message: String = "正在加载...",
   onDismissRequest: () -> Unit = {},
 ) {
   if (!isOpen) return

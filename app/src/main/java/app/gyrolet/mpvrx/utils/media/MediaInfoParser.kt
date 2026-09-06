@@ -858,7 +858,7 @@ object MediaInfoParser {
         if (HttpUtils.isYouTubeUrl(uri)) {
           val videoId = HttpUtils.extractYouTubeVideoId(uri)
           if (!videoId.isNullOrBlank()) {
-            return@runCatching "YouTube Video ($videoId)"
+            return@runCatching "YouTube 视频 ($videoId)"
           }
         }
         val queryParams = listOf("path", "file", "filename", "title", "name", "url", "src", "stream", "video", "target", "source", "query", "q")

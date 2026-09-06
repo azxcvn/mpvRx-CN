@@ -136,7 +136,7 @@ fun SwipeableVideoActions(
         horizontalArrangement = Arrangement.End,
       ) {
         SwipePillAction(
-          label = "Rename",
+          label = "重命名",
           icon = Icons.RoundedFilled.Edit,
           background = MaterialTheme.colorScheme.secondaryContainer,
           contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -145,7 +145,7 @@ fun SwipeableVideoActions(
           onClick = { settle(0f, onRename) },
         )
         SwipePillAction(
-          label = "Delete",
+          label = "删除",
           icon = Icons.RoundedFilled.Delete,
           background = MaterialTheme.colorScheme.errorContainer,
           contentColor = MaterialTheme.colorScheme.onErrorContainer,

@@ -184,7 +184,7 @@ fun MoreSheet(
             ) {
               Icon(
                 imageVector = Icons.RoundedFilled.Code,
-                contentDescription = "Scripts",
+                contentDescription = "脚本",
                 tint =
                   if (enableLuaScripts && selectedLuaScripts.isNotEmpty()) {
                     MaterialTheme.colorScheme.primary
@@ -196,9 +196,9 @@ fun MoreSheet(
                 Text(
                   text =
                     if (selectedLuaScripts.isEmpty()) {
-                      "Scripts"
+                      "脚本"
                     } else {
-                      "Scripts (${selectedLuaScripts.size})"
+                      "脚本 (${selectedLuaScripts.size})"
                     },
                   color =
                     if (enableLuaScripts && selectedLuaScripts.isNotEmpty()) {
@@ -225,7 +225,7 @@ fun MoreSheet(
             label = {
               Text(
                 if (page == 7) {
-                  "Console"
+                  "控制台"
                 } else {
                   stringResource(
                     if (page == 0) {

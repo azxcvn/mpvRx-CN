@@ -127,7 +127,7 @@ fun BulkAiRenameDialog(
       deferred.forEach { it.join() }
 
       if (results.isEmpty()) {
-        errorMessage = "AI rename failed for all $failCount items. Check your model/API key."
+        errorMessage = "全部 $failCount 个项目的 AI 重命名失败。请检查你的模型/API 密钥。"
         phase = RenamePhase.IDLE
         return@launch
       }
@@ -164,9 +164,9 @@ fun BulkAiRenameDialog(
       Text(
         text =
           when (phase) {
-            RenamePhase.IDLE -> "Bulk AI Rename"
-            RenamePhase.GENERATING -> "Generating Previews…"
-            RenamePhase.PREVIEW -> "Review & Confirm"
+            RenamePhase.IDLE -> "批量 AI 重命名"
+            RenamePhase.GENERATING -> "正在生成预览…"
+            RenamePhase.PREVIEW -> "检查并确认"
           },
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.Bold,
@@ -185,8 +185,8 @@ fun BulkAiRenameDialog(
 
           phase == RenamePhase.IDLE ->
             Text(
-              "AI will suggest new names for ${selectedVideos.size} selected file(s). " +
-                "You can review and edit each name before confirming.",
+              "AI 将为 ${selectedVideos.size} 个选中的文件建议新名称。 " +
+                "你可以在确认前逐一检查并编辑名称。",
               style = MaterialTheme.typography.bodyMedium,
             )
 
@@ -209,7 +209,7 @@ fun BulkAiRenameDialog(
 
             val checkedCount = checkedState.values.count { it }
             Text(
-              "$checkedCount / ${previewItems.size} file(s) selected to rename",
+              "$checkedCount / ${previewItems.size} 个文件已选择重命名",
               style = MaterialTheme.typography.labelMedium,
               color = MaterialTheme.colorScheme.outline,
             )

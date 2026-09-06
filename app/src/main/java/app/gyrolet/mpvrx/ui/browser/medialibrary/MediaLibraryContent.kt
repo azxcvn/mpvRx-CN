@@ -660,7 +660,7 @@ fun MediaLibraryContent(forceAudio: Boolean = false) {
                     androidx.compose.ui.res
                       .stringResource(app.gyrolet.mpvrx.R.string.ui_no_videos_found)
                   },
-                message = "Try a different search term",
+                message = "尝试其他搜索词",
               )
             }
           } else {

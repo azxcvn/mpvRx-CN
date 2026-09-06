@@ -115,7 +115,7 @@ fun SortDialog(
               .verticalScroll(rememberScrollState()),
         ) {
           if (showSortOptions) {
-            DialogSectionTitle(text = "Sort by")
+            DialogSectionTitle(text = "排序方式")
             SortTypeSelector(
               sortType = sortType,
               onSortTypeChange = onSortTypeChange,
@@ -443,7 +443,7 @@ private fun GridColumnsNextSection(
   HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
 
   if (folderGridColumnSelector != null && videoGridColumnSelector != null) {
-    DialogSectionTitle(text = "Grid Columns")
+    DialogSectionTitle(text = "网格列数")
     Row(
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -586,5 +586,5 @@ data class GridColumnSelector(
   val onValueChange: (Int) -> Unit,
   val valueRange: ClosedFloatingPointRange<Float> = 1f..4f,
   val steps: Int = 2,
-  val unitSuffix: String = "cols",
+  val unitSuffix: String = "列",
 )

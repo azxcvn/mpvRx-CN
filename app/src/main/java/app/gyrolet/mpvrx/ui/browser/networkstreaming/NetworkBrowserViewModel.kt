@@ -100,7 +100,7 @@ class NetworkBrowserViewModel(
       try {
         val connection =
           repository.getConnectionById(connectionId)
-            ?: throw Exception("Connection not found")
+            ?: throw Exception("未找到连接")
         _connection.value = connection
 
         repository
@@ -112,10 +112,10 @@ class NetworkBrowserViewModel(
                   .thenBy { it.name.lowercase() },
               )
           }.onFailure { e ->
-            _error.value = e.message ?: "Unknown error"
+            _error.value = e.message ?: "未知错误"
           }
       } catch (e: Exception) {
-        _error.value = e.message ?: "Unknown error"
+        _error.value = e.message ?: "未知错误"
       } finally {
         _isLoading.value = false
       }
@@ -130,7 +130,7 @@ class NetworkBrowserViewModel(
       try {
         val connection =
           repository.getConnectionById(connectionId)
-            ?: throw Exception("Connection not found")
+            ?: throw Exception("未找到连接")
 
         if (isM3uFile(file)) {
           openM3uFile(connection, file)
@@ -141,7 +141,7 @@ class NetworkBrowserViewModel(
         throw cancellation
       } catch (e: Exception) {
         Log.e(TAG, "Error opening network media", e)
-        _error.value = e.message ?: "Unknown error"
+        _error.value = e.message ?: "未知错误"
       }
     }
   }
@@ -154,13 +154,13 @@ class NetworkBrowserViewModel(
       try {
         val connection =
           repository.getConnectionById(connectionId)
-            ?: throw Exception("Connection not found")
+            ?: throw Exception("未找到连接")
         playVideoInternal(connection, file)
       } catch (cancellation: CancellationException) {
         throw cancellation
       } catch (e: Exception) {
         Log.e(TAG, "Error playing video", e)
-        _error.value = e.message ?: "Unknown error"
+        _error.value = e.message ?: "未知错误"
       }
     }
   }
@@ -201,7 +201,7 @@ class NetworkBrowserViewModel(
           sourceName = file.name,
         ).getOrElse { e ->
           Log.e(TAG, "Failed to create playlist from M3U content", e)
-          _error.value = "Failed to import playlist: ${e.message}"
+          _error.value = "导入播放列表失败：${e.message}"
           return
         }
     _importedPlaylistId.emit(playlistId.toInt())

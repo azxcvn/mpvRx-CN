@@ -9,11 +9,11 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 enum class MusicTab(val title: String) {
-  SONGS("Songs"),
-  ALBUMS("Albums"),
-  ARTISTS("Artists"),
-  PLAYLISTS("Playlists"),
-  FOLDERS("Folders");
+  SONGS("歌曲"),
+  ALBUMS("专辑"),
+  ARTISTS("艺术家"),
+  PLAYLISTS("播放列表"),
+  FOLDERS("文件夹");
 
   companion object {
     val defaultTabs = entries.toList()
@@ -57,13 +57,13 @@ data class MusicArtist(
 
 @Immutable
 enum class MusicSortField(val displayName: String) {
-  TITLE("Title"),
-  ARTIST("Artist"),
-  ALBUM("Album"),
-  DURATION("Duration"),
-  DATE_ADDED("Date Added"),
-  TRACK_COUNT("Track Count"),
-  YEAR("Year")
+  TITLE("标题"),
+  ARTIST("艺术家"),
+  ALBUM("专辑"),
+  DURATION("时长"),
+  DATE_ADDED("添加日期"),
+  TRACK_COUNT("曲目数"),
+  YEAR("年份")
 }
 
 @Immutable

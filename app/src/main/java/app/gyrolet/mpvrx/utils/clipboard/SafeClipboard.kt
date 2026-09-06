@@ -82,7 +82,7 @@ object SafeClipboard {
     }
 
     fun suffixFor(copiedBytes: Int) =
-      "\n\n[MPVRX: copied first $copiedBytes of $bytes bytes. Use Share/Export for full content.]"
+      "\n\n[MPVRX: 已复制前 $copiedBytes / $bytes 字节。完整内容请使用分享/导出。]"
 
     val suffixBytes = suffixFor(0).toByteArray(StandardCharsets.UTF_8).size
     val budget = (maxBytes - suffixBytes).coerceAtLeast(0)
@@ -133,9 +133,9 @@ object SafeClipboard {
 
   private fun TruncatedText.toastMessage(): String =
     if (truncated) {
-      "Copied truncated text (${copiedBytes / 1024} KB of ${originalBytes / 1024} KB)"
+      "已复制截断的文本（${copiedBytes / 1024} KB / ${originalBytes / 1024} KB）"
     } else {
-      "Copied to clipboard"
+      "已复制到剪贴板"
     }
 
   private fun showToast(

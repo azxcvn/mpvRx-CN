@@ -28,7 +28,7 @@ object ArtistImageRepository {
   private val failedAt = ConcurrentHashMap<String, Long>()
 
   suspend fun getArtistImageUrl(client: OkHttpClient, artistName: String): String? {
-    if (artistName.isBlank() || artistName.equals("Unknown Artist", ignoreCase = true)) return null
+    if (artistName.isBlank() || artistName.equals("未知艺术家", ignoreCase = true)) return null
     val key = artistName.trim().lowercase()
 
     synchronized(cache) { cache.get(key) }?.let { return it }

@@ -849,7 +849,7 @@ object FolderListScreen : Screen {
                     EmptyState(
                       icon = Icons.RoundedFilled.Search,
                       title = stringResource(R.string.ui_no_results_found),
-                      message = if (audioOnly) "No audio folders or songs match your search query" else "No folders or videos match your search query",
+                      message = if (audioOnly) "没有与您的搜索匹配的音频文件夹或歌曲" else "没有与您的搜索匹配的文件夹或视频",
                       modifier = Modifier.fillMaxSize(),
                     )
                   } else {
@@ -1262,8 +1262,8 @@ private fun FolderListContent(
         } else if (showEmpty) {
           EmptyState(
             icon = Icons.RoundedFilled.Folder,
-            title = if (audioOnly) "No song folders found" else stringResource(R.string.ui_no_video_folders_found),
-            message = if (audioOnly) "Add some audio files to your device to see them here" else "Add some video files to your device to see them here",
+            title = if (audioOnly) "未找到歌曲文件夹" else stringResource(R.string.ui_no_video_folders_found),
+            message = if (audioOnly) "将一些音频文件添加到您的设备以在此处查看" else "将一些视频文件添加到您的设备以在此处查看",
           )
         }
       }

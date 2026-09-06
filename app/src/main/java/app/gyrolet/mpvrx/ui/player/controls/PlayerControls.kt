@@ -915,7 +915,7 @@ fun PlayerControls(
               is PlayerUpdates.VideoZoom -> {
                 val zoomPercentage = (videoZoom * 100).toInt()
                 TextPlayerUpdate(
-                  text = String.format("Zoom:%3d%%", zoomPercentage),
+                  text = String.format("缩放：%3d%%", zoomPercentage),
                   modifier = Modifier.widthIn(min = 112.dp),
                 )
               }
@@ -923,7 +923,7 @@ fun PlayerControls(
               is PlayerUpdates.SubtitleZoom -> {
                 val scaleVal = (currentPlayerUpdate as PlayerUpdates.SubtitleZoom).scale
                 TextPlayerUpdate(
-                  text = String.format("Sub: %.2fx", scaleVal),
+                  text = String.format("字幕：%.2fx", scaleVal),
                   modifier = Modifier.widthIn(min = 112.dp),
                 )
               }
@@ -941,13 +941,13 @@ fun PlayerControls(
                 val mode = (currentPlayerUpdate as PlayerUpdates.RepeatMode).mode
                 val text =
                   when (mode) {
-                    app.gyrolet.mpvrx.ui.player.RepeatMode.OFF -> "Repeat: Off"
-                    app.gyrolet.mpvrx.ui.player.RepeatMode.ONE -> "Repeat: Current file"
+                    app.gyrolet.mpvrx.ui.player.RepeatMode.OFF -> "重复播放：关闭"
+                    app.gyrolet.mpvrx.ui.player.RepeatMode.ONE -> "重复播放：当前文件"
                     app.gyrolet.mpvrx.ui.player.RepeatMode.ALL -> {
                       if (playlistMode && playlistItems.isNotEmpty()) {
-                        "Repeat: All playlist"
+                        "重复播放：整个播放列表"
                       } else {
-                        "Repeat: Current file"
+                        "重复播放：当前文件"
                       }
                     }
                   }
@@ -959,12 +959,12 @@ fun PlayerControls(
                 val text =
                   if (enabled) {
                     if (playlistMode && playlistItems.isNotEmpty()) {
-                      "Shuffle: On"
+                      "随机播放：开启"
                     } else {
-                      "Shuffle: Not available"
+                      "随机播放：不可用"
                     }
                   } else {
-                    "Shuffle: Off"
+                    "随机播放：关闭"
                   }
                 TextPlayerUpdate(text)
               }
@@ -999,9 +999,9 @@ is PlayerUpdates.FrameInfo -> {
                 val frameInfo = (currentPlayerUpdate as PlayerUpdates.FrameInfo)
                 val text =
                   if (frameInfo.totalFrames > 0) {
-                    "Frame: ${frameInfo.currentFrame}/${frameInfo.totalFrames}"
+                    "帧：${frameInfo.currentFrame}/${frameInfo.totalFrames}"
                   } else {
-                    "Frame: ${frameInfo.currentFrame}"
+                    "帧：${frameInfo.currentFrame}"
                   }
                 TextPlayerUpdate(text)
               }
@@ -1349,15 +1349,15 @@ is PlayerUpdates.FrameInfo -> {
                   isTorrentStreaming -> {
                     val streamState = torrentState as TorrentStreamingState.Streaming
                     val speed = app.gyrolet.mpvrx.domain.torrent.formatTorrentSpeed(streamState.downloadSpeed)
-                    val peers = "${streamState.peers} peers"
+                    val peers = "${streamState.peers} 个节点"
                     val progress = "${(streamState.bufferProgress * 100).toInt()}%"
                     "$speed | $peers | $progress"
                   }
                   // mpv only reports a fill target while it is actually holding playback for cache.
                   isMpvBuffering && cachePercent != null && cachePercent in 1..99 ->
-                    "Buffering $cachePercent%"
+                    "正在缓冲 $cachePercent%"
                   isMpvBuffering && cacheSeconds != null ->
-                    "Buffering (${String.format(java.util.Locale.ROOT, "%.1f", cacheSeconds)}s)"
+                    "正在缓冲（${String.format(java.util.Locale.ROOT, "%.1f", cacheSeconds)} 秒）"
                   else -> stringResource(R.string.ui_buffering)
                 }
               Surface(
@@ -2122,13 +2122,13 @@ private fun CustomStatsPageSixOverlay(
         processMemoryText = "--",
         playbackCacheText = "--",
         batteryPercentText = "--%",
-        batteryRateText = "Unknown",
+        batteryRateText = "未知",
         batteryWattsText = "-- W",
         batteryTempText = "--°C",
         hdrActive = "--",
         sessionPlayTimeText = "00:00:00",
-        decoderEfficiencyText = "Unknown",
-        thermalStateText = "Normal",
+        decoderEfficiencyText = "未知",
+        thermalStateText = "正常",
         peakTempText = "--°C",
         tempRiseText = "+0.0°C",
       ),
@@ -2256,14 +2256,14 @@ private fun CustomStatsPageSixOverlay(
         }
       val thermalStateText =
         when (thermalStatus) {
-          0 -> "Normal"
-          1 -> "Light Throttling"
-          2 -> "Moderate Throttling"
-          3 -> "Severe Throttling"
-          4 -> "Critical Throttling"
-          5 -> "Emergency!"
-          6 -> "Overheating Shutdown!"
-          else -> "Normal"
+          0 -> "正常"
+          1 -> "轻度节流"
+          2 -> "中度节流"
+          3 -> "严重节流"
+          4 -> "危急节流"
+          5 -> "紧急！"
+          6 -> "过热关机！"
+          else -> "正常"
         }
 
       val currentHwdec = runCatching { PlaybackSession.getPropertyString("hwdec-current") ?: "no" }.getOrDefault("no")
@@ -2272,9 +2272,9 @@ private fun CustomStatsPageSixOverlay(
       val renderContext = "$currentVideoOutput | $gpuApi | $gpuContext"
       val decoderEfficiencyText =
         when {
-          currentHwdec == "no" || currentHwdec.isBlank() -> "Low (Software Decoding, CPU-heavy)"
-          currentHwdec.contains("copy") -> "Moderate (Hardware-copy, GPU texture overhead)"
-          else -> "High (Hardware Direct, $gpuApi backend)"
+          currentHwdec == "no" || currentHwdec.isBlank() -> "低（软件解码，CPU 占用高）"
+          currentHwdec.contains("copy") -> "中（硬件复制，GPU 纹理开销）"
+          else -> "高（硬件直通，$gpuApi 后端）"
         }
 
       value =
@@ -2301,16 +2301,16 @@ private fun CustomStatsPageSixOverlay(
                   sourceGamma == "hlg" ||
                   (sourcePrimaries == "bt.2020" && sourcePeak > 1.0)
 
-              val sourceLabel = if (isHdrSource) "HDR Source" else "SDR Source"
+              val sourceLabel = if (isHdrSource) "HDR 源" else "SDR 源"
               val outputLabel =
                 if (isHdrOutputEnabled) {
                   hdrOutputText
                 } else {
-                  "SDR Output"
+                  "SDR 输出"
                 }
 
               "$sourceLabel | $outputLabel"
-            }.getOrDefault("Unknown"),
+            }.getOrDefault("未知"),
           sessionPlayTimeText = sessionPlayTimeText,
           decoderEfficiencyText = decoderEfficiencyText,
           thermalStateText = thermalStateText,
@@ -2356,14 +2356,14 @@ private fun CustomStatsPageSixOverlay(
     val valueStyle = baseStyle
 
     OutlinedText(stringResource(R.string.diagnostics_playback_decoder_header), style = headerStyle)
-    OutlinedLabeled("File", stats.fileName, labelStyle, valueStyle)
+    OutlinedLabeled("文件", stats.fileName, labelStyle, valueStyle)
     OutlinedLabeled(
-      "Decoder & VO",
-      "${stats.renderContext} | ${stats.video} | Eff: ${stats.decoderEfficiencyText}",
+      "解码器与 VO",
+      "${stats.renderContext} | ${stats.video} | 效率：${stats.decoderEfficiencyText}",
       labelStyle,
       valueStyle,
     )
-    OutlinedLabeled("Audio", "${stats.audio} | HDR: ${stats.hdrActive}", labelStyle, valueStyle)
+    OutlinedLabeled("音频", "${stats.audio} | HDR：${stats.hdrActive}", labelStyle, valueStyle)
 
     when (val currentTorrentState = torrentState) {
       is TorrentStreamingState.Connecting -> {
@@ -2466,22 +2466,22 @@ private fun CustomStatsPageSixOverlay(
     Spacer(modifier = Modifier.height(2.dp))
     OutlinedText(stringResource(R.string.diagnostics_power_thermals_header), style = headerStyle)
     OutlinedLabeled(
-      "Battery",
-      "${stats.batteryPercentText} | ${stats.batteryWattsText} | Rate: ${stats.batteryRateText}",
+      "电池",
+      "${stats.batteryPercentText} | ${stats.batteryWattsText} | 速率：${stats.batteryRateText}",
       labelStyle,
       valueStyle,
     )
     OutlinedLabeled(
-      "Temp",
-      "${stats.batteryTempText} (Peak: ${stats.peakTempText} | Rise: ${stats.tempRiseText})",
+      "温度",
+      "${stats.batteryTempText}（峰值：${stats.peakTempText} | 上升：${stats.tempRiseText}）",
       labelStyle,
       valueStyle,
     )
-    OutlinedLabeled("Thermal", stats.thermalStateText, labelStyle, valueStyle)
+    OutlinedLabeled("温度状态", stats.thermalStateText, labelStyle, valueStyle)
 
     Spacer(modifier = Modifier.height(2.dp))
     OutlinedText(stringResource(R.string.diagnostics_session_header), style = headerStyle)
-    OutlinedLabeled("Active", stats.sessionPlayTimeText, labelStyle, valueStyle)
+    OutlinedLabeled("活跃时长", stats.sessionPlayTimeText, labelStyle, valueStyle)
 
     LinearProgressIndicator(
       progress = { stats.cpuPercent / 100f },

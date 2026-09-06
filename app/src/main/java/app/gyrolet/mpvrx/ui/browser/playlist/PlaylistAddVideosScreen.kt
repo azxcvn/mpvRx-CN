@@ -156,7 +156,7 @@ data class PlaylistAddVideosScreen(
         withContext(Dispatchers.Main) {
           Toast.makeText(
             context,
-            if (isAudio) "Added ${videos.size} songs to playlist" else context.getString(R.string.playlist_add_videos_success, videos.size),
+            if (isAudio) "已将 ${videos.size} 首歌曲添加到播放列表" else context.getString(R.string.playlist_add_videos_success, videos.size),
             Toast.LENGTH_SHORT,
           ).show()
           backstack.popSafely()
@@ -176,7 +176,7 @@ data class PlaylistAddVideosScreen(
       topBar = {
         if (folder == null) {
           BrowserTopBar(
-            title = if (isAudio) "Add Songs" else stringResource(R.string.playlist_add_videos_title),
+            title = if (isAudio) "添加歌曲" else stringResource(R.string.playlist_add_videos_title),
             isInSelectionMode = false,
             selectedCount = 0,
             totalCount = sortedFolders.size,
@@ -207,7 +207,7 @@ data class PlaylistAddVideosScreen(
               onClick = { addSelectedToPlaylist() },
               modifier = Modifier.fillMaxWidth().padding(16.dp),
             ) {
-              Text(if (isAudio) "Add $selectedCount Songs" else stringResource(R.string.playlist_add_videos_button, selectedCount))
+              Text(if (isAudio) "添加 $selectedCount 首歌曲" else stringResource(R.string.playlist_add_videos_button, selectedCount))
             }
           }
         }
@@ -217,8 +217,8 @@ data class PlaylistAddVideosScreen(
         if (sortedFolders.isEmpty()) {
           EmptyState(
             icon = Icons.RoundedFilled.Folder,
-            title = if (isAudio) "No music folders found" else stringResource(R.string.playlist_add_videos_empty_title),
-            message = if (isAudio) "No folders with songs available" else stringResource(R.string.playlist_add_videos_empty_message),
+            title = if (isAudio) "未找到音乐文件夹" else stringResource(R.string.playlist_add_videos_empty_title),
+            message = if (isAudio) "没有包含歌曲的文件夹" else stringResource(R.string.playlist_add_videos_empty_message),
             modifier = Modifier.padding(padding),
           )
         } else {
@@ -239,8 +239,8 @@ data class PlaylistAddVideosScreen(
       } else if (sortedVideos.isEmpty()) {
         EmptyState(
           icon = Icons.RoundedFilled.Folder,
-          title = if (isAudio) "No songs found" else stringResource(R.string.playlist_add_videos_empty_title),
-          message = if (isAudio) "No songs available in this folder" else stringResource(R.string.playlist_add_videos_empty_message),
+          title = if (isAudio) "未找到歌曲" else stringResource(R.string.playlist_add_videos_empty_title),
+          message = if (isAudio) "此文件夹中没有可用的歌曲" else stringResource(R.string.playlist_add_videos_empty_message),
           modifier = Modifier.padding(padding),
         )
       } else {

@@ -187,7 +187,7 @@ private fun MiniPlayerContent(
     queueState.currentItem?.title?.takeIf { queueState.isExplicitQueue && it.isNotBlank() }
       ?: rawMediaTitle?.takeIf { it.isNotBlank() }
       ?: currentItem?.title?.takeIf { it.isNotBlank() }
-      ?: "Media Track"
+      ?: "媒体轨道"
 
   val isVideoMode = detachedPlaybackActive && hasRealVideo && !isAudioOnlyItem && enableVideoMiniPlayer
 
@@ -482,7 +482,7 @@ private fun MiniPlayerContent(
             )
           }
           Text(
-            text = if (isPlaying) "Playing" else "Paused",
+            text = if (isPlaying) "正在播放" else "已暂停",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,

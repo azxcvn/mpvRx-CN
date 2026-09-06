@@ -315,7 +315,7 @@ fun TorrentHeroBanner(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                  text = "Watch Now",
+                  text = "立即观看",
                   style = MaterialTheme.typography.labelLarge,
                   fontWeight = FontWeight.Bold,
                 )
@@ -421,7 +421,7 @@ fun TorrentSectionHeader(
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
       ) {
         Text(
-          text = "See All",
+          text = "查看全部",
           style = MaterialTheme.typography.labelLarge,
           fontWeight = FontWeight.SemiBold,
           color = MaterialTheme.colorScheme.primary,
@@ -516,7 +516,7 @@ fun TorrentResumeCard(
         Box(contentAlignment = Alignment.Center) {
           Icon(
             imageVector = Icons.RoundedFilled.PlayArrow,
-            contentDescription = "Play",
+            contentDescription = "播放",
             modifier = Modifier.size(22.dp),
             tint = MaterialTheme.colorScheme.onPrimary,
           )

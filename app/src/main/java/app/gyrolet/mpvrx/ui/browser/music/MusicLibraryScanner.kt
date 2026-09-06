@@ -67,8 +67,8 @@ object MusicLibraryScanner {
           if (!fileExists && size <= 0L && duration <= 0L) continue
 
           val title = cursor.getString(titleCol)?.takeIf { it.isNotBlank() } ?: file.nameWithoutExtension
-          val artist = cursor.getString(artistCol)?.takeIf { it.isNotBlank() && it != "<unknown>" } ?: "Unknown Artist"
-          val album = cursor.getString(albumCol)?.takeIf { it.isNotBlank() && it != "<unknown>" } ?: "Unknown Album"
+          val artist = cursor.getString(artistCol)?.takeIf { it.isNotBlank() && it != "<unknown>" } ?: "未知艺术家"
+          val album = cursor.getString(albumCol)?.takeIf { it.isNotBlank() && it != "<unknown>" } ?: "未知专辑"
           val albumId = cursor.getLong(albumIdCol)
           val dateAdded = cursor.getLong(dateAddedCol)
           val track = cursor.getInt(trackCol)

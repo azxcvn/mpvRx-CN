@@ -396,7 +396,7 @@ object DecoderPreferencesScreen : Screen {
                       )
                       Icon(
                         Icons.RoundedFilled.KeyboardArrowDown,
-                        contentDescription = if (anime4kExpanded) "Collapse" else "Expand",
+                        contentDescription = if (anime4kExpanded) "折叠" else "展开",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.rotate(rotationState),
                       )

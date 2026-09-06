@@ -271,7 +271,7 @@ object AdvancedPreferencesScreen : Screen {
               R.string.pref_import_complete_text,
               importStats?.imported ?: 0,
               importStats?.failed ?: 0,
-              importStats?.version ?: "unknown",
+              importStats?.version ?: "未知",
             ),
           )
         },
@@ -819,7 +819,7 @@ object AdvancedPreferencesScreen : Screen {
                           Toast
                             .makeText(
                               context,
-                              "Failed to clear: ${error.message}",
+                              "清除失败：${error.message}",
                               Toast.LENGTH_LONG,
                             ).show()
                         }
@@ -1021,7 +1021,7 @@ object AdvancedPreferencesScreen : Screen {
                     val fontsDir = File(context.filesDir, "fonts")
                     runCatching {
                       check(!fontsDir.exists() || fontsDir.deleteRecursively()) {
-                        "Unable to clear fonts cache directory: ${fontsDir.absolutePath}"
+                        "无法清除字体缓存目录：${fontsDir.absolutePath}"
                       }
                     }.onSuccess {
                       withContext(Dispatchers.Main) {

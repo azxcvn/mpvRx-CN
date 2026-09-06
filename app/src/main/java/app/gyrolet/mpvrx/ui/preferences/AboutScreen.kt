@@ -685,7 +685,7 @@ private fun collectSystemStats(context: Context): List<Pair<String, String>> {
     if (configInfo.reqGlEsVersion != android.content.pm.ConfigurationInfo.GL_ES_VERSION_UNDEFINED) {
       configInfo.glEsVersion
     } else {
-      "Unknown"
+      "未知"
     }
 
   // Vulkan
@@ -702,14 +702,14 @@ private fun collectSystemStats(context: Context): List<Pair<String, String>> {
           val ver = vulkanVersionFeature.version
           val major = (ver shr 22) and 0x3FF
           val minor = (ver shr 12) and 0x3FF
-          "Vulkan $major.$minor (Level 1)"
+          "Vulkan $major.$minor（级别 1）"
         } else {
-          "Vulkan 1.1+ (Level 1)"
+          "Vulkan 1.1+（级别 1）"
         }
       }
-      pm.hasSystemFeature(PackageManager.FEATURE_VULKAN_HARDWARE_LEVEL, 0) -> "Vulkan 1.0 (Level 0)"
-      pm.hasSystemFeature("android.hardware.vulkan.compute") -> "Vulkan (compute)"
-      else -> "Not supported"
+      pm.hasSystemFeature(PackageManager.FEATURE_VULKAN_HARDWARE_LEVEL, 0) -> "Vulkan 1.0（级别 0）"
+      pm.hasSystemFeature("android.hardware.vulkan.compute") -> "Vulkan（计算）"
+      else -> "不支持"
     }
 
   // CPU ABIs
@@ -719,23 +719,23 @@ private fun collectSystemStats(context: Context): List<Pair<String, String>> {
   val cores = Runtime.getRuntime().availableProcessors()
 
   return listOf(
-    "Manufacturer" to Build.MANUFACTURER.replaceFirstChar { it.uppercase() },
-    "Device" to "${Build.MODEL} (${Build.DEVICE})",
+    "制造商" to Build.MANUFACTURER.replaceFirstChar { it.uppercase() },
+    "设备" to "${Build.MODEL} (${Build.DEVICE})",
     "Android" to "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})",
     "CPU ABI" to abis,
-    "CPU Cores" to "$cores cores",
+    "CPU 核心" to "$cores 核心",
     "RAM" to ramStr,
     "OpenGL ES" to glesVersion,
-    "mpv Renderer Build" to
+    "mpv 渲染器构建" to
       if (BuildConfig.MPV_SUPPORTS_VULKAN) {
         "OpenGL + Vulkan"
       } else {
-        "OpenGL only (non-Vulkan)"
+        "仅 OpenGL（非 Vulkan）"
       },
     "Vulkan" to vulkanStr,
-    "GPU Renderer" to (Build.HARDWARE.ifBlank { "Unknown" }),
-    "Board" to Build.BOARD,
-    "Kernel" to System.getProperty("os.version", "Unknown"),
+    "GPU 渲染器" to (Build.HARDWARE.ifBlank { "未知" }),
+    "主板" to Build.BOARD,
+    "内核" to System.getProperty("os.version", "未知"),
   )
 }
 

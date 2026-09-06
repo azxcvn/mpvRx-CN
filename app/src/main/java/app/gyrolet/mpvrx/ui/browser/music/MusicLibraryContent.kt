@@ -464,19 +464,19 @@ fun MusicLibraryContent(
             modifier = Modifier
               .fillMaxWidth()
               .padding(horizontal = 16.dp, vertical = 8.dp),
-            placeholder = { Text(if (selectedTab == MusicTab.FOLDERS) "Search folders & songs..." else "Search songs, albums, artists...") },
+            placeholder = { Text(if (selectedTab == MusicTab.FOLDERS) "搜索文件夹与歌曲..." else "搜索歌曲、专辑、艺术家...") },
             leadingIcon = {
               IconButton(onClick = {
                 isSearchActive = false
                 musicViewModel.setSearchQuery("")
               }) {
-                Icon(imageVector = Icons.RoundedFilled.ArrowBack, contentDescription = "Back")
+                Icon(imageVector = Icons.RoundedFilled.ArrowBack, contentDescription = "返回")
               }
             },
             trailingIcon = {
               if (searchQuery.isNotEmpty()) {
                 IconButton(onClick = { musicViewModel.setSearchQuery("") }) {
-                  Icon(imageVector = Icons.RoundedFilled.Close, contentDescription = "Clear search")
+                  Icon(imageVector = Icons.RoundedFilled.Close, contentDescription = "清除搜索")
                 }
               }
             },
@@ -634,7 +634,7 @@ fun MusicLibraryContent(
             ) {
               Icon(
                 imageVector = Icons.RoundedFilled.Add,
-                contentDescription = "New Playlist",
+                contentDescription = "新建播放列表",
               )
             }
           },
@@ -688,7 +688,7 @@ fun MusicLibraryContent(
                 musicViewModel.playAllSongs(context, songs, shuffle = false)
               },
               icon = { Icon(Icons.RoundedFilled.PlayArrow, contentDescription = null) },
-              text = { Text("Play All Songs") },
+              text = { Text("播放全部歌曲") },
             )
             FloatingActionButtonMenuItem(
               onClick = {
@@ -696,7 +696,7 @@ fun MusicLibraryContent(
                 musicViewModel.playAllSongs(context, songs, shuffle = true)
               },
               icon = { Icon(Icons.RoundedFilled.Shuffle, contentDescription = null) },
-              text = { Text("Shuffle Songs") },
+              text = { Text("随机播放歌曲") },
             )
           }
         }
@@ -899,7 +899,7 @@ fun MusicLibraryContent(
               HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
               ListItem(
-                content = { Text("Play") },
+                content = { Text("播放") },
                 leadingContent = { Icon(Icons.RoundedFilled.PlayArrow, contentDescription = null) },
                 modifier = Modifier.clickable {
                   val target = song
@@ -908,7 +908,7 @@ fun MusicLibraryContent(
                 }
               )
               ListItem(
-                content = { Text("Add to Playlist") },
+                content = { Text("添加到播放列表") },
                 leadingContent = { Icon(Icons.RoundedFilled.PlaylistAdd, contentDescription = null) },
                 modifier = Modifier.clickable {
                   val target = song
@@ -917,7 +917,7 @@ fun MusicLibraryContent(
                 }
               )
               ListItem(
-                content = { Text("Share") },
+                content = { Text("分享") },
                 leadingContent = { Icon(Icons.RoundedFilled.Share, contentDescription = null) },
                 modifier = Modifier.clickable {
                   val target = song
@@ -926,7 +926,7 @@ fun MusicLibraryContent(
                 }
               )
               ListItem(
-                content = { Text("Delete Song", color = MaterialTheme.colorScheme.error) },
+                content = { Text("删除歌曲", color = MaterialTheme.colorScheme.error) },
                 leadingContent = { Icon(Icons.RoundedFilled.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
                 modifier = Modifier.clickable {
                   val target = song
@@ -1016,14 +1016,14 @@ fun MusicLibraryContent(
                 Spacer(modifier = Modifier.width(14.dp))
                 Column(modifier = Modifier.weight(1f)) {
                   Text(text = album.title, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                  Text(text = "${album.artist} • ${albumSongs.size} tracks", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                  Text(text = "${album.artist} • ${albumSongs.size} 首歌曲", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
               }
 
               HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
               ListItem(
-                content = { Text("View Album Tracks") },
+                content = { Text("查看专辑曲目") },
                 leadingContent = { Icon(Icons.RoundedFilled.Audiotrack, contentDescription = null) },
                 modifier = Modifier.clickable {
                   val target = album
@@ -1032,7 +1032,7 @@ fun MusicLibraryContent(
                 }
               )
               ListItem(
-                content = { Text("Play Album") },
+                content = { Text("播放专辑") },
                 leadingContent = { Icon(Icons.RoundedFilled.PlayArrow, contentDescription = null) },
                 modifier = Modifier.clickable {
                   val list = albumSongs
@@ -1041,7 +1041,7 @@ fun MusicLibraryContent(
                 }
               )
               ListItem(
-                content = { Text("Shuffle Album") },
+                content = { Text("随机播放专辑") },
                 leadingContent = { Icon(Icons.RoundedFilled.Shuffle, contentDescription = null) },
                 modifier = Modifier.clickable {
                   val list = albumSongs
@@ -1050,7 +1050,7 @@ fun MusicLibraryContent(
                 }
               )
               ListItem(
-                content = { Text("Add Album to Playlist") },
+                content = { Text("添加专辑到播放列表") },
                 leadingContent = { Icon(Icons.RoundedFilled.PlaylistAdd, contentDescription = null) },
                 modifier = Modifier.clickable {
                   val list = albumSongs
@@ -1085,14 +1085,14 @@ fun MusicLibraryContent(
                 Spacer(modifier = Modifier.width(14.dp))
                 Column(modifier = Modifier.weight(1f)) {
                   Text(text = artist.name, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                  Text(text = "${artistSongs.size} songs", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                  Text(text = "${artistSongs.size} 首歌曲", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
               }
 
               HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
               ListItem(
-                content = { Text("View Artist Songs") },
+                content = { Text("查看艺术家歌曲") },
                 leadingContent = { Icon(Icons.RoundedFilled.Person, contentDescription = null) },
                 modifier = Modifier.clickable {
                   val target = artist
@@ -1101,7 +1101,7 @@ fun MusicLibraryContent(
                 }
               )
               ListItem(
-                content = { Text("Play Artist Songs") },
+                content = { Text("播放艺术家歌曲") },
                 leadingContent = { Icon(Icons.RoundedFilled.PlayArrow, contentDescription = null) },
                 modifier = Modifier.clickable {
                   val list = artistSongs
@@ -1110,7 +1110,7 @@ fun MusicLibraryContent(
                 }
               )
               ListItem(
-                content = { Text("Shuffle Artist Songs") },
+                content = { Text("随机播放艺术家歌曲") },
                 leadingContent = { Icon(Icons.RoundedFilled.Shuffle, contentDescription = null) },
                 modifier = Modifier.clickable {
                   val list = artistSongs
@@ -1119,7 +1119,7 @@ fun MusicLibraryContent(
                 }
               )
               ListItem(
-                content = { Text("Add Artist Songs to Playlist") },
+                content = { Text("添加艺术家歌曲到播放列表") },
                 leadingContent = { Icon(Icons.RoundedFilled.PlaylistAdd, contentDescription = null) },
                 modifier = Modifier.clickable {
                   val list = artistSongs
@@ -1155,7 +1155,7 @@ fun MusicLibraryContent(
               HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
               ListItem(
-                content = { Text("Open Playlist") },
+                content = { Text("打开播放列表") },
                 leadingContent = { Icon(Icons.RoundedFilled.PlaylistPlay, contentDescription = null) },
                 modifier = Modifier.clickable {
                   val target = playlist
@@ -1165,7 +1165,7 @@ fun MusicLibraryContent(
               )
               if (!playlist.name.equals(PlaylistRepository.FAVORITES_PLAYLIST_NAME, ignoreCase = true)) {
                 ListItem(
-                  content = { Text("Delete Playlist", color = MaterialTheme.colorScheme.error) },
+                  content = { Text("删除播放列表", color = MaterialTheme.colorScheme.error) },
                   leadingContent = { Icon(Icons.RoundedFilled.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
                   modifier = Modifier.clickable {
                     val target = playlist
@@ -1352,7 +1352,7 @@ private fun SongsTabContent(
   gridState: LazyGridState = rememberLazyGridState(),
 ) {
   if (songs.isEmpty()) {
-    EmptyMusicState(text = "No songs found")
+    EmptyMusicState(text = "未找到歌曲")
     return
   }
 
@@ -1460,7 +1460,7 @@ private fun SongGridCard(
           ) {
             Icon(
               imageVector = Icons.RoundedFilled.CheckCircle,
-              contentDescription = "Selected",
+              contentDescription = "已选中",
               tint = Color.White,
               modifier = Modifier.size(36.dp)
             )
@@ -1557,7 +1557,7 @@ private fun AlbumsTabContent(
   gridState: LazyGridState = rememberLazyGridState(),
 ) {
   if (albums.isEmpty()) {
-    EmptyMusicState(text = "No albums found")
+    EmptyMusicState(text = "未找到专辑")
     return
   }
 
@@ -1644,7 +1644,7 @@ private fun AlbumGridCard(
           ) {
             Icon(
               imageVector = Icons.RoundedFilled.CheckCircle,
-              contentDescription = "Selected",
+              contentDescription = "已选中",
               tint = Color.White,
               modifier = Modifier.size(36.dp)
             )
@@ -1733,7 +1733,7 @@ private fun AlbumListCard(
           ) {
             Icon(
               imageVector = Icons.RoundedFilled.CheckCircle,
-              contentDescription = "Selected",
+              contentDescription = "已选中",
               tint = Color.White,
               modifier = Modifier.size(24.dp)
             )
@@ -1781,7 +1781,7 @@ private fun ArtistsTabContent(
   gridState: LazyGridState = rememberLazyGridState(),
 ) {
   if (artists.isEmpty()) {
-    EmptyMusicState(text = "No artists found")
+    EmptyMusicState(text = "未找到艺术家")
     return
   }
 
@@ -1866,7 +1866,7 @@ private fun ArtistGridCard(
           ) {
             Icon(
               imageVector = Icons.RoundedFilled.CheckCircle,
-              contentDescription = "Selected",
+              contentDescription = "已选中",
               tint = Color.White,
               modifier = Modifier.size(36.dp)
             )
@@ -1939,7 +1939,7 @@ private fun ArtistListCard(
           ) {
             Icon(
               imageVector = Icons.RoundedFilled.CheckCircle,
-              contentDescription = "Selected",
+              contentDescription = "已选中",
               tint = Color.White,
               modifier = Modifier.size(24.dp)
             )
@@ -1985,7 +1985,7 @@ private fun PlaylistArtCollage(
       0 -> {
         Icon(
           imageVector = if (isFavorites) Icons.RoundedFilled.Favorite else Icons.RoundedFilled.QueueMusic,
-          contentDescription = "Playlist",
+          contentDescription = "播放列表",
           modifier = Modifier
             .fillMaxSize()
             .padding(12.dp),
@@ -2184,7 +2184,7 @@ private fun MusicPlaylistCard(
             ) {
               Icon(
                 imageVector = Icons.RoundedFilled.CheckCircle,
-                contentDescription = "Selected",
+                contentDescription = "已选中",
                 tint = Color.White,
                 modifier = Modifier.size(36.dp)
               )
@@ -2239,7 +2239,7 @@ private fun MusicPlaylistCard(
             ) {
               Icon(
                 imageVector = Icons.RoundedFilled.CheckCircle,
-                contentDescription = "Selected",
+                contentDescription = "已选中",
                 tint = Color.White,
                 modifier = Modifier.size(24.dp)
               )
@@ -2306,14 +2306,14 @@ private fun PlaylistsTabContent(
       verticalAlignment = Alignment.CenterVertically
     ) {
       Text(
-        text = "${playlists.size} Playlists",
+        text = "${playlists.size} 个播放列表",
         style = MaterialTheme.typography.labelLarge,
         color = MaterialTheme.colorScheme.onSurfaceVariant
       )
     }
 
     if (playlists.isEmpty()) {
-      EmptyMusicState(text = "No playlists found. Create one!")
+      EmptyMusicState(text = "未找到播放列表。快来创建一个吧！")
     } else {
       val navBarHeight = LocalNavigationBarHeight.current.takeIf { it > 0.dp } ?: 88.dp
       if (viewMode == MusicViewMode.GRID) {
@@ -2432,7 +2432,7 @@ private fun AlbumDetailSheet(
         Button(onClick = onPlayAlbum) {
           Icon(imageVector = Icons.RoundedFilled.PlayArrow, contentDescription = null)
           Spacer(modifier = Modifier.width(4.dp))
-          Text("Play")
+          Text("播放")
         }
       }
 
@@ -2507,7 +2507,7 @@ private fun ArtistDetailSheet(
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
           )
           Text(
-            text = "${songs.size} Songs",
+            text = "${songs.size} 首歌曲",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
           )
@@ -2516,7 +2516,7 @@ private fun ArtistDetailSheet(
         Button(onClick = onPlayArtist) {
           Icon(imageVector = Icons.RoundedFilled.PlayArrow, contentDescription = null)
           Spacer(modifier = Modifier.width(4.dp))
-          Text("Play All")
+          Text("播放全部")
         }
       }
 
@@ -2557,12 +2557,12 @@ private fun CreatePlaylistDialog(
 
   androidx.compose.material3.AlertDialog(
     onDismissRequest = onDismiss,
-    title = { Text("Create Playlist") },
+    title = { Text("创建播放列表") },
     text = {
       OutlinedTextField(
         value = playlistName,
         onValueChange = { playlistName = it },
-        label = { Text("Playlist Name") },
+        label = { Text("播放列表名称") },
         singleLine = true,
         modifier = Modifier.fillMaxWidth()
       )
@@ -2572,12 +2572,12 @@ private fun CreatePlaylistDialog(
         onClick = { onCreate(playlistName) },
         enabled = playlistName.isNotBlank()
       ) {
-        Text("Create")
+        Text("创建")
       }
     },
     dismissButton = {
       TextButton(onClick = onDismiss) {
-        Text("Cancel")
+        Text("取消")
       }
     }
   )

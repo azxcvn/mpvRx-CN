@@ -256,7 +256,7 @@ fun JellyfinHeroBanner(
               color = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
             ) {
               Text(
-                text = if (item.isSeries) "SERIES" else "MOVIE",
+                text = if (item.isSeries) "剧集" else "电影",
                 style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp),
                 color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
@@ -389,9 +389,9 @@ fun JellyfinHeroBanner(
               Text(
                 text =
                   when {
-                    item.progressPercent > 0.05f -> "Resume"
-                    item.isSeries -> "Explore Series"
-                    else -> "Watch Now"
+                    item.progressPercent > 0.05f -> "继续观看"
+                    item.isSeries -> "浏览剧集"
+                    else -> "立即观看"
                   },
                 fontWeight = FontWeight.Bold,
               )
@@ -408,7 +408,7 @@ fun JellyfinHeroBanner(
                 modifier = Modifier.size(18.dp),
               )
               Spacer(modifier = Modifier.width(6.dp))
-              Text(text = "Details", fontWeight = FontWeight.Medium)
+              Text(text = "详情", fontWeight = FontWeight.Medium)
             }
 
             // Trailer Icon Button
@@ -432,7 +432,7 @@ fun JellyfinHeroBanner(
             ) {
               Icon(
                 imageVector = Icons.RoundedFilled.Movie,
-                contentDescription = "Trailer",
+                contentDescription = "预告片",
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp),
               )
@@ -555,7 +555,7 @@ fun JellyfinSectionHeader(
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
       ) {
         Text(
-          text = "See All",
+          text = "查看全部",
           style = MaterialTheme.typography.labelMedium,
           fontWeight = FontWeight.SemiBold,
           color = MaterialTheme.colorScheme.primary,
@@ -967,7 +967,7 @@ fun JellyfinPosterCard(
         ) {
           Icon(
             imageVector = Icons.RoundedFilled.Check,
-            contentDescription = "Selected",
+            contentDescription = "已选中",
             tint = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.padding(3.dp),
           )
@@ -984,7 +984,7 @@ fun JellyfinPosterCard(
         ) {
           Icon(
             imageVector = Icons.RoundedFilled.Check,
-            contentDescription = "Played",
+            contentDescription = "已播放",
             tint = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.padding(3.dp),
           )
@@ -1015,12 +1015,12 @@ fun JellyfinPosterCard(
           val before = buildList {
             item.productionYear?.let { add(it.toString()) }
             if (item.isSeries && item.childCount != null && item.childCount > 0) {
-              add(if (item.childCount == 1) "1 Season" else "${item.childCount} Seasons")
+              add(if (item.childCount == 1) "1 季" else "${item.childCount} 季")
             } else if (item.type == "Episode") {
               if (item.parentIndexNumber != null && item.indexNumber != null) {
                 add("S${item.parentIndexNumber}:E${item.indexNumber}")
               } else {
-                add("Episode")
+                add("单集")
               }
             } else if (item.productionYear == null) {
               add(item.type)
@@ -1122,7 +1122,7 @@ fun JellyfinMusicCard(
         ) {
           Icon(
             imageVector = Icons.RoundedFilled.Check,
-            contentDescription = "Selected",
+            contentDescription = "已选中",
             tint = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.padding(3.dp),
           )
@@ -1189,7 +1189,7 @@ fun JellyfinLibraryChipRow(
     FilterChip(
       selected = selectedLibraryId == null,
       onClick = { onSelectLibrary(null) },
-      label = { Text("All", fontWeight = if (selectedLibraryId == null) FontWeight.Bold else FontWeight.Normal) },
+      label = { Text("全部", fontWeight = if (selectedLibraryId == null) FontWeight.Bold else FontWeight.Normal) },
       shape = RoundedCornerShape(12.dp),
       colors =
         FilterChipDefaults.filterChipColors(
@@ -1254,7 +1254,7 @@ fun JellyfinGenreChipRow(
     FilterChip(
       selected = selectedGenre == null,
       onClick = { onSelectGenre(null) },
-      label = { Text("All", fontWeight = if (selectedGenre == null) FontWeight.Bold else FontWeight.Normal) },
+      label = { Text("全部", fontWeight = if (selectedGenre == null) FontWeight.Bold else FontWeight.Normal) },
       shape = RoundedCornerShape(12.dp),
       colors =
         FilterChipDefaults.filterChipColors(
@@ -1525,7 +1525,7 @@ fun JellyfinEpisodeCard(
           ) {
             Icon(
               imageVector = Icons.RoundedFilled.Check,
-              contentDescription = "Played",
+              contentDescription = "已播放",
               tint = MaterialTheme.colorScheme.onPrimary,
               modifier = Modifier.padding(2.dp),
             )
@@ -1534,7 +1534,7 @@ fun JellyfinEpisodeCard(
       }
 
       Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-        val epPrefix = if (item.indexNumber != null) "EPISODE ${item.indexNumber} • " else ""
+        val epPrefix = if (item.indexNumber != null) "第${item.indexNumber}集 • " else ""
         Text(
           text = "$epPrefix${item.name}",
           style = MaterialTheme.typography.titleMedium,
@@ -1746,7 +1746,7 @@ fun JellyfinListItemCard(
           ) {
             Icon(
               imageVector = Icons.RoundedFilled.Check,
-              contentDescription = "Selected",
+              contentDescription = "已选中",
               tint = MaterialTheme.colorScheme.onPrimary,
               modifier = Modifier.padding(3.dp),
             )
@@ -1763,7 +1763,7 @@ fun JellyfinListItemCard(
           ) {
             Icon(
               imageVector = Icons.RoundedFilled.Check,
-              contentDescription = "Played",
+              contentDescription = "已播放",
               tint = MaterialTheme.colorScheme.onPrimary,
               modifier = Modifier.padding(2.dp),
             )

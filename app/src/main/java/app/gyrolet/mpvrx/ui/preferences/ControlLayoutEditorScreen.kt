@@ -154,10 +154,10 @@ data class ControlLayoutEditorScreen(
     val title =
       remember(region) {
         when (region) {
-          ControlRegion.TOP_RIGHT -> "Edit Top Right"
-          ControlRegion.BOTTOM_RIGHT -> "Edit Bottom Right"
-          ControlRegion.BOTTOM_LEFT -> "Edit Bottom Left"
-          ControlRegion.PORTRAIT_BOTTOM -> "Edit Portrait Bottom"
+          ControlRegion.TOP_RIGHT -> "编辑右上角"
+          ControlRegion.BOTTOM_RIGHT -> "编辑右下角"
+          ControlRegion.BOTTOM_LEFT -> "编辑左下角"
+          ControlRegion.PORTRAIT_BOTTOM -> "编辑竖屏底部"
         }
       }
 

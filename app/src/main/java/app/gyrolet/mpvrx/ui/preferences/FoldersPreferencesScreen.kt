@@ -540,9 +540,9 @@ private fun BlacklistedFolderItem(
               label = {
                 Text(
                   text = when (scope) {
-                    BlacklistScope.BOTH -> "Both (Video & Audio)"
-                    BlacklistScope.VIDEO_ONLY -> "Videos Only"
-                    BlacklistScope.AUDIO_ONLY -> "Audio Only"
+                    BlacklistScope.BOTH -> "视频和音频"
+                    BlacklistScope.VIDEO_ONLY -> "仅视频"
+                    BlacklistScope.AUDIO_ONLY -> "仅音频"
                   },
                   style = MaterialTheme.typography.labelSmall
                 )
@@ -660,7 +660,7 @@ private fun AddFolderDialog(
           HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
           Text(
-            text = "Blacklist for",
+            text = "黑名单范围",
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.primary,
           )
@@ -678,7 +678,7 @@ private fun AddFolderDialog(
                 selected = selectedScope == BlacklistScope.BOTH,
                 onClick = { selectedScope = BlacklistScope.BOTH },
               )
-              Text("Both", style = MaterialTheme.typography.bodyMedium)
+              Text("视频和音频", style = MaterialTheme.typography.bodyMedium)
             }
             Row(
               verticalAlignment = Alignment.CenterVertically,
@@ -688,7 +688,7 @@ private fun AddFolderDialog(
                 selected = selectedScope == BlacklistScope.VIDEO_ONLY,
                 onClick = { selectedScope = BlacklistScope.VIDEO_ONLY },
               )
-              Text("Video", style = MaterialTheme.typography.bodyMedium)
+              Text("仅视频", style = MaterialTheme.typography.bodyMedium)
             }
             Row(
               verticalAlignment = Alignment.CenterVertically,
@@ -698,7 +698,7 @@ private fun AddFolderDialog(
                 selected = selectedScope == BlacklistScope.AUDIO_ONLY,
                 onClick = { selectedScope = BlacklistScope.AUDIO_ONLY },
               )
-              Text("Audio", style = MaterialTheme.typography.bodyMedium)
+              Text("仅音频", style = MaterialTheme.typography.bodyMedium)
             }
           }
         }
@@ -761,7 +761,7 @@ internal fun StorageRootPickerCard(
             if (currentPath.isNotEmpty()) {
               getSimplifiedStoragePath(currentPath)
             } else {
-              "Tap to select - creates Subtitles/, Fonts/, scripts/, script-opts/ subdirs"
+              "点击选择 - 将创建 Subtitles/、Fonts/、scripts/、script-opts/ 子目录"
             },
           style = MaterialTheme.typography.bodySmall,
           color = MaterialTheme.colorScheme.onSurfaceVariant,

@@ -1745,7 +1745,7 @@
   <string name="pref_codecs_hardware_features">硬件特性：</string>
   <string name="pref_codecs_min_resolution">最低分辨率：%s</string>
   <string name="pref_codecs_alignment">像素对齐：%1$dx%2$d</string>
-  <string name="ui_music">Music</string>
+  <string name="ui_music">音乐</string>
   <string name="pref_nav_music_title">显示音乐标签页</string>
   <string name="pref_nav_music_summary">在底部导航栏中显示或隐藏音乐</string>
   <string name="player_up_next_title">播放列表</string>

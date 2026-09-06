@@ -543,7 +543,7 @@ object MediaUtils {
         Intent(Intent.ACTION_SEND_MULTIPLE).apply {
           type = "video/*"
           putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
-          putExtra(Intent.EXTRA_SUBJECT, "Sharing ${uris.size} videos")
+          putExtra(Intent.EXTRA_SUBJECT, "分享 ${uris.size} 个视频")
           val clip = android.content.ClipData.newRawUri(videos.first().displayName, uris.first())
           uris.drop(1).forEach { u -> clip.addItem(android.content.ClipData.Item(u)) }
           clipData = clip
@@ -554,7 +554,7 @@ object MediaUtils {
     context.startActivity(
       Intent.createChooser(
         intent,
-        if (uris.size == 1) "Share video" else "Share ${uris.size} videos",
+        if (uris.size == 1) "分享视频" else "分享 ${uris.size} 个视频",
       ),
     )
   }
@@ -576,11 +576,11 @@ object MediaUtils {
     val days = hours / 24L
 
     return when {
-      seconds < 60 -> "Just now"
-      minutes < 60 -> "${minutes}m ago"
-      hours < 24 -> "${hours}h ago"
-      days == 1L -> "Yesterday"
-      days < 7L -> "${days}d ago"
+      seconds < 60 -> "刚刚"
+      minutes < 60 -> "${minutes} 分钟前"
+      hours < 24 -> "${hours} 小时前"
+      days == 1L -> "昨天"
+      days < 7L -> "${days} 天前"
       else -> {
         val sdf = java.text.SimpleDateFormat("MMM d", java.util.Locale.getDefault())
         sdf.format(java.util.Date(epochMillis))

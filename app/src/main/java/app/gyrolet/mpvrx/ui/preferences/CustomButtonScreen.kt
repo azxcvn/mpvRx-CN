@@ -576,7 +576,7 @@ fun ButtonSlotCard(
         Column(Modifier.weight(1f)) {
           val titleAlpha = if (isPopulated && !draftEnabled) 0.4f else 1f
           Text(
-            text = draftTitle.ifBlank { if (isPopulated) button.title else "Empty slot" },
+            text = draftTitle.ifBlank { if (isPopulated) button.title else "空槽位" },
             style = MaterialTheme.typography.titleSmall,
             fontWeight = if (isPopulated) FontWeight.SemiBold else FontWeight.Normal,
             color =
@@ -696,9 +696,9 @@ fun ButtonSlotCard(
     val fieldKey = activeScriptField!!
     val fieldLabel =
       when (fieldKey) {
-        "content" -> "Tap action  ·  $slotLabel"
-        "longPress" -> "Long press  ·  $slotLabel"
-        "startup" -> "On startup  ·  $slotLabel"
+        "content" -> "点按操作  ·  $slotLabel"
+        "longPress" -> "长按  ·  $slotLabel"
+        "startup" -> "启动时  ·  $slotLabel"
         else -> fieldKey
       }
     val fieldValue =
@@ -751,7 +751,7 @@ fun ButtonSlotCard(
             },
             navigationIcon = {
               IconButton(onClick = { dismissAndSave() }) {
-                Icon(Icons.RoundedFilled.ArrowBack, "Back")
+                Icon(Icons.RoundedFilled.ArrowBack, "返回")
               }
             },
             actions = {
@@ -844,7 +844,7 @@ fun ButtonExpandedContent(
         .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
     verticalArrangement = Arrangement.spacedBy(10.dp),
   ) {
-    HorizontalDividerWithLabel("Button")
+    HorizontalDividerWithLabel("按钮")
 
     // Title
     OutlinedTextField(
@@ -861,7 +861,7 @@ fun ButtonExpandedContent(
       shape = RoundedCornerShape(12.dp),
     )
 
-    HorizontalDividerWithLabel("Scripts (Lua / JS)")
+    HorizontalDividerWithLabel("脚本（Lua / JS）")
 
     Row(
       modifier = Modifier.fillMaxWidth(),
@@ -899,19 +899,19 @@ fun ButtonExpandedContent(
 
     // Long press
     LuaEditorEntryCard(
-      label = "Long press action",
+      label = "长按操作",
       code = draftLongPress,
       onClick = { onOpenScriptEditor("longPress") },
     )
 
     // On startup
     LuaEditorEntryCard(
-      label = "On startup",
+      label = "启动时",
       code = draftStartup,
       onClick = { onOpenScriptEditor("startup") },
     )
 
-    HorizontalDividerWithLabel("Settings")
+    HorizontalDividerWithLabel("设置")
 
     // Enable / Disable row
     Row(
@@ -929,7 +929,7 @@ fun ButtonExpandedContent(
           color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
-          text = if (draftEnabled) "Button is active in the player" else "Button is saved but hidden",
+          text = if (draftEnabled) "按钮已在播放器中生效" else "按钮已保存但处于隐藏状态",
           style = MaterialTheme.typography.bodySmall,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

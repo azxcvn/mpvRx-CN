@@ -105,9 +105,9 @@ fun OnlineSubtitleSearchSheet(
         val hashMatches = searchResults.count { it.isHashMatch }
         val headerText =
           if (hashMatches > 0) {
-            "Verified Matches ($hashMatches) + Others"
+            "已验证匹配 ($hashMatches) + 其他"
           } else {
-            "Online Results (${searchResults.size})"
+            "在线结果 (${searchResults.size})"
           }
         list.add(OnlineSubtitleItem.Header(headerText))
         if (isOnlineSectionExpanded) {
@@ -260,7 +260,7 @@ fun OnlineSubtitleSearchSheet(
                     Spacer(Modifier.width(4.dp))
                   } else {
                     IconButton(onClick = { formatWithAi() }) {
-                      Icon(Icons.RoundedFilled.AutoAwesome, "Format with AI", tint = MaterialTheme.colorScheme.tertiary)
+                      Icon(Icons.RoundedFilled.AutoAwesome, "使用 AI 格式化", tint = MaterialTheme.colorScheme.tertiary)
                     }
                   }
                 }
@@ -318,7 +318,7 @@ fun OnlineSubtitleSearchSheet(
                   .padding(horizontal = MaterialTheme.spacing.medium),
             ) {
               Text(
-                text = "Found ${mediaSearchResults.size}",
+                text = "找到 ${mediaSearchResults.size} 条",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.outline,
                 modifier =
@@ -370,7 +370,7 @@ fun OnlineSubtitleSearchSheet(
             }
             is OnlineSubtitleItem.Header -> {
               val isOnlineHeader =
-                item.title.startsWith("Online Results") || item.title.startsWith("Verified Matches")
+                item.title.startsWith("在线结果") || item.title.startsWith("已验证匹配")
               Row(
                 modifier =
                   Modifier
@@ -626,7 +626,7 @@ private fun SubdlEpisodeDropdown(
       shape = RoundedCornerShape(8.dp),
     ) {
       Text(
-        text = "Ep $selectedEpisode",
+        text = "第 $selectedEpisode 集",
         style = MaterialTheme.typography.labelMedium,
         fontWeight = FontWeight.Bold,
         maxLines = 1,
@@ -882,7 +882,7 @@ private fun SeriesSelectionControls(
         shape = RoundedCornerShape(10.dp),
       ) {
         Text(
-          text = selectedSeason?.let { "S${it.season_number}" } ?: "Season",
+          text = selectedSeason?.let { "S${it.season_number}" } ?: "季",
           style = MaterialTheme.typography.labelLarge,
           fontWeight = FontWeight.Bold,
           maxLines = 1,
@@ -900,7 +900,7 @@ private fun SeriesSelectionControls(
           DropdownMenuItem(
             text = {
               Text(
-                "Season ${season.season_number}",
+                "第 ${season.season_number} 季",
                 style = MaterialTheme.typography.bodyLarge,
               )
             },
@@ -931,7 +931,7 @@ private fun SeriesSelectionControls(
           Spacer(Modifier.width(6.dp))
         }
         Text(
-          text = selectedEpisode?.let { "E${it.episode_number}" } ?: "Ep",
+          text = selectedEpisode?.let { "E${it.episode_number}" } ?: "集",
           style = MaterialTheme.typography.labelLarge,
           fontWeight = FontWeight.Bold,
           maxLines = 1,
@@ -950,7 +950,7 @@ private fun SeriesSelectionControls(
             text = {
               Column(modifier = Modifier.padding(vertical = 4.dp)) {
                 Text(
-                  "Ep ${episode.episode_number}",
+                  "第 ${episode.episode_number} 集",
                   style = MaterialTheme.typography.bodyLarge,
                   fontWeight = FontWeight.Bold,
                 )

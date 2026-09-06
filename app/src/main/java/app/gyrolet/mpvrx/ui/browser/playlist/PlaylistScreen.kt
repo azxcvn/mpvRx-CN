@@ -298,7 +298,7 @@ object PlaylistScreen : Screen {
             EmptyState(
               icon = Icons.RoundedFilled.PlaylistAdd,
               title = stringResource(R.string.ui_no_playlists_yet),
-              message = "Create a playlist or add one from an m3u URL",
+              message = "创建播放列表，或从 m3u 链接添加一个",
             )
           }
         }

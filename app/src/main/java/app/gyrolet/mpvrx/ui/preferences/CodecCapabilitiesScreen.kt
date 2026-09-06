@@ -169,20 +169,20 @@ object CodecInspector {
             // Hardware Features inspection
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
               if (caps.isFeatureSupported(MediaCodecInfo.CodecCapabilities.FEATURE_AdaptivePlayback)) {
-                featureList.add("Adaptive Res")
+                featureList.add("自适应分辨率")
               }
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
               if (caps.isFeatureSupported(MediaCodecInfo.CodecCapabilities.FEATURE_TunneledPlayback)) {
-                featureList.add("Direct Tunneling")
+                featureList.add("直接隧道")
               }
               if (caps.isFeatureSupported(MediaCodecInfo.CodecCapabilities.FEATURE_SecurePlayback)) {
-                featureList.add("Hardware DRM (L1)")
+                featureList.add("硬件 DRM (L1)")
               }
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
               if (caps.isFeatureSupported(MediaCodecInfo.CodecCapabilities.FEATURE_LowLatency)) {
-                featureList.add("Low Latency")
+                featureList.add("低延迟")
               }
             }
 
@@ -642,7 +642,7 @@ object CodecCapabilitiesScreen : Screen {
             IconButton(onClick = copyReportToClipboard) {
               Icon(
                 imageVector = Icons.RoundedFilled.ContentCopy,
-                contentDescription = "Copy Spec Report",
+                contentDescription = "复制规格报告",
                 tint = MaterialTheme.colorScheme.primary,
               )
             }
@@ -728,7 +728,7 @@ object CodecCapabilitiesScreen : Screen {
                 StatCounterChip(
                   modifier = Modifier.weight(1f),
                   count = hwCount,
-                  label = "Hardware",
+                  label = "硬件",
                   icon = Icons.RoundedFilled.DeveloperBoard,
                   containerColor = MaterialTheme.colorScheme.primaryContainer,
                   contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -744,7 +744,7 @@ object CodecCapabilitiesScreen : Screen {
                 StatCounterChip(
                   modifier = Modifier.weight(1f),
                   count = videoCount,
-                  label = "Video",
+                  label = "视频",
                   icon = Icons.RoundedFilled.Videocam,
                   containerColor = MaterialTheme.colorScheme.secondaryContainer,
                   contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -794,7 +794,7 @@ object CodecCapabilitiesScreen : Screen {
               leadingIcon = {
                 Icon(
                   imageVector = Icons.RoundedFilled.Search,
-                  contentDescription = "Search",
+                  contentDescription = "搜索",
                 )
               },
               trailingIcon = {
@@ -802,7 +802,7 @@ object CodecCapabilitiesScreen : Screen {
                   IconButton(onClick = { searchQuery = "" }) {
                     Icon(
                       imageVector = Icons.RoundedFilled.Close,
-                      contentDescription = "Clear",
+                      contentDescription = "清除",
                     )
                   }
                 }
@@ -872,7 +872,7 @@ object CodecCapabilitiesScreen : Screen {
             )
             if (searchQuery.isNotEmpty()) {
               Text(
-                text = "${filteredCodecs.size} matches",
+                text = "${filteredCodecs.size} 个匹配",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
@@ -1059,7 +1059,7 @@ private fun KeyCodecStatusCard(status: KeyCodecStatus) {
                 when {
                   isHw -> stringResource(R.string.pref_codecs_badge_hardware)
                   isSw -> stringResource(R.string.pref_codecs_badge_software)
-                  else -> "Unsupported"
+                  else -> "不支持"
                 },
               style = MaterialTheme.typography.labelMedium,
               fontWeight = FontWeight.Black,
@@ -1218,7 +1218,7 @@ private fun CodecDetailCard(codec: CodecCapabilitiesInfo) {
 
         Icon(
           imageVector = Icons.RoundedFilled.KeyboardArrowDown,
-          contentDescription = "Toggle Details",
+          contentDescription = "切换详情",
           tint = MaterialTheme.colorScheme.onSurfaceVariant,
           modifier = Modifier
             .size(24.dp)

@@ -66,7 +66,7 @@ sealed class TorrentStreamingState {
   data object Idle : TorrentStreamingState()
 
   data class Connecting(
-    val phase: String = "Starting Torrent Engine...",
+    val phase: String = "正在启动种子引擎…",
     val downloadSpeed: Long = 0L,
     val uploadSpeed: Long = 0L,
     val peers: Int = 0,

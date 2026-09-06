@@ -128,7 +128,7 @@ fun SharedMusicTrackListItem(
           ) {
             Icon(
               imageVector = Icons.RoundedFilled.CheckCircle,
-              contentDescription = "Selected",
+              contentDescription = "已选中",
               tint = Color.White,
               modifier = Modifier.size(24.dp),
             )
@@ -261,7 +261,7 @@ fun SharedMusicGridCard(
         ) {
           Icon(
             imageVector = Icons.RoundedFilled.CheckCircle,
-            contentDescription = "Selected",
+            contentDescription = "已选中",
             tint = Color.White,
             modifier = Modifier.size(32.dp),
           )

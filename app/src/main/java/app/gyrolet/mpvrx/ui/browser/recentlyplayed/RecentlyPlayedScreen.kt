@@ -470,7 +470,7 @@ object RecentlyPlayedScreen : Screen {
             EmptyState(
               icon = Icons.RoundedFilled.History,
               title = stringResource(R.string.ui_recently_played_disabled),
-              message = "Enable it in Advanced Settings to track your playback history",
+              message = "请在高级设置中启用，以跟踪您的播放历史",
             )
           }
         }
@@ -511,7 +511,7 @@ object RecentlyPlayedScreen : Screen {
                     } else {
                       stringResource(R.string.ui_no_recently_played_videos)
                     },
-                  message = "Items you play will appear here",
+                  message = "您播放过的项目将显示在这里",
                 )
               }
             } else {
@@ -555,24 +555,24 @@ object RecentlyPlayedScreen : Screen {
       if (deleteDialogOpen.value && selectionManager.isInSelectionMode) {
         // Remove selected items from history
         val itemCount = selectionManager.selectedCount
-        val itemText = if (itemCount == 1) "item" else "items"
+        val itemText = if (itemCount == 1) "项目" else "项目"
         val deleteFiles = deleteFilesCheckbox.value
 
         val title =
           if (deleteFiles) {
-            "Delete $itemCount $itemText?"
+            "删除 $itemCount 个$itemText？"
           } else {
-            "Remove $itemCount $itemText from history?"
+            "从历史记录中移除 $itemCount 个$itemText？"
           }
 
         val subtitle =
           buildString {
             if (deleteFiles) {
-              append("This will permanently delete the original video file(s) from your device storage.\n\n")
-              append("This action cannot be undone.")
+              append("这将永久删除设备存储中的原始视频文件。\n\n")
+              append("此操作无法撤销。")
             } else {
-              append("This will remove the selected $itemText from your recently played list. ")
-              append("The original video files will not be deleted.")
+              append("将从最近播放列表中移除所选$itemText。")
+              append("原始视频文件不会被删除。")
             }
           }
 

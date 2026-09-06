@@ -379,7 +379,7 @@ fun PlaylistSheet(
               )
             }
             Text(
-              text = "$totalCount items",
+              text = "$totalCount 项",
               style = MaterialTheme.typography.bodyMedium,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -406,7 +406,7 @@ fun PlaylistSheet(
               ) {
                 Icon(
                   imageVector = if (isListMode) Icons.RoundedFilled.GridView else Icons.RoundedFilled.ViewList,
-                  contentDescription = if (isListMode) "Switch to Grid View" else "Switch to List View",
+                  contentDescription = if (isListMode) "切换到网格视图" else "切换到列表视图",
                   tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
               }
@@ -551,7 +551,7 @@ private fun DragHandle(
   ) {
     Icon(
       imageVector = Icons.RoundedFilled.DragHandle,
-      contentDescription = "Drag to reorder",
+      contentDescription = "拖动以重新排序",
       tint =
         if (isDragging) {
           MaterialTheme.colorScheme.primary

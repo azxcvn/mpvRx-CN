@@ -485,7 +485,7 @@ data class PlaylistDetailScreen(
               Modifier.padding(bottom = app.gyrolet.mpvrx.ui.browser.NavigationBarState.miniPlayerClearance),
             onClick = { backStack.add(PlaylistAddVideosScreen(playlistId, isAudio = isAudioPlaylist)) },
             icon = { Icon(Icons.RoundedFilled.Add, contentDescription = null) },
-            text = { Text(if (isAudioPlaylist) "Add Songs" else stringResource(R.string.playlist_add_videos)) },
+            text = { Text(if (isAudioPlaylist) "添加歌曲" else stringResource(R.string.playlist_add_videos)) },
           )
         }
       },
@@ -1021,13 +1021,13 @@ private fun RemoveFromPlaylistDialog(
 ) {
   if (!isOpen) return
 
-  val itemText = if (itemCount == 1) "video" else "videos"
+  val itemText = if (itemCount == 1) "视频" else "视频"
 
   androidx.compose.material3.AlertDialog(
     onDismissRequest = onDismiss,
     title = {
       Text(
-        text = "Remove $itemCount $itemText from playlist?",
+        text = "从播放列表移除 $itemCount 个$itemText？",
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
       )
@@ -1046,7 +1046,7 @@ private fun RemoveFromPlaylistDialog(
           shape = MaterialTheme.shapes.extraLarge,
         ) {
           Text(
-            text = "The selected $itemText will be removed from this playlist. The original ${if (itemCount == 1) "file" else "files"} will not be deleted.",
+            text = "将从该播放列表移除所选$itemText。原始${if (itemCount == 1) "文件" else "文件"}不会被删除。",
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSecondaryContainer,

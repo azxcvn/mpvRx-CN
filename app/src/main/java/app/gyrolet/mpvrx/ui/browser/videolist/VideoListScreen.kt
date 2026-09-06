@@ -970,7 +970,7 @@ internal fun VideoListContent(
         EmptyState(
           icon = Icons.RoundedFilled.VideoLibrary,
           title = stringResource(R.string.ui_no_videos_in_folder),
-          message = "Videos you add to this folder will appear here",
+          message = "您添加到此文件夹的视频将显示在这里",
         )
       }
     }

@@ -70,7 +70,7 @@ fun AudioMiniPlayer(modifier: Modifier = Modifier) {
   val title =
     sessionState.currentItem?.title?.takeIf { it.isNotBlank() }
       ?: rawMediaTitle?.takeIf { it.isNotBlank() }
-      ?: "Audio Track"
+      ?: "音轨"
 
   Surface(
     modifier =
@@ -160,7 +160,7 @@ fun AudioMiniPlayer(modifier: Modifier = Modifier) {
             barCount = 3,
           )
           Text(
-            text = if (isPlaying) "Playing" else "Paused",
+            text = if (isPlaying) "正在播放" else "已暂停",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,

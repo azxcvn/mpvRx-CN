@@ -319,7 +319,7 @@ fun JellyfinContent(
             onSearch = { query -> viewModel.performSearch(query, debounceMs = 0L) },
             modifier = Modifier.fillMaxWidth(),
             inputFieldModifier = Modifier.focusRequester(searchFocusRequester),
-            placeholder = { Text("Search movies, shows, episodes...") },
+            placeholder = { Text("搜索电影、剧集、单集...") },
             leadingIcon = {
               Icon(
                 imageVector = Icons.RoundedFilled.Search,
@@ -495,7 +495,7 @@ fun JellyfinContent(
             // Error state
             uiState.error != null && uiState.libraries.isEmpty() && uiState.currentItems.isEmpty() -> {
               ErrorView(
-                message = uiState.error ?: "An error occurred",
+                message = uiState.error ?: "发生错误",
                 onRetry = { viewModel.refresh() },
                 onReauthenticate = {
                   serverToReauth = uiState.activeServer
@@ -547,7 +547,7 @@ fun JellyfinContent(
                           verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                           JellyfinSectionHeader(
-                            title = "Libraries",
+                            title = "媒体库",
                           )
 
                           LazyRow(
@@ -570,8 +570,8 @@ fun JellyfinContent(
                     if (uiState.resumeItems.isNotEmpty()) {
                       item {
                         JellyfinHorizontalSection(
-                          title = "Continue Watching",
-                          subtitle = "Jump back in",
+                          title = "继续观看",
+                          subtitle = "接着上次继续",
                           items = uiState.resumeItems,
                           server = server,
                           isContinueWatching = true,
@@ -601,8 +601,8 @@ fun JellyfinContent(
                       if (uiState.latestMovies.isNotEmpty()) {
                         item {
                           JellyfinHorizontalSection(
-                            title = "Latest Movies",
-                            subtitle = "Newly added to server",
+                            title = "最新电影",
+                            subtitle = "服务器上新添加的",
                             items = uiState.latestMovies,
                             server = server,
                             onItemClick = { item -> viewModel.openDetail(item) },
@@ -619,8 +619,8 @@ fun JellyfinContent(
                       if (uiState.latestShows.isNotEmpty()) {
                         item {
                           JellyfinHorizontalSection(
-                            title = "Latest TV Shows",
-                            subtitle = "Newly updated series",
+                            title = "最新剧集",
+                            subtitle = "新更新的剧集",
                             items = uiState.latestShows,
                             server = server,
                             onItemClick = { item -> viewModel.openDetail(item) },
@@ -638,8 +638,8 @@ fun JellyfinContent(
                     if (uiState.recommendations.isNotEmpty()) {
                       item {
                         JellyfinHorizontalSection(
-                          title = "Top Picks For You",
-                          subtitle = "Popular & trending media",
+                          title = "为您推荐",
+                          subtitle = "热门与趋势媒体",
                           items = uiState.recommendations,
                           server = server,
                           onItemClick = { item -> viewModel.openDetail(item) },
@@ -748,7 +748,7 @@ fun JellyfinContent(
                   )
                   Spacer(modifier = Modifier.height(12.dp))
                   Text(
-                    text = if (uiState.searchQuery.isNotBlank()) "No results found for \"${uiState.searchQuery}\"" else "No media found in this folder",
+                    text = if (uiState.searchQuery.isNotBlank()) "未找到与 \"${uiState.searchQuery}\" 相关的结果" else "此文件夹中未找到媒体",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -1002,7 +1002,7 @@ fun JellyfinContent(
                 ) {
                   Icon(
                     imageVector = Icons.RoundedFilled.PlayArrow,
-                    contentDescription = "Play",
+                    contentDescription = "播放",
                     modifier = Modifier.size(24.dp),
                     tint = MaterialTheme.colorScheme.primary,
                   )
@@ -1031,7 +1031,7 @@ fun JellyfinContent(
               ) {
                 Icon(
                   imageVector = Icons.RoundedFilled.RemoveCircle,
-                  contentDescription = "Mark unwatched",
+                  contentDescription = "标记为未观看",
                   modifier = Modifier.size(24.dp),
                   tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -1043,7 +1043,7 @@ fun JellyfinContent(
                 ) {
                   Icon(
                     imageVector = Icons.RoundedFilled.Info,
-                    contentDescription = "Info",
+                    contentDescription = "信息",
                     modifier = Modifier.size(24.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                   )
@@ -1121,7 +1121,7 @@ fun JellyfinContent(
                 viewModel.playRandom(context)
               },
               icon = { Icon(Icons.RoundedFilled.Shuffle, contentDescription = null) },
-              text = { Text("Play Random") },
+              text = { Text("随机播放") },
             )
 
             FloatingActionButtonMenuItem(
@@ -1130,7 +1130,7 @@ fun JellyfinContent(
                 isManageServersOpen = true
               },
               icon = { Icon(Icons.RoundedFilled.BringYourOwnIp, contentDescription = null) },
-              text = { Text("Switch Server") },
+              text = { Text("切换服务器") },
             )
 
             FloatingActionButtonMenuItem(
@@ -1261,13 +1261,13 @@ private fun EmptyServersView(onAddClick: () -> Unit) {
     }
     Spacer(modifier = Modifier.height(16.dp))
     Text(
-      text = "Connect to Jellyfin",
+      text = "连接到 Jellyfin",
       style = MaterialTheme.typography.titleLarge,
       fontWeight = FontWeight.Bold,
     )
     Spacer(modifier = Modifier.height(8.dp))
     Text(
-      text = "Stream your media library directly with mpvRx hardware acceleration and zero transcoding.",
+      text = "使用 mpvRx 硬件加速直接流式播放您的媒体库，无需转码。",
       style = MaterialTheme.typography.bodyMedium,
       color = MaterialTheme.colorScheme.onSurfaceVariant,
       textAlign = TextAlign.Center,
@@ -1280,7 +1280,7 @@ private fun EmptyServersView(onAddClick: () -> Unit) {
         modifier = Modifier.size(18.dp),
       )
       Spacer(modifier = Modifier.width(8.dp))
-      Text("Add Jellyfin Server")
+      Text("添加 Jellyfin 服务器")
     }
   }
 }
@@ -1309,7 +1309,7 @@ private fun ErrorView(
     )
     Spacer(modifier = Modifier.height(12.dp))
     Text(
-      text = if (isAuthError) "Authentication failed (HTTP 401). Session expired or unauthorized." else message,
+      text = if (isAuthError) "认证失败（HTTP 401）。会话已过期或未授权。" else message,
       style = MaterialTheme.typography.bodyMedium,
       color = MaterialTheme.colorScheme.error,
       textAlign = TextAlign.Center,
@@ -1320,11 +1320,11 @@ private fun ErrorView(
       verticalAlignment = Alignment.CenterVertically,
     ) {
       FilledTonalButton(onClick = onRetry) {
-        Text("Retry")
+        Text("重试")
       }
       if (isAuthError && onReauthenticate != null) {
         Button(onClick = onReauthenticate) {
-          Text("Re-authenticate")
+          Text("重新认证")
         }
       }
     }

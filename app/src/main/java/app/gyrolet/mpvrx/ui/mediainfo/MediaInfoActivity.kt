@@ -148,7 +148,7 @@ class MediaInfoActivity : AppCompatActivity() {
     var error by remember { mutableStateOf<String?>(null) }
     var textContent by remember { mutableStateOf<String?>(null) }
     var fullMediaInfoText by remember { mutableStateOf<String?>(null) }
-    var fileName by remember { mutableStateOf("Media File") }
+    var fileName by remember { mutableStateOf("媒体文件") }
     var fileUri by remember { mutableStateOf<Uri?>(null) }
     var mediaInfo by remember { mutableStateOf<MediaInfoOps.MediaInfoData?>(null) }
     var valueDetail by remember { mutableStateOf<ValueDetailSelection?>(null) }
@@ -173,7 +173,7 @@ class MediaInfoActivity : AppCompatActivity() {
         }
 
       if (uri == null) {
-        error = "No media file provided"
+        error = "未提供媒体文件"
         isLoading = false
         return@LaunchedEffect
       }
@@ -186,14 +186,14 @@ class MediaInfoActivity : AppCompatActivity() {
           context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
             val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
             if (nameIndex >= 0 && cursor.moveToFirst()) {
-              cursor.getString(nameIndex) ?: uri.lastPathSegment ?: "Unknown"
+              cursor.getString(nameIndex) ?: uri.lastPathSegment ?: "未知"
             } else {
-              uri.lastPathSegment ?: "Unknown"
+              uri.lastPathSegment ?: "未知"
             }
-          } ?: uri.lastPathSegment ?: "Unknown"
+          } ?: uri.lastPathSegment ?: "未知"
         } catch (e: Exception) {
           Log.e(tag, "Error getting file name", e)
-          uri.lastPathSegment ?: "Unknown"
+          uri.lastPathSegment ?: "未知"
         }
 
       // Load media info
@@ -213,11 +213,11 @@ class MediaInfoActivity : AppCompatActivity() {
 
               isLoading = false
             }.onFailure { e ->
-              error = e.message ?: "Failed to load media information"
+              error = e.message ?: "无法加载媒体信息"
               isLoading = false
             }
         } catch (e: Exception) {
-          error = e.message ?: "Unknown error"
+          error = e.message ?: "未知错误"
           isLoading = false
         }
       }
@@ -386,7 +386,7 @@ class MediaInfoActivity : AppCompatActivity() {
         shape = MaterialTheme.shapes.extraLarge,
       ) {
         Text(
-          text = "Error: $errorMessage",
+          text = "错误：$errorMessage",
           style = MaterialTheme.typography.bodyLarge,
           fontWeight = FontWeight.Medium,
           color = MaterialTheme.colorScheme.onErrorContainer,
@@ -530,10 +530,10 @@ class MediaInfoActivity : AppCompatActivity() {
               menuSections.firstOrNull()?.properties?.size ?: 0,
               filePath,
             )
-          InfoTab.VIDEO -> StreamTabContent(videoSections, "Video Stream")
-          InfoTab.AUDIO -> StreamTabContent(audioSections, "Audio Stream")
-          InfoTab.SUBTITLES -> StreamTabContent(subtitleSections, "Subtitle Track")
-          InfoTab.IMAGE -> StreamTabContent(imageSections, "Image")
+          InfoTab.VIDEO -> StreamTabContent(videoSections, "视频流")
+          InfoTab.AUDIO -> StreamTabContent(audioSections, "音频流")
+          InfoTab.SUBTITLES -> StreamTabContent(subtitleSections, "字幕轨道")
+          InfoTab.IMAGE -> StreamTabContent(imageSections, "图像")
           InfoTab.CHAPTERS -> ChaptersTabContent(menuSections)
           InfoTab.OTHER -> OtherTabContent(otherSections, attachmentNames)
           InfoTab.RAW -> RawTabContent(fullMediaInfoText)
@@ -753,16 +753,16 @@ class MediaInfoActivity : AppCompatActivity() {
           } else if (w.isNotEmpty() && h.isNotEmpty()) {
             "${w}x$h"
           } else {
-            "Unknown"
+            "未知"
           }
         } else {
-          "No Video"
-        }
+            "无视频"
+          }
       }
 
-    val sizeLabel = mediaInfo.general.fileSize.ifBlank { "Unknown" }
-    val durationLabel = mediaInfo.general.duration.ifBlank { "Unknown" }
-    val formatLabel = mediaInfo.general.format.ifBlank { "Unknown" }
+    val sizeLabel = mediaInfo.general.fileSize.ifBlank { "未知" }
+    val durationLabel = mediaInfo.general.duration.ifBlank { "未知" }
+    val formatLabel = mediaInfo.general.format.ifBlank { "未知" }
 
     val heroChips =
       remember(mediaInfo, sections) {
@@ -788,8 +788,8 @@ class MediaInfoActivity : AppCompatActivity() {
             imageValue("Format").takeIf(String::isNotBlank)?.let { add(it) }
             if (imageResolution.isNotBlank()) add(imageResolution)
           }
-          if (sizeLabel != "Unknown") add(sizeLabel)
-          if (durationLabel != "Unknown") add(durationLabel)
+          if (sizeLabel != "未知") add(sizeLabel)
+          if (durationLabel != "未知") add(durationLabel)
         }
       }
 
@@ -852,7 +852,7 @@ class MediaInfoActivity : AppCompatActivity() {
             ) {
               QuickStatCard(
                 title = stringResource(R.string.ui_resolution),
-                value = imageResolution.ifBlank { "Unknown" },
+                value = imageResolution.ifBlank { "未知" },
                 icon = Icons.RoundedFilled.Palette,
                 accentColor = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.weight(1f),
@@ -871,7 +871,7 @@ class MediaInfoActivity : AppCompatActivity() {
             ) {
               QuickStatCard(
                 title = stringResource(R.string.media_info_stat_bit_depth),
-                value = imageValue("Bit depth").ifBlank { "Unknown" },
+                value = imageValue("Bit depth").ifBlank { "未知" },
                 icon = Icons.RoundedFilled.Tune,
                 accentColor = MaterialTheme.colorScheme.tertiary,
                 modifier = Modifier.weight(1f),
@@ -899,7 +899,7 @@ class MediaInfoActivity : AppCompatActivity() {
               )
               QuickStatCard(
                 title = stringResource(R.string.media_info_stat_channels),
-                value = primaryAudio?.channels?.ifBlank { "Unknown" } ?: "Unknown",
+                value = primaryAudio?.channels?.ifBlank { "未知" } ?: "未知",
                 icon = Icons.RoundedFilled.VolumeUp,
                 accentColor = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.weight(1f),
@@ -911,14 +911,14 @@ class MediaInfoActivity : AppCompatActivity() {
             ) {
               QuickStatCard(
                 title = stringResource(R.string.media_info_stat_sample_rate),
-                value = primaryAudio?.samplingRate?.ifBlank { "Unknown" } ?: "Unknown",
+                value = primaryAudio?.samplingRate?.ifBlank { "未知" } ?: "未知",
                 icon = Icons.RoundedFilled.Tune,
                 accentColor = MaterialTheme.colorScheme.tertiary,
                 modifier = Modifier.weight(1f),
               )
               QuickStatCard(
                 title = stringResource(R.string.ui_bitrate),
-                value = mediaInfo.general.overallBitRate.ifBlank { "Unknown" },
+                value = mediaInfo.general.overallBitRate.ifBlank { "未知" },
                 icon = Icons.RoundedFilled.Speed,
                 accentColor = Color(0xFFFFB300),
                 modifier = Modifier.weight(1f),
@@ -958,7 +958,7 @@ class MediaInfoActivity : AppCompatActivity() {
               )
               QuickStatCard(
                 title = stringResource(R.string.ui_bitrate),
-                value = mediaInfo.general.overallBitRate.ifBlank { "Unknown" },
+                value = mediaInfo.general.overallBitRate.ifBlank { "未知" },
                 icon = Icons.RoundedFilled.Speed,
                 accentColor = Color(0xFFFFB300),
                 modifier = Modifier.weight(1f),
@@ -992,24 +992,24 @@ class MediaInfoActivity : AppCompatActivity() {
               horizontalArrangement = Arrangement.SpaceAround,
             ) {
               if (videoCount > 0) {
-                TrackSummaryItem(videoCount, "Video", Icons.RoundedFilled.Videocam, MaterialTheme.colorScheme.primary)
+                TrackSummaryItem(videoCount, "视频", Icons.RoundedFilled.Videocam, MaterialTheme.colorScheme.primary)
               }
               if (audioCount > 0) {
-                TrackSummaryItem(audioCount, "Audio", Icons.RoundedFilled.VolumeUp, MaterialTheme.colorScheme.secondary)
+                TrackSummaryItem(audioCount, "音频", Icons.RoundedFilled.VolumeUp, MaterialTheme.colorScheme.secondary)
               }
               if (subtitleCount > 0) {
                 TrackSummaryItem(
                   subtitleCount,
-                  "Subtitle",
+                  "字幕",
                   Icons.RoundedFilled.Subtitles,
                   MaterialTheme.colorScheme.tertiary,
                 )
               }
               if (imageCount > 0) {
-                TrackSummaryItem(imageCount, "Image", Icons.RoundedFilled.Palette, MaterialTheme.colorScheme.secondary)
+                TrackSummaryItem(imageCount, "图像", Icons.RoundedFilled.Palette, MaterialTheme.colorScheme.secondary)
               }
               if (chapterCount > 0) {
-                TrackSummaryItem(chapterCount, "Chapters", Icons.RoundedFilled.ViewList, Color(0xFFFFB300))
+                TrackSummaryItem(chapterCount, "章节", Icons.RoundedFilled.ViewList, Color(0xFFFFB300))
               }
             }
           }
@@ -1253,26 +1253,26 @@ class MediaInfoActivity : AppCompatActivity() {
     ) {
       sections.forEachIndexed { index, section ->
         val format =
-          section.properties.firstOrNull { it.first.equals("Format", ignoreCase = true) }?.second ?: "Unknown"
+          section.properties.firstOrNull { it.first.equals("Format", ignoreCase = true) }?.second ?: "未知"
         val language = section.properties.firstOrNull { it.first.equals("Language", ignoreCase = true) }?.second
 
         val badgeLabel = if (language != null) "$format ($language)" else format
 
         val (headerBgColor, headerTextColor, icon) =
           when {
-            streamTypeLabel.contains("Video", ignoreCase = true) ->
+            streamTypeLabel.contains("视频", ignoreCase = true) ->
               Triple(
                 MaterialTheme.colorScheme.primaryContainer,
                 MaterialTheme.colorScheme.onPrimaryContainer,
                 Icons.RoundedFilled.Videocam,
               )
-            streamTypeLabel.contains("Audio", ignoreCase = true) ->
+            streamTypeLabel.contains("音频", ignoreCase = true) ->
               Triple(
                 MaterialTheme.colorScheme.tertiaryContainer,
                 MaterialTheme.colorScheme.onTertiaryContainer,
                 Icons.RoundedFilled.VolumeUp,
               )
-            streamTypeLabel.contains("Image", ignoreCase = true) ->
+            streamTypeLabel.contains("图像", ignoreCase = true) ->
               Triple(
                 MaterialTheme.colorScheme.secondaryContainer,
                 MaterialTheme.colorScheme.onSecondaryContainer,
@@ -1348,7 +1348,7 @@ class MediaInfoActivity : AppCompatActivity() {
                     } else {
                       s
                     }
-                  }.ifBlank { "Chapter ${index + 1}" }
+                  }.ifBlank { "章节 ${index + 1}" }
 
               Row(
                 modifier =
@@ -1647,7 +1647,7 @@ class MediaInfoActivity : AppCompatActivity() {
     withContext(Dispatchers.Main) {
       SafeClipboard.copyPlainText(
         context = this@MediaInfoActivity,
-        label = "Media Info - $fileName",
+        label = "媒体信息 - $fileName",
         text = content,
       )
     }
@@ -1676,19 +1676,19 @@ class MediaInfoActivity : AppCompatActivity() {
             Intent(Intent.ACTION_SEND).apply {
               type = "text/plain"
               putExtra(Intent.EXTRA_STREAM, fileUri)
-              putExtra(Intent.EXTRA_SUBJECT, "Media Info - $fileName")
-              putExtra(Intent.EXTRA_TEXT, "Media information for: $fileName")
+              putExtra(Intent.EXTRA_SUBJECT, "媒体信息 - $fileName")
+              putExtra(Intent.EXTRA_TEXT, "媒体信息：$fileName")
               addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
-          startActivity(Intent.createChooser(shareIntent, "Share Media Info"))
+          startActivity(Intent.createChooser(shareIntent, "分享媒体信息"))
         }
       } catch (e: Exception) {
         withContext(Dispatchers.Main) {
           Toast
             .makeText(
               this@MediaInfoActivity,
-              "Failed to share: ${e.message}",
+              "分享失败：${e.message}",
               Toast.LENGTH_LONG,
             ).show()
         }

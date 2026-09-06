@@ -120,7 +120,7 @@ internal fun DebugLogsScreen(onNavigateBack: () -> Unit) {
           readError = null
           hasLoadedOnce = true
         }.onFailure { error ->
-          readError = error.message ?: "Unable to read app logs"
+          readError = error.message ?: "无法读取应用日志"
           hasLoadedOnce = true
         }
       delay(DEBUG_LOG_POLL_INTERVAL_MS)
@@ -196,24 +196,24 @@ internal fun DebugLogsScreen(onNavigateBack: () -> Unit) {
         title = {
           Column {
             Text(
-              text = "Debug Logs",
+              text = "调试日志",
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
             )
             Text(
               text =
                 buildString {
-                  append(if (isPaused) "Paused" else if (readError != null) "Retrying" else "Live")
+                  append(if (isPaused) "已暂停" else if (readError != null) "重试中" else "实时")
                   append(" • ")
                   if (filteredEntries.size == sourceEntries.size) {
                     append(sourceEntries.size)
-                    append(" logs")
+                    append(" 条日志")
                   } else {
                     append(filteredEntries.size)
-                    append(" of ")
+                    append(" / ")
                     append(sourceEntries.size)
                   }
-                  if (readSource == "pid-fallback") append(" • compatibility mode")
+                  if (readSource == "pid-fallback") append(" • 兼容模式")
                 },
               style = MaterialTheme.typography.labelMedium,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -224,26 +224,26 @@ internal fun DebugLogsScreen(onNavigateBack: () -> Unit) {
         },
         navigationIcon = {
           IconButton(onClick = onNavigateBack) {
-            Icon(Icons.RoundedFilled.ArrowBack, contentDescription = "Back")
+            Icon(Icons.RoundedFilled.ArrowBack, contentDescription = "返回")
           }
         },
         actions = {
           IconButton(onClick = ::togglePause) {
             Icon(
               imageVector = if (isPaused) Icons.RoundedFilled.PlayArrow else Icons.RoundedFilled.Pause,
-              contentDescription = if (isPaused) "Resume logs" else "Pause logs",
+              contentDescription = if (isPaused) "恢复日志" else "暂停日志",
             )
           }
           Box {
             IconButton(onClick = { menuExpanded = true }) {
-              Icon(Icons.RoundedFilled.MoreVert, contentDescription = "Log options")
+              Icon(Icons.RoundedFilled.MoreVert, contentDescription = "日志选项")
             }
             DropdownMenu(
               expanded = menuExpanded,
               onDismissRequest = { menuExpanded = false },
             ) {
               DropdownMenuItem(
-                text = { Text("Share visible logs") },
+                text = { Text("分享可见日志") },
                 leadingIcon = { Icon(Icons.RoundedFilled.Share, contentDescription = null) },
                 enabled = filteredEntries.isNotEmpty(),
                 onClick = {
@@ -252,7 +252,7 @@ internal fun DebugLogsScreen(onNavigateBack: () -> Unit) {
                 },
               )
               DropdownMenuItem(
-                text = { Text("Export visible logs") },
+                text = { Text("导出可见日志") },
                 leadingIcon = { Icon(Icons.RoundedFilled.Download, contentDescription = null) },
                 enabled = filteredEntries.isNotEmpty(),
                 onClick = {
@@ -261,7 +261,7 @@ internal fun DebugLogsScreen(onNavigateBack: () -> Unit) {
                 },
               )
               DropdownMenuItem(
-                text = { Text("Copy visible logs") },
+                text = { Text("复制可见日志") },
                 leadingIcon = { Icon(Icons.RoundedFilled.ContentCopy, contentDescription = null) },
                 enabled = filteredEntries.isNotEmpty(),
                 onClick = {
@@ -274,7 +274,7 @@ internal fun DebugLogsScreen(onNavigateBack: () -> Unit) {
                 },
               )
               DropdownMenuItem(
-                text = { Text("Clear captured logs") },
+                text = { Text("清除已捕获的日志") },
                 leadingIcon = { Icon(Icons.RoundedFilled.Clear, contentDescription = null) },
                 enabled = sourceEntries.isNotEmpty(),
                 onClick = {
@@ -299,7 +299,7 @@ internal fun DebugLogsScreen(onNavigateBack: () -> Unit) {
             }
           },
         ) {
-          Icon(Icons.RoundedFilled.KeyboardArrowDown, contentDescription = "Jump to latest log")
+          Icon(Icons.RoundedFilled.KeyboardArrowDown, contentDescription = "跳转到最新日志")
         }
       }
     },
@@ -323,12 +323,12 @@ internal fun DebugLogsScreen(onNavigateBack: () -> Unit) {
           onValueChange = { query = it },
           modifier = Modifier.fillMaxWidth(),
           singleLine = true,
-          placeholder = { Text("Search tag or message") },
+          placeholder = { Text("搜索标签或消息") },
           leadingIcon = { Icon(Icons.RoundedFilled.Search, contentDescription = null) },
           trailingIcon = {
             if (query.isNotEmpty()) {
               IconButton(onClick = { query = "" }) {
-                Icon(Icons.RoundedFilled.Close, contentDescription = "Clear search")
+                Icon(Icons.RoundedFilled.Close, contentDescription = "清除搜索")
               }
             }
           },
@@ -346,7 +346,7 @@ internal fun DebugLogsScreen(onNavigateBack: () -> Unit) {
           FilterChip(
             selected = selectedLevels.size == DebugLogLevel.entries.size,
             onClick = { selectedLevels = DebugLogLevel.entries.toSet() },
-            label = { Text("All ${sourceEntries.size}") },
+            label = { Text("全部 ${sourceEntries.size}") },
           )
           DebugLogLevel.entries.forEach { level ->
             FilterChip(
@@ -375,7 +375,7 @@ internal fun DebugLogsScreen(onNavigateBack: () -> Unit) {
             color = MaterialTheme.colorScheme.errorContainer,
           ) {
             Text(
-              text = "Logcat temporarily unavailable. Showing the last captured logs and retrying automatically.",
+              text = "Logcat 暂时不可用。正在显示最后捕获的日志并自动重试。",
               modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
               style = MaterialTheme.typography.bodySmall,
               color = MaterialTheme.colorScheme.onErrorContainer,
@@ -386,28 +386,28 @@ internal fun DebugLogsScreen(onNavigateBack: () -> Unit) {
         when {
           !hasLoadedOnce && sourceEntries.isEmpty() -> {
             DebugLogMessageState(
-              title = "Loading logs…",
-              message = "Reading the current mpvRx process logcat.",
+              title = "加载日志中…",
+              message = "正在读取当前 mpvRx 进程的日志。",
             )
           }
           readError != null && sourceEntries.isEmpty() -> {
             DebugLogMessageState(
-              title = "Unable to read logs",
-              message = "Android did not return the app logcat. mpvRx will keep retrying automatically.\n\n${readError.orEmpty()}",
+              title = "无法读取日志",
+              message = "Android 未返回应用日志。mpvRx 将持续自动重试。\n\n${readError.orEmpty()}",
               isError = true,
             )
           }
           filteredEntries.isEmpty() -> {
             val hasActiveFilter = query.isNotBlank() || selectedLevels.size != DebugLogLevel.entries.size
             DebugLogMessageState(
-              title = if (hasActiveFilter) "No matching logs" else if (isPaused) "Logs paused" else "Waiting for logs…",
+              title = if (hasActiveFilter) "无匹配日志" else if (isPaused) "日志已暂停" else "等待日志…",
               message =
                 if (hasActiveFilter) {
-                  "Try clearing the search or enabling more log levels."
+                  "请尝试清除搜索或启用更多日志级别。"
                 } else if (isPaused) {
-                  "Resume to see the latest captured entries."
+                  "恢复后即可看到最新捕获的日志。"
                 } else {
-                  "Use mpvRx normally and new app logs will appear here."
+                  "正常使用 mpvRx，新的应用日志将显示在这里。"
                 },
             )
           }
@@ -547,7 +547,7 @@ private fun DebugLogEntryCard(
               append(" • tid ")
               append(it)
             }
-            append(" • long-press to copy")
+            append(" • 长按复制")
           },
           style = MaterialTheme.typography.labelSmall,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -630,7 +630,7 @@ private fun shareDebugLogs(
   if (text.isBlank()) return
   val byteCount = text.toByteArray(Charsets.UTF_8).size
   if (byteCount > 256 * 1024) {
-    exportDebugLogs(context, text, chooserTitle = "Share debug logs")
+    exportDebugLogs(context, text, chooserTitle = "分享调试日志")
     return
   }
 
@@ -640,7 +640,7 @@ private fun shareDebugLogs(
         type = "text/plain"
         putExtra(Intent.EXTRA_TEXT, text)
       },
-      "Share debug logs",
+      "分享调试日志",
     ),
   )
 }
@@ -648,7 +648,7 @@ private fun shareDebugLogs(
 private fun exportDebugLogs(
   context: Context,
   text: String,
-  chooserTitle: String = "Export debug logs",
+  chooserTitle: String = "导出调试日志",
 ) {
   if (text.isBlank()) return
 

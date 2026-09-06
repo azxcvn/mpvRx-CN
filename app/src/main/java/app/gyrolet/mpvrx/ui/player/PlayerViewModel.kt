@@ -449,7 +449,7 @@ class PlayerViewModel : ViewModel(),
       } else {
         IntroDbStatus(
           state = IntroDbStatusState.DISABLED,
-          message = "Online skip markers are disabled",
+          message = "在线跳过标记已禁用",
         )
       },
     )
@@ -1309,20 +1309,20 @@ class PlayerViewModel : ViewModel(),
       currentMediaTitle.takeIf { it.isNotBlank() }
         ?: PlaybackSession.getPropertyString("metadata/by-key/Title")
         ?: PlaybackSession.getPropertyString("media-title")
-        ?: "Unknown Title"
+        ?: "未知标题"
 
     val artist =
       PlaybackSession.getPropertyString("metadata/by-key/Artist")
         ?: PlaybackSession.getPropertyString("metadata/by-key/ARTIST")
         ?: PlaybackSession.getPropertyString("metadata/by-key/album_artist")
-        ?: "Unknown Artist"
+        ?: "未知艺术家"
 
     val album =
       PlaybackSession.getPropertyString("metadata/by-key/Album")
         ?: PlaybackSession.getPropertyString("metadata/by-key/ALBUM")
-        ?: "Unknown Album"
+        ?: "未知专辑"
 
-    val codec = PlaybackSession.getPropertyString("audio-codec-name")?.uppercase() ?: "Unknown"
+    val codec = PlaybackSession.getPropertyString("audio-codec-name")?.uppercase() ?: "未知"
     val samplerateInt = PlaybackSession.getPropertyInt("audio-params/samplerate") ?: 0
     val sampleRateStr =
       if (samplerateInt >
@@ -1330,21 +1330,21 @@ class PlayerViewModel : ViewModel(),
       ) {
         String.format(java.util.Locale.US, "%.1f kHz", samplerateInt / 1000f)
       } else {
-        "Unknown"
+        "未知"
       }
 
     val channelsInt = PlaybackSession.getPropertyInt("audio-params/channel-count") ?: 0
     val channelsStr =
       when (channelsInt) {
-        1 -> "Mono (1.0)"
-        2 -> "Stereo (2.0)"
-        6 -> "5.1 Surround"
-        8 -> "7.1 Surround"
-        else -> if (channelsInt > 0) "$channelsInt Channels" else "Unknown"
+        1 -> "单声道 (1.0)"
+        2 -> "立体声 (2.0)"
+        6 -> "5.1 环绕声"
+        8 -> "7.1 环绕声"
+        else -> if (channelsInt > 0) "$channelsInt 声道" else "未知"
       }
 
     val bitrateInt = PlaybackSession.getPropertyInt("audio-bitrate") ?: 0
-    val bitrateStr = if (bitrateInt > 0) "${bitrateInt / 1000} kbps" else "Variable / Unknown"
+    val bitrateStr = if (bitrateInt > 0) "${bitrateInt / 1000} kbps" else "可变 / 未知"
 
     val path = PlaybackSession.getPropertyString("path") ?: PlaybackSession.getPropertyString("stream-open-filename") ?: ""
     val fileSizeStr =
@@ -1367,44 +1367,44 @@ class PlayerViewModel : ViewModel(),
     return buildList {
       add(
         app.gyrolet.mpvrx.ui.player.controls.components.sheets
-          .AudioPropertyItem("Title", title),
+          .AudioPropertyItem("标题", title),
       )
       add(
         app.gyrolet.mpvrx.ui.player.controls.components.sheets
-          .AudioPropertyItem("Artist", artist),
+          .AudioPropertyItem("艺术家", artist),
       )
       add(
         app.gyrolet.mpvrx.ui.player.controls.components.sheets
-          .AudioPropertyItem("Album", album),
+          .AudioPropertyItem("专辑", album),
       )
       add(
         app.gyrolet.mpvrx.ui.player.controls.components.sheets.AudioPropertyItem(
-          "Format / Codec",
+          "格式 / 编解码器",
           if (formatExt.isNotBlank()) "$formatExt ($codec)" else codec,
         ),
       )
       add(
         app.gyrolet.mpvrx.ui.player.controls.components.sheets
-          .AudioPropertyItem("Sample Rate", sampleRateStr),
+          .AudioPropertyItem("采样率", sampleRateStr),
       )
       add(
         app.gyrolet.mpvrx.ui.player.controls.components.sheets
-          .AudioPropertyItem("Bitrate", bitrateStr),
+          .AudioPropertyItem("比特率", bitrateStr),
       )
       add(
         app.gyrolet.mpvrx.ui.player.controls.components.sheets
-          .AudioPropertyItem("Channels", channelsStr),
+          .AudioPropertyItem("声道", channelsStr),
       )
       if (fileSizeStr.isNotBlank()) {
         add(
           app.gyrolet.mpvrx.ui.player.controls.components.sheets
-            .AudioPropertyItem("File Size", fileSizeStr),
+            .AudioPropertyItem("文件大小", fileSizeStr),
         )
       }
       if (path.isNotBlank()) {
         add(
           app.gyrolet.mpvrx.ui.player.controls.components.sheets
-            .AudioPropertyItem("File Location", path),
+            .AudioPropertyItem("文件位置", path),
         )
       }
     }
@@ -2115,11 +2115,11 @@ val isBrightnessSliderShown = MutableStateFlow(false)
       is TorrentStreamingState.Connecting -> state.phase
       is TorrentStreamingState.Streaming -> {
         val speed = formatTorrentSpeed(state.downloadSpeed)
-        val peers = "${state.peers} peers"
+        val peers = "${state.peers} 个节点"
         val progress = "${(state.bufferProgress * 100).toInt()}%"
         "$speed | $peers | $progress"
       }
-      is TorrentStreamingState.Error -> state.message.ifBlank { "Torrent error" }
+      is TorrentStreamingState.Error -> state.message.ifBlank { "种子错误" }
     }
 
   private fun currentSyncplayPlaybackState(): SyncplayPlaybackState =
@@ -2640,7 +2640,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
         val path =
           uri.resolveUri(appContext)
             ?: return@launch withContext(Dispatchers.Main) {
-              showToast("Failed to load audio file: Invalid URI")
+              showToast("加载音频文件失败：无效 URI")
             }
 
         val title = getFileNameFromUri(uri)?.substringBeforeLast(".")?.ifBlank { null }
@@ -2651,11 +2651,11 @@ val isBrightnessSliderShown = MutableStateFlow(false)
           } else {
             PlaybackSession.command("audio-add", path, "cached")
           }
-          showToast("Audio track added")
+          showToast("音频轨道已添加")
         }
       }.onFailure { e ->
         withContext(Dispatchers.Main) {
-          showToast("Failed to load audio: ${e.message}")
+          showToast("加载音频失败：${e.message}")
         }
         android.util.Log.e("PlayerViewModel", "Error adding audio", e)
       }
@@ -2689,7 +2689,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
 
         if (!isValidSubtitleFile(fileName)) {
           return@withLock withContext(Dispatchers.Main) {
-            showToast("Invalid subtitle file format")
+            showToast("无效的字幕文件格式")
           }
         }
 
@@ -2743,13 +2743,13 @@ val isBrightnessSliderShown = MutableStateFlow(false)
         val displayName = fileName.take(30).let { if (fileName.length > 30) "$it..." else it }
         if (!silent) {
           withContext(Dispatchers.Main) {
-            showToast("$displayName added")
+            showToast("已添加 $displayName")
           }
         }
       }.onFailure {
         if (!silent) {
           withContext(Dispatchers.Main) {
-            showToast("Failed to load subtitle")
+            showToast("加载字幕失败")
           }
         }
       }
@@ -2781,13 +2781,13 @@ val isBrightnessSliderShown = MutableStateFlow(false)
         _translatingTrackName.value =
           getFileNameFromUri(uri)?.let { it.substringBeforeLast(".") }?.lowercase() ?: "subtitle"
         _translationProgress.value = 0f
-        _translationStatus.value = "Preparing translation"
+        _translationStatus.value = "正在准备翻译"
 
         try {
           val content =
             appContext.contentResolver.openInputStream(uri)?.use {
               it.readBytes().decodeToString()
-            } ?: throw Exception("Could not read subtitle file")
+            } ?: throw Exception("无法读取字幕文件")
 
           val originalFileName = getFileNameFromUri(uri) ?: "subtitle.srt"
           val extension = originalFileName.substringAfterLast('.', "srt")
@@ -2797,7 +2797,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
               _translationProgress.value = progress.progress
               _translationStatus.value =
                 buildString {
-                  append(if (progress.isResuming) "Resuming" else "Translating")
+                  append(if (progress.isResuming) "继续翻译" else "正在翻译")
                   append(" ${progress.completedChunks}/${progress.totalChunks}")
                 }
             }
@@ -2810,20 +2810,20 @@ val isBrightnessSliderShown = MutableStateFlow(false)
 
               val savedUri =
                 saveTranslatedSubtitle(uri, newFileName, extension, targetLanguage, translatedContent)
-                  ?: throw Exception("Could not save translated subtitle")
+                  ?: throw Exception("无法保存翻译后的字幕")
 
               withContext(Dispatchers.Main) {
                 addSubtitle(savedUri, select = true)
-                showToast("Translation complete: $newFileName")
+                showToast("翻译完成：$newFileName")
               }
             }.onFailure { error ->
               withContext(Dispatchers.Main) {
-                showToast("Translation failed: ${error.message}")
+                showToast("翻译失败：${error.message}")
               }
             }
         } catch (e: Exception) {
           withContext(Dispatchers.Main) {
-            showToast("Error: ${e.message}")
+            showToast("错误：${e.message}")
           }
         } finally {
           _isTranslatingSub.value = false
@@ -2849,7 +2849,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
       cacheDir.listFiles()?.forEach { it.delete() }
       cacheDir.delete()
     }
-    showToast("Translation cancelled")
+    showToast("已取消翻译")
   }
 
   fun generateSubtitles(
@@ -2858,7 +2858,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
   ) {
     val videoUri = currentVideoUriForSubtitleGeneration()
     if (videoUri == null) {
-      showToast("Could not find current video path")
+      showToast("找不到当前视频路径")
       return
     }
 
@@ -2868,7 +2868,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
     viewModelScope.launch(Dispatchers.IO) {
       _isGeneratingSubtitles.value = true
       _subtitleGenerationProgress.value = 0f
-      _subtitleGenerationStatus.value = "Preparing audio"
+      _subtitleGenerationStatus.value = "正在准备音频"
 
       try {
         val result =
@@ -2888,19 +2888,19 @@ val isBrightnessSliderShown = MutableStateFlow(false)
             val newFileName = "$baseName.$sanitizedLang.AI.${generated.extension}"
             val savedUri =
               saveTranslatedSubtitle(videoUri, newFileName, generated.extension, sanitizedLang, generated.content)
-                ?: throw Exception("Could not save generated subtitles")
+                ?: throw Exception("无法保存生成的字幕")
             withContext(Dispatchers.Main) {
               addSubtitle(savedUri, select = true)
-              showToast("Generated subtitles: $newFileName")
+              showToast("已生成字幕：$newFileName")
             }
           }.onFailure { error ->
             withContext(Dispatchers.Main) {
-              showToast("Subtitle generation failed: ${error.message}")
+              showToast("字幕生成失败：${error.message}")
             }
           }
       } catch (e: Exception) {
         withContext(Dispatchers.Main) {
-          showToast("Subtitle generation error: ${e.message}")
+          showToast("字幕生成错误：${e.message}")
         }
       } finally {
         _isGeneratingSubtitles.value = false
@@ -2918,12 +2918,12 @@ val isBrightnessSliderShown = MutableStateFlow(false)
   fun startRealtimeSubtitles(language: String) {
     val videoUri = currentVideoUriForSubtitleGeneration()
     if (videoUri == null) {
-      showToast("Could not find current video path")
+      showToast("找不到当前视频路径")
       return
     }
     val videoDurationMs = (_preciseDuration.value * 1000f).toLong()
     if (videoDurationMs <= 0) {
-      showToast("Video duration unknown")
+      showToast("视频时长未知")
       return
     }
 
@@ -2940,7 +2940,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
       scope = viewModelScope,
       onProgress = { progress ->
         _realtimeSubsProgress.value = progress.chunkIndex.toFloat() / progress.totalChunks.coerceAtLeast(1)
-        _translationStatus.value = "Chunk ${progress.chunkIndex + 1}/${progress.totalChunks}"
+        _translationStatus.value = "分块 ${progress.chunkIndex + 1}/${progress.totalChunks}"
       },
       onNewContent = { srtContent ->
         realtimeSrtFile?.writeText(srtContent)
@@ -2960,14 +2960,14 @@ val isBrightnessSliderShown = MutableStateFlow(false)
         _realtimeSubsProgress.value = 0f
         _translationStatus.value = ""
         realtimeSrtFile = null
-        showToast("Real-time subtitles complete")
+        showToast("实时字幕已完成")
       },
       onError = { error ->
         _isRealtimeSubsActive.value = false
         _realtimeSubsLanguage.value = ""
         _realtimeSubsProgress.value = 0f
         _translationStatus.value = ""
-        showToast("Real-time subtitles error: $error")
+        showToast("实时字幕错误：$error")
       },
     )
   }
@@ -2983,7 +2983,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
     realtimeSrtFile = null
     realtimeSrtFileAdded = false
     if (showToastMessage && wasActive) {
-      showToast("Real-time subtitles stopped")
+      showToast("已停止实时字幕")
     }
   }
 
@@ -3140,7 +3140,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
         } else {
           IntroDbStatus(
             state = IntroDbStatusState.DISABLED,
-            message = "Online skip markers are disabled",
+            message = "在线跳过标记已禁用",
           )
         }
       lookupIntroSegments(mediaTitle)
@@ -3211,7 +3211,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
       PlaybackSession.getPropertyBoolean("pause") ?: false,
       doSeek = true,
     )
-    showToast(if (auto) "${segment.label} (auto)" else segment.label)
+    showToast(if (auto) "${segment.label}（自动）" else segment.label)
   }
 
   private fun mergeSkipSegments() {
@@ -3282,7 +3282,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
     _introDbStatus.value =
       IntroDbStatus(
         state = IntroDbStatusState.LOOKING_UP,
-        message = "${provider.displayName}: matching title",
+        message = "${provider.displayName}：正在匹配标题",
       )
 
     introLookupJob?.cancel()
@@ -3347,7 +3347,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
                   else -> fallbackOutcome
                 }
               } else {
-                IntroDbLookupOutcome.Error("No outcomes", IntroSegmentProvider.HYBRID)
+                IntroDbLookupOutcome.Error("无结果", IntroSegmentProvider.HYBRID)
               }
             }
           } else {
@@ -3505,7 +3505,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
               cacheStatusMessage(
                 provider,
                 entry.message,
-                "loaded ${entry.segments.size} marker${if (entry.segments.size == 1) "" else "s"}",
+                "已加载 ${entry.segments.size} 个标记",
               ),
             imdbId = entry.imdbId,
             segmentCount = entry.segments.size,
@@ -3517,7 +3517,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
         _introDbStatus.value =
           IntroDbStatus(
             state = IntroDbStatusState.NO_SEGMENTS,
-            message = cacheStatusMessage(provider, entry.message, "no markers cached"),
+            message = cacheStatusMessage(provider, entry.message, "未缓存标记"),
             imdbId = entry.imdbId,
           )
       }
@@ -3527,7 +3527,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
         _introDbStatus.value =
           IntroDbStatus(
             state = IntroDbStatusState.UNRESOLVED,
-            message = cacheStatusMessage(provider, entry.message, "cached title match failed"),
+            message = cacheStatusMessage(provider, entry.message, "缓存的标题匹配失败"),
           )
       }
     }
@@ -3586,7 +3586,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
     fallback: String,
   ): String {
     val sourceMessage = message.ifBlank { "${provider.displayName}: $fallback" }
-    return if (sourceMessage.contains("(cached)")) sourceMessage else "$sourceMessage (cached)"
+    return if (sourceMessage.contains("（已缓存）")) sourceMessage else "$sourceMessage（已缓存）"
   }
 
   private fun refreshChapterDerivedSegments(chapters: List<dev.vivvvek.seeker.Segment>) {
@@ -3656,7 +3656,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
           _externalSubtitles.remove(originalUriString)
           mpvPathToUriMap.remove(mpvPath)
           withContext(Dispatchers.Main) {
-            showToast("Subtitle deleted")
+            showToast("字幕已删除")
           }
         }
       }
@@ -3734,7 +3734,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
             selectSeason(matchingSeason, preferredEpisode)
           }
         }.onFailure {
-          showProviderStatusToast("Failed to load series details: ${it.message}")
+          showProviderStatusToast("加载剧集详情失败：${it.message}")
         }
       _isFetchingTvDetails.value = false
     }
@@ -3769,7 +3769,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
             )
           }
         }.onFailure {
-          showProviderStatusToast("Failed to load series details: ${it.message}")
+          showProviderStatusToast("加载剧集详情失败：${it.message}")
         }
       _isFetchingEpisodes.value = false
     }
@@ -3880,7 +3880,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
           ).onSuccess { results ->
             _onlineSubtitleSearchResults.value = results
           }.onFailure {
-            showProviderStatusToast("Search failed: ${it.message}")
+            showProviderStatusToast("搜索失败：${it.message}")
           }
         _isSearchingSub.value = false
       }
@@ -3900,7 +3900,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
       if (selectedSeason == null || selectedEpisode == null) {
         return WyzieSearchPlan(
           request = null,
-          missingSelectionMessage = "Select season and episode for Wyzie.",
+          missingSelectionMessage = "请选择 Wyzie 的季和集。",
         )
       }
       return WyzieSearchPlan(
@@ -3921,7 +3921,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
     if (detectedSeason != null || detectedEpisode != null) {
       return WyzieSearchPlan(
         request = null,
-        missingSelectionMessage = "Select the show, season, and episode for Wyzie.",
+        missingSelectionMessage = "请选择 Wyzie 的节目、季和集。",
       )
     }
 
@@ -3947,7 +3947,7 @@ val isBrightnessSliderShown = MutableStateFlow(false)
           }
           addSubtitle(uri)
         }.onFailure {
-          showToast("Download failed: ${it.message}")
+          showToast("下载失败：${it.message}")
         }
       _isDownloadingSub.value = false
     }

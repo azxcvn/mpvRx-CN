@@ -587,9 +587,9 @@ fun PermissionDeniedState(
             )
             Text(
               text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                "On Android 13 and above, this permission allows the app to read video files from your device's storage, including Downloads, Movies, and DCIM folders."
+                "在 Android 13 及以上版本中，此权限允许应用读取设备存储中的视频文件，包括下载、电影和 DCIM 文件夹。"
               } else {
-                "This permission allows the app to read media files from your device's storage to play videos and audio."
+                "此权限允许应用读取设备存储中的媒体文件，以播放视频和音频。"
               },
               style = MaterialTheme.typography.bodyMedium,
               color = MaterialTheme.colorScheme.onSurfaceVariant,

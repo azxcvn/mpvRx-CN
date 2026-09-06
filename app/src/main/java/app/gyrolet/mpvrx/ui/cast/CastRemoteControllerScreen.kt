@@ -105,14 +105,14 @@ fun CastRemoteControllerScreen(
         IconButton(onClick = onBackClick, modifier = Modifier.align(Alignment.CenterVertically)) {
           Icon(
             Icons.RoundedFilled.KeyboardArrowDown,
-            contentDescription = "Close",
+            contentDescription = "关闭",
             tint = Color.White,
             modifier = Modifier.size(32.dp),
           )
         }
         Spacer(modifier = Modifier.weight(1f))
         Text(
-          text = castState.deviceName ?: "Cast",
+          text = castState.deviceName ?: "投屏",
           style = MaterialTheme.typography.labelSmall,
           color = Color.White.copy(alpha = 0.7f),
           letterSpacing = 1.sp,
@@ -121,7 +121,7 @@ fun CastRemoteControllerScreen(
         IconButton(onClick = onStopCasting) {
           Icon(
             Icons.RoundedFilled.Cast,
-            contentDescription = "Stop Casting",
+            contentDescription = "停止投屏",
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(28.dp),
           )
@@ -238,7 +238,7 @@ private fun CastPlaybackControls(
     }, modifier = Modifier.size(56.dp)) {
       Icon(
         Icons.RoundedFilled.FastRewind,
-        contentDescription = "Rewind 10s",
+        contentDescription = "后退 10 秒",
         tint = Color.White,
         modifier = Modifier.size(32.dp),
       )
@@ -264,7 +264,7 @@ private fun CastPlaybackControls(
       } else {
         Icon(
           imageVector = if (castState.isPlaying) Icons.RoundedFilled.Pause else Icons.RoundedFilled.PlayArrow,
-          contentDescription = if (castState.isPlaying) "Pause" else "Play",
+          contentDescription = if (castState.isPlaying) "暂停" else "播放",
           tint = Color.White,
           modifier = Modifier.size(36.dp),
         )
@@ -278,7 +278,7 @@ private fun CastPlaybackControls(
     }, modifier = Modifier.size(56.dp)) {
       Icon(
         Icons.RoundedFilled.FastForward,
-        contentDescription = "Forward 30s",
+        contentDescription = "快进 30 秒",
         tint = Color.White,
         modifier = Modifier.size(32.dp),
       )
@@ -300,8 +300,8 @@ private fun CastOptionsRow(
     horizontalArrangement = Arrangement.spacedBy(4.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    CastOptionButton(icon = Icons.RoundedFilled.Speed, label = "Speed", onClick = onShowSpeed)
-    CastOptionButton(icon = Icons.RoundedFilled.Settings, label = "Quality", onClick = onShowBitrate)
+    CastOptionButton(icon = Icons.RoundedFilled.Speed, label = "速度", onClick = onShowSpeed)
+    CastOptionButton(icon = Icons.RoundedFilled.Settings, label = "画质", onClick = onShowBitrate)
   }
 }
 
@@ -349,7 +349,7 @@ private fun CastVolumeSlider(
         } else {
           Icons.RoundedFilled.VolumeUp
         },
-      contentDescription = "Volume",
+      contentDescription = "音量",
       tint = Color.White.copy(alpha = 0.6f),
       modifier = Modifier.size(24.dp),
     )
@@ -387,7 +387,7 @@ private fun CastSpeedDialog(
 
   AlertDialog(
     onDismissRequest = onDismiss,
-    title = { Text("Playback Speed") },
+    title = { Text("播放速度") },
     text = {
       Column {
         speeds.forEach { speed ->
@@ -413,7 +413,7 @@ private fun CastSpeedDialog(
         }
       }
     },
-    confirmButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+    confirmButton = { TextButton(onClick = onDismiss) { Text("取消") } },
   )
 }
 
@@ -425,7 +425,7 @@ private fun CastBitrateDialog(
 ) {
   val bitrateOptions =
     listOf(
-      CastBitrateOption("Auto", 0),
+      CastBitrateOption("自动", 0),
       CastBitrateOption("4K (50 Mbps)", 50_000_000),
       CastBitrateOption("4K (25 Mbps)", 25_000_000),
       CastBitrateOption("1080p (16 Mbps)", 16_000_000),
@@ -435,7 +435,7 @@ private fun CastBitrateDialog(
 
   AlertDialog(
     onDismissRequest = onDismiss,
-    title = { Text("Quality / Bitrate") },
+    title = { Text("画质 / 码率") },
     text = {
       Column {
         bitrateOptions.forEach { option ->
@@ -459,7 +459,7 @@ private fun CastBitrateDialog(
         }
       }
     },
-    confirmButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+    confirmButton = { TextButton(onClick = onDismiss) { Text("取消") } },
   )
 }
 

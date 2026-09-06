@@ -144,7 +144,7 @@ fun LyricsTranslateDialog(
                 color = if (!state.isTranslationActive) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
               )
               Text(
-                text = "Show original language without translation",
+                text = "仅显示原始语言，不提供翻译",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.outline,
               )
@@ -163,7 +163,7 @@ fun LyricsTranslateDialog(
           FilterChip(
             selected = displayMode == LyricsTranslationDisplayMode.DualLine,
             onClick = { audioPreferences.lyricsTranslationDisplayMode.set(LyricsTranslationDisplayMode.DualLine) },
-            label = { Text("Dual-Line", fontWeight = FontWeight.Bold, fontSize = 12.sp) },
+            label = { Text("双行显示", fontWeight = FontWeight.Bold, fontSize = 12.sp) },
             modifier = Modifier.weight(1f),
             colors = FilterChipDefaults.filterChipColors(
               selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -173,7 +173,7 @@ fun LyricsTranslateDialog(
           FilterChip(
             selected = displayMode == LyricsTranslationDisplayMode.Replace,
             onClick = { audioPreferences.lyricsTranslationDisplayMode.set(LyricsTranslationDisplayMode.Replace) },
-            label = { Text("Replace Original", fontWeight = FontWeight.Bold, fontSize = 12.sp) },
+            label = { Text("替换原文", fontWeight = FontWeight.Bold, fontSize = 12.sp) },
             modifier = Modifier.weight(1f),
             colors = FilterChipDefaults.filterChipColors(
               selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -188,7 +188,7 @@ fun LyricsTranslateDialog(
         OutlinedTextField(
           value = searchQuery,
           onValueChange = { searchQuery = it },
-          placeholder = { Text("Search language...") },
+          placeholder = { Text("搜索语言…") },
           modifier = Modifier.fillMaxWidth(),
           singleLine = true,
           shape = RoundedCornerShape(10.dp),
@@ -236,7 +236,7 @@ fun LyricsTranslateDialog(
                 )
                 if (lang.isRomanization) {
                   Text(
-                    text = lang.subtitle ?: "Pronunciation / Romanized",
+                    text = lang.subtitle ?: "发音 / 罗马化",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.tertiary,
                   )
@@ -249,7 +249,7 @@ fun LyricsTranslateDialog(
     },
     confirmButton = {
       TextButton(onClick = onDismiss) {
-        Text("Done", fontWeight = FontWeight.Bold)
+        Text("完成", fontWeight = FontWeight.Bold)
       }
     },
   )

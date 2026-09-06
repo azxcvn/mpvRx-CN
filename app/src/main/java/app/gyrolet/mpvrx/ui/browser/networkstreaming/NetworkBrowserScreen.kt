@@ -358,7 +358,7 @@ private fun NetworkBrowserContent(
         EmptyState(
           icon = Icons.RoundedFilled.Folder,
           title = stringResource(R.string.ui_empty_folder),
-          message = "This folder contains no files or directories",
+          message = "此文件夹不包含任何文件或目录",
         )
       }
     }
@@ -371,7 +371,7 @@ private fun NetworkBrowserContent(
         EmptyState(
           icon = Icons.RoundedFilled.Search,
           title = stringResource(R.string.settings_search_title),
-          message = "No items match '$searchQuery'",
+          message = "没有项目与 '$searchQuery' 匹配",
         )
       }
     }

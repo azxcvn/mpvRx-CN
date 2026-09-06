@@ -123,7 +123,7 @@ fun SeerrDetailSheet(
     if (it.numberOfSeason != null || it.seasons != null) MediaType.TV else MediaType.MOVIE
   } ?: searchItem?.getMediaType() ?: MediaType.MOVIE
 
-  val title = details?.getDisplayTitle() ?: searchItem?.getDisplayTitle() ?: "Details"
+  val title = details?.getDisplayTitle() ?: searchItem?.getDisplayTitle() ?: "详情"
   val overview = details?.overview ?: searchItem?.overview ?: ""
   val backdropUrl = details?.getBackdropUrl() ?: searchItem?.getBackdropUrl()
   val posterUrl = details?.getPosterUrl() ?: searchItem?.getPosterUrl()
@@ -160,7 +160,7 @@ fun SeerrDetailSheet(
       sonarrServers.forEach { server ->
         server.profiles.forEach { profile ->
           val label = buildString {
-            append(profile.name ?: "Default")
+            append(profile.name ?: "默认")
             if (server.is4k == true) append(" (4K)")
             else if (sonarrServers.size > 1) append(" (${server.name})")
           }
@@ -179,7 +179,7 @@ fun SeerrDetailSheet(
       radarrServers.forEach { server ->
         server.profiles.forEach { profile ->
           val label = buildString {
-            append(profile.name ?: "Default")
+            append(profile.name ?: "默认")
             if (server.is4k == true) append(" (4K)")
             else if (radarrServers.size > 1) append(" (${server.name})")
           }
@@ -199,7 +199,7 @@ fun SeerrDetailSheet(
     if (options.isEmpty()) {
       options.add(
         ResolutionOption(
-          label = "Standard (1080p)",
+          label = "标准 (1080p)",
           is4k = false,
           serverId = null,
           profileId = null,
@@ -561,7 +561,7 @@ fun SeerrDetailSheet(
                   color = MaterialTheme.colorScheme.onPrimary,
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Submitting…")
+                Text("正在提交…")
               } else {
                 Icon(
                   Icons.RoundedFilled.AddToQueue,
@@ -572,7 +572,7 @@ fun SeerrDetailSheet(
                 Text(
                   text = if (mediaType == MediaType.TV) {
                     if (unrequestedSeasons.size < seasons.size && unrequestedSeasons.isNotEmpty()) {
-                      "Request Remaining (${selectedSeasons.size})"
+                      "待请求（${selectedSeasons.size}）"
                     } else {
                       stringResource(R.string.seerr_request_tv)
                     }
@@ -638,10 +638,10 @@ fun SeerrDetailSheet(
               val isSelected = selectedSeasons.contains(seasonNum)
 
               val label = when {
-                seasonStatus == MediaStatus.AVAILABLE -> "S$seasonNum (Available)"
-                seasonStatus == MediaStatus.PROCESSING -> "S$seasonNum (Processing)"
-                seasonStatus == MediaStatus.PENDING -> "S$seasonNum (Pending)"
-                else -> "Season $seasonNum"
+                seasonStatus == MediaStatus.AVAILABLE -> "第$seasonNum 季（可用）"
+                seasonStatus == MediaStatus.PROCESSING -> "第$seasonNum 季（处理中）"
+                seasonStatus == MediaStatus.PENDING -> "第$seasonNum 季（待处理）"
+                else -> "第 $seasonNum 季"
               }
 
               FilterChip(
@@ -717,14 +717,14 @@ fun SeerrDetailSheet(
           ) {
             Icon(Icons.RoundedFilled.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
             Spacer(modifier = Modifier.width(6.dp))
-            Text("Delete Request", fontWeight = FontWeight.SemiBold)
+            Text("删除请求", fontWeight = FontWeight.SemiBold)
           }
 
           if (showDeleteDialog) {
             AlertDialog(
               onDismissRequest = { showDeleteDialog = false },
-              title = { Text("Delete Request?") },
-              text = { Text("Are you sure you want to delete and cancel the request for \"$title\"?") },
+              title = { Text("删除请求？") },
+              text = { Text("您确定要删除并取消对 \"$title\" 的请求吗？") },
               confirmButton = {
                 Button(
                   onClick = {
@@ -736,12 +736,12 @@ fun SeerrDetailSheet(
                     contentColor = MaterialTheme.colorScheme.onError,
                   ),
                 ) {
-                  Text("Delete")
+                  Text("删除")
                 }
               },
               dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                  Text("Cancel")
+                  Text("取消")
                 }
               },
             )
@@ -775,7 +775,7 @@ fun SeerrDetailSheet(
           )
           if (overview.length > 150) {
             Text(
-              text = if (isOverviewExpanded) "Show less" else "Read more",
+              text = if (isOverviewExpanded) "收起" else "阅读更多",
               style = MaterialTheme.typography.labelSmall,
               fontWeight = FontWeight.Bold,
               color = MaterialTheme.colorScheme.primary,
@@ -796,7 +796,7 @@ fun SeerrDetailSheet(
             .padding(vertical = 8.dp),
         ) {
           Text(
-            text = "Cast",
+            text = "演员",
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
@@ -896,7 +896,7 @@ private fun ResolutionProfileDropdown(
     verticalArrangement = Arrangement.spacedBy(6.dp),
   ) {
     Text(
-      text = "Resolution Profile",
+      text = "分辨率配置",
       style = MaterialTheme.typography.labelLarge,
       fontWeight = FontWeight.SemiBold,
       color = MaterialTheme.colorScheme.onSurface,
@@ -933,7 +933,7 @@ private fun ResolutionProfileDropdown(
           }
           Icon(
             Icons.RoundedFilled.ArrowDropDown,
-            contentDescription = "Select Resolution",
+            contentDescription = "选择分辨率",
             modifier = Modifier.size(20.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
           )

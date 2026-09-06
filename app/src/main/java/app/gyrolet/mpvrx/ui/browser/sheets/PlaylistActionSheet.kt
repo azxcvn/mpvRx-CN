@@ -256,7 +256,7 @@ fun PlaylistActionSheet(
                       android.widget.Toast
                         .makeText(
                           context,
-                          "Failed to create playlist: ${e.message}",
+                          "创建播放列表失败：${e.message}",
                           android.widget.Toast.LENGTH_LONG,
                         ).show()
                     }
@@ -307,7 +307,7 @@ fun PlaylistActionSheet(
                 android.widget.Toast
                   .makeText(
                     context,
-                    "Failed to add M3U playlist: ${error.message}",
+                    "添加 M3U 播放列表失败：${error.message}",
                     android.widget.Toast.LENGTH_LONG,
                   ).show()
               }

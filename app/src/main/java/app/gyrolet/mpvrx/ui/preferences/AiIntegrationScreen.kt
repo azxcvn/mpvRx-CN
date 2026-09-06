@@ -89,50 +89,50 @@ import org.koin.compose.koinInject
 
 private val allLanguages =
   mapOf(
-    "en" to "English",
-    "es" to "Spanish",
-    "fr" to "French",
-    "de" to "German",
-    "it" to "Italian",
-    "pt" to "Portuguese",
-    "ru" to "Russian",
-    "zh" to "Chinese",
-    "ja" to "Japanese",
-    "ko" to "Korean",
-    "ar" to "Arabic",
-    "hi" to "Hindi",
-    "bn" to "Bengali",
-    "vi" to "Vietnamese",
-    "te" to "Telugu",
-    "ta" to "Tamil",
-    "ur" to "Urdu",
-    "tr" to "Turkish",
-    "pl" to "Polish",
-    "uk" to "Ukrainian",
-    "nl" to "Dutch",
-    "el" to "Greek",
-    "hu" to "Hungarian",
-    "sv" to "Swedish",
-    "cs" to "Czech",
-    "ro" to "Romanian",
-    "da" to "Danish",
-    "fi" to "Finnish",
-    "no" to "Norwegian",
-    "he" to "Hebrew",
-    "id" to "Indonesian",
-    "th" to "Thai",
-    "ms" to "Malay",
-    "fa" to "Persian",
-    "sk" to "Slovak",
-    "bg" to "Bulgarian",
-    "hr" to "Croatian",
-    "sr" to "Serbian",
-    "sl" to "Slovenian",
-    "et" to "Estonian",
-    "lv" to "Latvian",
-    "lt" to "Lithuanian",
-    "af" to "Afrikaans",
-    "sw" to "Swahili",
+    "en" to "英语",
+    "es" to "西班牙语",
+    "fr" to "法语",
+    "de" to "德语",
+    "it" to "意大利语",
+    "pt" to "葡萄牙语",
+    "ru" to "俄语",
+    "zh" to "中文",
+    "ja" to "日语",
+    "ko" to "韩语",
+    "ar" to "阿拉伯语",
+    "hi" to "印地语",
+    "bn" to "孟加拉语",
+    "vi" to "越南语",
+    "te" to "泰卢固语",
+    "ta" to "泰米尔语",
+    "ur" to "乌尔都语",
+    "tr" to "土耳其语",
+    "pl" to "波兰语",
+    "uk" to "乌克兰语",
+    "nl" to "荷兰语",
+    "el" to "希腊语",
+    "hu" to "匈牙利语",
+    "sv" to "瑞典语",
+    "cs" to "捷克语",
+    "ro" to "罗马尼亚语",
+    "da" to "丹麦语",
+    "fi" to "芬兰语",
+    "no" to "挪威语",
+    "he" to "希伯来语",
+    "id" to "印度尼西亚语",
+    "th" to "泰语",
+    "ms" to "马来语",
+    "fa" to "波斯语",
+    "sk" to "斯洛伐克语",
+    "bg" to "保加利亚语",
+    "hr" to "克罗地亚语",
+    "sr" to "塞尔维亚语",
+    "sl" to "斯洛文尼亚语",
+    "et" to "爱沙尼亚语",
+    "lv" to "拉脱维亚语",
+    "lt" to "立陶宛语",
+    "af" to "南非荷兰语",
+    "sw" to "斯瓦希里语",
   )
 
 @Serializable
@@ -279,7 +279,7 @@ object AiIntegrationScreen : Screen {
                 },
                 summary = {
                   Text(
-                    if (enabled) "AI features are active" else "AI features are disabled",
+                    if (enabled) "AI 功能已启用" else "AI 功能已禁用",
                     color = MaterialTheme.colorScheme.outline,
                   )
                 },
@@ -322,48 +322,48 @@ val apiKeyInfo =
                   when (provider) {
                   AiProvider.OPENCODE ->
                     ApiKeyInfo(
-                      "OpenCode API Key",
-                      "Get your key from opencode.ai/auth",
+                      "OpenCode API 密钥",
+                      "从 opencode.ai/auth 获取密钥",
                       "sk-...",
                       openCodeKey,
                       preferences.openCodeApiKey::set,
                     )
                   AiProvider.GROQ ->
                     ApiKeyInfo(
-                      "Groq API Key",
-                      "Get your key from console.groq.com",
+                      "Groq API 密钥",
+                      "从 console.groq.com 获取密钥",
                       "gsk_...",
                       groqKey,
                       preferences.groqApiKey::set,
                     )
                   AiProvider.OPENAI ->
                     ApiKeyInfo(
-                      "OpenAI API Key",
-                      "Get your key from platform.openai.com/api-keys",
+                      "OpenAI API 密钥",
+                      "从 platform.openai.com/api-keys 获取密钥",
                       "sk-...",
                       openaiKey,
                       preferences.openaiApiKey::set,
                     )
                   AiProvider.ANTHROPIC ->
                     ApiKeyInfo(
-                      "Anthropic API Key",
-                      "Get your key from console.anthropic.com",
+                      "Anthropic API 密钥",
+                      "从 console.anthropic.com 获取密钥",
                       "sk-ant-...",
                       anthropicKey,
                       preferences.anthropicApiKey::set,
                     )
                   AiProvider.OPENROUTER ->
                     ApiKeyInfo(
-                      "OpenRouter API Key",
-                      "Get your key from openrouter.ai/keys",
+                      "OpenRouter API 密钥",
+                      "从 openrouter.ai/keys 获取密钥",
                       "sk-or-...",
                       openrouterKey,
                       preferences.openrouterApiKey::set,
                     )
                   AiProvider.TOGETHER ->
                     ApiKeyInfo(
-                      "Together API Key",
-                      "Get your key from api.together.xyz/settings/api-keys",
+                      "Together API 密钥",
+                      "从 api.together.xyz/settings/api-keys 获取密钥",
                       "...",
                       togetherKey,
                       preferences.togetherApiKey::set,
@@ -453,7 +453,7 @@ val apiKeyInfo =
                                 verifyResult = it
                                 preferences.lastVerified.set(System.currentTimeMillis())
                               }.onFailure { e ->
-                                verifyResult = "Verification failed: ${e.message}"
+                                verifyResult = "验证失败：${e.message}"
                               }
                             isVerifying = false
                           }
@@ -606,7 +606,7 @@ val apiKeyInfo =
                                 if (selectedModel.isNotBlank()) {
                                   modelDisplayNames[selectedModel] ?: selectedModel
                                 } else {
-                                  "Tap to select a model"
+                                  "点击选择模型"
                                 },
                               style = MaterialTheme.typography.bodySmall,
                               color = MaterialTheme.colorScheme.outline,
@@ -637,7 +637,7 @@ val apiKeyInfo =
                       }
                     } else {
                       Text(
-                        text = "Tap 'Fetch Models' to load available models from ${provider.displayName}",
+                        text = "点击「获取模型」以从 ${provider.displayName} 加载可用模型",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.outline,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -671,7 +671,7 @@ val apiKeyInfo =
                               .verifyModel()
                               .onSuccess { verifyModelResult = it }
                               .onFailure { e ->
-                                verifyModelResult = "Error: ${e.message}"
+                                verifyModelResult = "错误：${e.message}"
                               }
                             isVerifyingModel = false
                           }
@@ -920,24 +920,24 @@ val apiKeyInfo =
                     valueToText = { lang ->
                       androidx.compose.ui.text.AnnotatedString(
                         when (lang) {
-                          "" -> "Auto-detect"
-                          "en" -> "English"
-                          "es" -> "Spanish"
-                          "fr" -> "French"
-                          "de" -> "German"
-                          "hi" -> "Hindi"
-                          "ja" -> "Japanese"
-                          "zh" -> "Chinese"
-                          "ko" -> "Korean"
-                          "pt" -> "Portuguese"
-                          "ru" -> "Russian"
-                          "ar" -> "Arabic"
-                          "it" -> "Italian"
-                          "nl" -> "Dutch"
-                          "pl" -> "Polish"
-                          "tr" -> "Turkish"
-                          "vi" -> "Vietnamese"
-                          "th" -> "Thai"
+                          "" -> "自动检测"
+                          "en" -> "英语"
+                          "es" -> "西班牙语"
+                          "fr" -> "法语"
+                          "de" -> "德语"
+                          "hi" -> "印地语"
+                          "ja" -> "日语"
+                          "zh" -> "中文"
+                          "ko" -> "韩语"
+                          "pt" -> "葡萄牙语"
+                          "ru" -> "俄语"
+                          "ar" -> "阿拉伯语"
+                          "it" -> "意大利语"
+                          "nl" -> "荷兰语"
+                          "pl" -> "波兰语"
+                          "tr" -> "土耳其语"
+                          "vi" -> "越南语"
+                          "th" -> "泰语"
                           else -> lang
                         },
                       )
@@ -950,7 +950,7 @@ val apiKeyInfo =
                     },
                     summary = {
                       Text(
-                        if (sttLanguage.isBlank()) "Auto-detect speech language" else sttLanguage.uppercase(),
+                        if (sttLanguage.isBlank()) "自动检测语音语言" else sttLanguage.uppercase(),
                         color = MaterialTheme.colorScheme.outline,
                       )
                     },
@@ -1021,9 +1021,9 @@ val apiKeyInfo =
                   summary = {
                     Text(
                       if (customPromptEnabled) {
-                        "Custom prompt will be used instead of built-in instructions"
+                        "将使用自定义提示词，而非内置指令"
                       } else {
-                        "Built-in AI instructions will be used"
+                        "将使用内置的 AI 指令"
                       },
                       color = MaterialTheme.colorScheme.outline,
                     )
@@ -1165,7 +1165,7 @@ val apiKeyInfo =
               androidx.compose.ui.res.stringResource(
                 app.gyrolet.mpvrx.R.string.ui_subtitle_translation_can_be_a_bit_messy,
               ) +
-                "For best results, use better models and don't rant that subs aren't working properly.",
+                "要获得更好效果，请使用更好的模型，也不要抱怨字幕不能正常工作。",
             )
           },
           confirmButton = {
@@ -1263,9 +1263,9 @@ val apiKeyInfo =
               if (sttModel.isNotBlank()) {
                 sttModel
               } else if (isLoadingStt) {
-                "Loading..."
+                "正在加载…"
               } else {
-                "Tap to select STT model"
+                "点击选择语音转文字模型"
               },
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.outline,
@@ -1360,7 +1360,7 @@ val apiKeyInfo =
                 ) {
                   Icon(
                     Icons.RoundedFilled.Close,
-                    contentDescription = "Remove $langName",
+                    contentDescription = "移除 $langName",
                     modifier = Modifier.size(14.dp),
                     tint = MaterialTheme.colorScheme.onPrimary,
                   )

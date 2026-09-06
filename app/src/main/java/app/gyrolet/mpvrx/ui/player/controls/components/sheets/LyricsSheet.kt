@@ -64,7 +64,7 @@ fun LyricsSheet(
   val state by viewModel.lyricsUiState.collectAsState()
   val mediaTitle by PlaybackSession.propString["media-title"].collectAsState()
   val artistName by PlaybackSession.propString["metadata/by-key/Artist"].collectAsState()
-  val displayTitle = mediaTitle?.takeIf { it.isNotBlank() } ?: "Current Track"
+  val displayTitle = mediaTitle?.takeIf { it.isNotBlank() } ?: "当前曲目"
   val displayArtist = artistName?.takeIf { it.isNotBlank() } ?: ""
 
   val listState = rememberLazyListState()
@@ -141,7 +141,7 @@ fun LyricsSheet(
         IconButton(onClick = onDismiss) {
           Icon(
             imageVector = Icons.RoundedFilled.Close,
-            contentDescription = "Close",
+            contentDescription = "关闭",
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
           )
         }
@@ -162,7 +162,7 @@ fun LyricsSheet(
           selected = state.selectedSource == LyricsSourceType.EMBEDDED || state.selectedSource == LyricsSourceType.LOCAL,
           onClick = { viewModel.switchLyricsSource(LyricsSourceType.EMBEDDED) },
           label = {
-            Text(if (state.embeddedLyrics?.sourceType == LyricsSourceType.LOCAL) "Local (.lrc)" else "Embedded")
+            Text(if (state.embeddedLyrics?.sourceType == LyricsSourceType.LOCAL) "本地 (.lrc)" else "内嵌")
           },
           enabled = hasEmbedded || state.selectedSource == LyricsSourceType.EMBEDDED,
           colors = FilterChipDefaults.filterChipColors(
@@ -175,7 +175,7 @@ fun LyricsSheet(
           selected = state.selectedSource == LyricsSourceType.ONLINE,
           onClick = { viewModel.switchLyricsSource(LyricsSourceType.ONLINE) },
           label = {
-            Text("Online (LRCLIB)")
+            Text("在线 (LRCLIB)")
           },
           colors = FilterChipDefaults.filterChipColors(
             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -223,7 +223,7 @@ fun LyricsSheet(
               CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
               Spacer(modifier = Modifier.height(12.dp))
               Text(
-                text = "Fetching synced lyrics...",
+                text = "正在获取同步歌词…",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
               )
@@ -318,13 +318,13 @@ fun LyricsSheet(
               verticalArrangement = Arrangement.Center,
             ) {
               Text(
-                text = "No lyrics found for this track.",
+                text = "未找到此曲目的歌词",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
               )
               Spacer(modifier = Modifier.height(8.dp))
               TextButton(onClick = { viewModel.loadLyricsForCurrentTrack(forceRefresh = true) }) {
-                Text("Search Online")
+                Text("在线搜索")
               }
             }
           }
@@ -341,7 +341,7 @@ fun LyricsSheet(
           horizontalArrangement = Arrangement.SpaceBetween,
         ) {
           Text(
-            text = "Sync: ${if (state.syncOffsetMs >= 0) "+" else ""}${state.syncOffsetMs / 1000f}s",
+            text = "同步：${if (state.syncOffsetMs >= 0) "+" else ""}${state.syncOffsetMs / 1000f}s",
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )

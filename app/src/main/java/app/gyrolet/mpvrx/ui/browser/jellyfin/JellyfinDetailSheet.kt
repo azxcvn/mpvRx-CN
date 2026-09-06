@@ -213,7 +213,7 @@ fun JellyfinDetailSheet(
                 )
               }
               Text(
-                text = "${episodes.size} ${if (item.type == "Playlist") "Items" else "Tracks"}",
+                text = "${episodes.size} ${if (item.type == "Playlist") "个项目" else "首曲目"}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.primary,
               )
@@ -224,7 +224,7 @@ fun JellyfinDetailSheet(
             Button(onClick = { onPlay(episodes.first(), false) }) {
               Icon(imageVector = Icons.RoundedFilled.PlayArrow, contentDescription = null)
               Spacer(modifier = Modifier.width(4.dp))
-              Text(if (item.type == "MusicArtist" || item.type == "Artist" || item.type == "AlbumArtist") "Play All" else "Play")
+              Text(if (item.type == "MusicArtist" || item.type == "Artist" || item.type == "AlbumArtist") "全部播放" else "播放")
             }
           }
         }
@@ -236,7 +236,7 @@ fun JellyfinDetailSheet(
           if ((item.type == "MusicArtist" || item.type == "Artist" || item.type == "AlbumArtist") && seasons.isNotEmpty()) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
               Text(
-                text = "Albums",
+                text = "专辑",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -261,7 +261,7 @@ fun JellyfinDetailSheet(
           if (episodes.isNotEmpty()) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
               Text(
-                text = if (item.type == "MusicArtist" || item.type == "Artist" || item.type == "AlbumArtist") "Songs" else "Tracks",
+                text = if (item.type == "MusicArtist" || item.type == "Artist" || item.type == "AlbumArtist") "歌曲" else "曲目",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -386,7 +386,7 @@ fun JellyfinDetailSheet(
         ) {
           Icon(
             imageVector = Icons.RoundedFilled.Close,
-            contentDescription = "Close",
+            contentDescription = "关闭",
             modifier = Modifier.size(20.dp),
           )
         }
@@ -641,9 +641,9 @@ fun JellyfinDetailSheet(
             Text(
               text =
                 when {
-                  item.progressPercent > 0.05f -> "Resume"
-                  item.isSeries -> "Watch S1:E1"
-                  else -> "Play Movie"
+                  item.progressPercent > 0.05f -> "继续观看"
+                  item.isSeries -> "观看 S1:E1"
+                  else -> "播放电影"
                 },
               fontWeight = FontWeight.Bold,
               style = MaterialTheme.typography.labelLarge,
@@ -676,7 +676,7 @@ fun JellyfinDetailSheet(
             ) {
               Icon(
                 imageVector = Icons.RoundedFilled.Movie,
-                contentDescription = "Trailer",
+                contentDescription = "预告片",
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(22.dp),
               )
@@ -750,7 +750,7 @@ fun JellyfinDetailSheet(
           ) {
             Icon(
               imageVector = if (item.isFavorite) Icons.RoundedFilled.Favorite else Icons.RoundedFilled.FavoriteBorder,
-              contentDescription = "Favorite",
+              contentDescription = "收藏",
               tint = MaterialTheme.colorScheme.onSecondaryContainer,
               modifier = Modifier.size(22.dp),
             )
@@ -764,7 +764,7 @@ fun JellyfinDetailSheet(
           ) {
             Icon(
               imageVector = if (item.isPlayed) Icons.RoundedFilled.Check else Icons.RoundedFilled.Visibility,
-              contentDescription = "Watched",
+              contentDescription = "已观看",
               tint = MaterialTheme.colorScheme.onSecondaryContainer,
               modifier = Modifier.size(22.dp),
             )
@@ -784,7 +784,7 @@ fun JellyfinDetailSheet(
             ) {
               Icon(
                 imageVector = Icons.RoundedFilled.Delete,
-                contentDescription = "Delete Item",
+                contentDescription = "删除项目",
                 tint = MaterialTheme.colorScheme.error,
                 modifier = Modifier.size(22.dp),
               )
@@ -806,12 +806,12 @@ fun JellyfinDetailSheet(
                       contentColor = MaterialTheme.colorScheme.onError,
                     ),
                   ) {
-                    Text("Delete")
+                    Text("删除")
                   }
                 },
                 dismissButton = {
                   TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text("取消")
                   }
                 },
               )
@@ -833,7 +833,7 @@ fun JellyfinDetailSheet(
               modifier = Modifier.size(16.dp),
             )
             Spacer(modifier = Modifier.width(6.dp))
-            Text("Play from Beginning", style = MaterialTheme.typography.labelMedium)
+            Text("从头播放", style = MaterialTheme.typography.labelMedium)
           }
         }
 
@@ -849,7 +849,7 @@ fun JellyfinDetailSheet(
             verticalArrangement = Arrangement.spacedBy(4.dp),
           ) {
             Text(
-              text = "Storyline",
+              text = "剧情简介",
               style = MaterialTheme.typography.titleSmall,
               fontWeight = FontWeight.Bold,
               color = MaterialTheme.colorScheme.onSurface,
@@ -862,7 +862,7 @@ fun JellyfinDetailSheet(
               overflow = TextOverflow.Ellipsis,
             )
             Text(
-              text = if (isOverviewExpanded) "Show less" else "Read more",
+              text = if (isOverviewExpanded) "收起" else "阅读更多",
               style = MaterialTheme.typography.labelSmall,
               color = MaterialTheme.colorScheme.primary,
               fontWeight = FontWeight.SemiBold,
@@ -877,7 +877,7 @@ fun JellyfinDetailSheet(
             verticalArrangement = Arrangement.spacedBy(10.dp),
           ) {
             Text(
-              text = "Episodes",
+              text = "单集",
               style = MaterialTheme.typography.titleMedium,
               fontWeight = FontWeight.Bold,
               color = MaterialTheme.colorScheme.onSurface,
@@ -915,14 +915,14 @@ fun JellyfinDetailSheet(
                   horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                   Text(
-                    text = selectedSeason?.name ?: "Select Season",
+                    text = selectedSeason?.name ?: "选择季",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                   )
                   Icon(
                     imageVector = Icons.RoundedFilled.ArrowDropDown,
-                    contentDescription = "Select Season",
+                    contentDescription = "选择季",
                     tint = if (isSeasonDropdownExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp).rotate(arrowRotation),
                   )
@@ -1016,7 +1016,7 @@ fun JellyfinDetailSheet(
               verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
               Text(
-                text = "Technical Details",
+                text = "技术详情",
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
               )
@@ -1028,7 +1028,7 @@ fun JellyfinDetailSheet(
                 item.videoCodec?.let {
                   Column {
                     Text(
-                      text = "Video",
+                      text = "视频",
                       style = MaterialTheme.typography.labelSmall,
                       color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -1043,7 +1043,7 @@ fun JellyfinDetailSheet(
                 item.audioCodec?.let {
                   Column {
                     Text(
-                      text = "Audio",
+                      text = "音频",
                       style = MaterialTheme.typography.labelSmall,
                       color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -1058,7 +1058,7 @@ fun JellyfinDetailSheet(
                 item.container?.let {
                   Column {
                     Text(
-                      text = "Container",
+                      text = "容器",
                       style = MaterialTheme.typography.labelSmall,
                       color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -1081,7 +1081,7 @@ fun JellyfinDetailSheet(
             verticalArrangement = Arrangement.spacedBy(8.dp),
           ) {
             Text(
-              text = "More Like This",
+              text = "更多类似内容",
               style = MaterialTheme.typography.titleMedium,
               fontWeight = FontWeight.Bold,
               color = MaterialTheme.colorScheme.onSurface,

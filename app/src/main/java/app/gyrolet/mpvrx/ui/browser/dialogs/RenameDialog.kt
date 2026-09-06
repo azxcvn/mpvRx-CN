@@ -77,12 +77,12 @@ fun RenameDialog(
     when {
       baseName.value.isBlank() -> {
         isError.value = true
-        errorMessage.value = "Name cannot be empty"
+        errorMessage.value = "名称不能为空"
       }
 
       baseName.value.contains("/") || baseName.value.contains("\\") -> {
         isError.value = true
-        errorMessage.value = "Name cannot contain / or \\"
+        errorMessage.value = "名称不能包含 / 或 \\"
       }
 
       else -> {
@@ -96,7 +96,7 @@ fun RenameDialog(
     onDismissRequest = onDismiss,
     title = {
       Text(
-        text = "Rename $itemType",
+        text = "重命名 $itemType",
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.Bold,
       )
@@ -159,7 +159,7 @@ fun RenameDialog(
                     baseName.value = aiName.removeSuffix(extension ?: "")
                   }.onFailure { _ ->
                     isError.value = true
-                    errorMessage.value = "AI rename failed. Check API key and model."
+                    errorMessage.value = "AI 重命名失败。请检查 API 密钥和模型。"
                   }
                 isAiLoading = false
               }

@@ -178,7 +178,7 @@ fun SeerrMediaCard(
         )
       }
       Text(
-        text = if (item.getMediaType() == MediaType.TV) "TV" else "Movie",
+        text = if (item.getMediaType() == MediaType.TV) "剧集" else "电影",
         style = MaterialTheme.typography.bodySmall,
         fontWeight = FontWeight.Medium,
         color = MaterialTheme.colorScheme.primary,
@@ -511,9 +511,9 @@ fun SeerrRequestCard(
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
       }
-      val requesterName = request.requestedBy.displayName ?: request.requestedBy.username ?: "User"
+      val requesterName = request.requestedBy.displayName ?: request.requestedBy.username ?: "用户"
       Text(
-        text = "Requested by $requesterName",
+        text = "由 $requesterName 请求",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         maxLines = 1,

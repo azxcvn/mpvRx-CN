@@ -155,7 +155,7 @@ class TorrentSelectionViewModel(
           activePreparationId = null
           _uiState.value =
             TorrentSelectionUiState.Error(
-              error.message.safeText(MAX_ERROR_LENGTH) ?: "Couldn't open this torrent.",
+              error.message.safeText(MAX_ERROR_LENGTH) ?: "无法打开此种子。",
             )
         }
       }
@@ -316,7 +316,7 @@ private fun prettyTorrentTitle(value: String): String =
     .replace(Regex("[._]+"), " ")
     .replace(Regex("\\s+"), " ")
     .trim(' ', '-', '_', ':', '.')
-    .ifBlank { "Torrent" }
+    .ifBlank { "种子" }
 
 private fun cleanSearchTitle(value: String): String =
   prettyTorrentTitle(value)

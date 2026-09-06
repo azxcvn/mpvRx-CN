@@ -180,11 +180,11 @@ object AudioPreferencesScreen : Screen {
               val maxMinimumDurationSeconds = 120f
               val minimumDurationLabel =
                 when {
-                  minimumAudioDurationSeconds <= 0 -> "Any duration"
-                  minimumAudioDurationSeconds < 60 -> "${minimumAudioDurationSeconds}s and longer"
-                  minimumAudioDurationSeconds % 60 == 0 -> "${minimumAudioDurationSeconds / 60} min and longer"
+                  minimumAudioDurationSeconds <= 0 -> "任意时长"
+                  minimumAudioDurationSeconds < 60 -> "${minimumAudioDurationSeconds} 秒及以上"
+                  minimumAudioDurationSeconds % 60 == 0 -> "${minimumAudioDurationSeconds / 60} 分钟及以上"
                   else ->
-                    "${minimumAudioDurationSeconds / 60}m ${minimumAudioDurationSeconds % 60}s and longer"
+                    "${minimumAudioDurationSeconds / 60} 分钟 ${minimumAudioDurationSeconds % 60} 秒及以上"
                 }
 
               Column(
@@ -223,13 +223,13 @@ object AudioPreferencesScreen : Screen {
                 )
                 Text(
                   text =
-                    "Applies to Music and audio in Files • Included: ${
+                    "适用于音乐和文件中的音频 • 已包含：${
                       if (minimumAudioDurationSeconds <= 0) {
-                        "0s"
+                        "0 秒"
                       } else {
-                        minimumDurationLabel.removeSuffix(" and longer")
+                        minimumDurationLabel.removeSuffix(" 及以上")
                       }
-                    } – no limit",
+                    } – 无上限",
                   color = MaterialTheme.colorScheme.outline,
                   style = MaterialTheme.typography.bodySmall,
                 )
@@ -242,7 +242,7 @@ object AudioPreferencesScreen : Screen {
                 val tabMap = MusicTab.entries.associateBy { it.name }
                 val orderedTabs = (musicTabOrder.mapNotNull { tabMap[it] } + (MusicTab.entries - musicTabOrder.mapNotNull { tabMap[it] }.toSet())).distinct()
                 val names = orderedTabs.filter { it.name in enabledMusicTabs }.map { it.title }
-                if (names.isEmpty()) "Songs" else names.joinToString(", ")
+                if (names.isEmpty()) "歌曲" else names.joinToString(", ")
               }
 
               Column(
@@ -292,7 +292,7 @@ object AudioPreferencesScreen : Screen {
                       Text(
                         text =
                           if (audioVisualizerStyle == AudioVisualizerStyle.Cuboid) {
-                            "Inspired by the Cuboid Warptunnel concept by Niklas Knaack"
+                            "灵感来自 Niklas Knaack 的 Cuboid Warptunnel 概念"
                           } else {
                             stringResource(R.string.pref_audio_visualizer_galaxy_credit)
                           },
@@ -622,7 +622,7 @@ object AudioPreferencesScreen : Screen {
         text = {
           Column {
             Text(
-              text = "Toggle tabs or use arrows to rearrange order:",
+              text = "切换标签页或使用箭头重新排序：",
               style = MaterialTheme.typography.bodyMedium,
               color = MaterialTheme.colorScheme.outline,
               modifier = Modifier.padding(bottom = 8.dp),
@@ -682,7 +682,7 @@ object AudioPreferencesScreen : Screen {
                 ) {
                   Icon(
                     imageVector = Icons.RoundedFilled.ExpandLess,
-                    contentDescription = "Move Up",
+                    contentDescription = "上移",
                     tint = if (index > 0) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline.copy(alpha = 0.38f),
                   )
                 }
@@ -699,7 +699,7 @@ object AudioPreferencesScreen : Screen {
                 ) {
                   Icon(
                     imageVector = Icons.RoundedFilled.ExpandMore,
-                    contentDescription = "Move Down",
+                    contentDescription = "下移",
                     tint = if (index < currentOrderedTabs.size - 1) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline.copy(alpha = 0.38f),
                   )
                 }

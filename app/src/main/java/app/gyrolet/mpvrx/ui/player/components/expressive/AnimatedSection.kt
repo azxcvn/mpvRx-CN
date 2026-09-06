@@ -75,7 +75,7 @@ fun AnimatedSection(
       }
       Icon(
         imageVector = Icons.RoundedFilled.KeyboardArrowDown,
-        contentDescription = if (isExpanded) "Collapse" else "Expand",
+        contentDescription = if (isExpanded) "收起" else "展开",
         modifier = Modifier.rotate(iconRotation),
         tint = MaterialTheme.colorScheme.onSurfaceVariant,
       )
@@ -140,7 +140,7 @@ fun AnimatedSection(
       )
       Icon(
         imageVector = Icons.RoundedFilled.KeyboardArrowDown,
-        contentDescription = if (isExpanded) "Collapse" else "Expand",
+        contentDescription = if (isExpanded) "收起" else "展开",
         modifier = Modifier.rotate(iconRotation),
         tint = MaterialTheme.colorScheme.onSurfaceVariant,
       )

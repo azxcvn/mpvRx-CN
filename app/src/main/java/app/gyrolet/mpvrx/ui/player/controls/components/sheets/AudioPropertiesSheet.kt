@@ -65,7 +65,7 @@ fun AudioPropertiesSheet(
           .padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 48.dp),
     ) {
       Text(
-        text = "AUDIO PROPERTIES",
+        text = "音频属性",
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         letterSpacing = 2.sp,
@@ -92,7 +92,7 @@ fun AudioPropertiesSheet(
           )
           Spacer(modifier = Modifier.height(4.dp))
           Text(
-            text = prop.value.ifBlank { "Unknown" },
+            text = prop.value.ifBlank { "未知" },
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 4,

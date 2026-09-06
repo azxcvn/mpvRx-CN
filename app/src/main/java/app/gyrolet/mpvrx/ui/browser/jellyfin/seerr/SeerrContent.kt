@@ -311,7 +311,7 @@ fun SeerrContent(
         } else if (uiState.searchResults.isEmpty() && uiState.searchQuery.isNotBlank()) {
           Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-              text = "No results found for \"${uiState.searchQuery}\"",
+              text = "未找到与 \"${uiState.searchQuery}\" 相关的结果",
               style = MaterialTheme.typography.bodyLarge,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

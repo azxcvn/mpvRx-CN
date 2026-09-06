@@ -318,10 +318,10 @@ fun VideoCompressorOverlay(
   if (showInfoDialog) {
     val infoText =
       buildString {
-        appendLine("App: ${state.appInfoVersion}")
-        appendLine("Device: ${Build.MANUFACTURER} ${Build.MODEL}")
-        appendLine("Android: ${Build.VERSION.RELEASE}")
-        append("Supported encoders: ${state.supportedCodecs.joinToString()}")
+        appendLine("应用：${state.appInfoVersion}")
+        appendLine("设备：${Build.MANUFACTURER} ${Build.MODEL}")
+        appendLine("Android：${Build.VERSION.RELEASE}")
+        append("支持的编码器：${state.supportedCodecs.joinToString()}")
       }
     CompressorInfoDialog(
       state = state,
@@ -342,7 +342,7 @@ fun VideoCompressorOverlay(
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, infoText)
               }
-            context.startActivity(Intent.createChooser(sendIntent, "Share device info"))
+            context.startActivity(Intent.createChooser(sendIntent, "分享设备信息"))
           }
         }
       },
@@ -368,7 +368,7 @@ private fun shareCompressedVideo(
         clipData = ClipData.newRawUri(title, contentUri)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
       }
-    context.startActivity(Intent.createChooser(intent, "Share compressed video"))
+    context.startActivity(Intent.createChooser(intent, "分享压缩后的视频"))
   }.onFailure {
     Toast
       .makeText(
@@ -404,7 +404,7 @@ private fun CompressorConfigSurface(
 ) {
   val pagerState = rememberPagerState(pageCount = { 3 })
   val scope = rememberCoroutineScope()
-  val tabs = listOf("Presets", "Video", "Audio")
+  val tabs = listOf("预设", "视频", "音频")
   val originalMb = state.originalSize / (1024f * 1024f)
   val actualEstimate = maxOf(state.targetSizeMb, state.minimumSizeMb)
   val isLarger = originalMb > 0f && actualEstimate > (originalMb + 0.01f)
@@ -665,7 +665,7 @@ private fun CompressorDestinationCard(
       }
 
       Text(
-        text = state.destinationDisplayPath.ifBlank { "Destination will be resolved when compression starts." },
+        text = state.destinationDisplayPath.ifBlank { "压缩开始时将解析目标位置。" },
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
@@ -852,9 +852,9 @@ private fun CompressorPresetsTab(
 
     val presets =
       listOf(
-        Triple(VideoCompressionPreset.HIGH, "High", describeQualityConfig(state.highPresetConfig)),
-        Triple(VideoCompressionPreset.MEDIUM, "Medium", describeQualityConfig(state.mediumPresetConfig)),
-        Triple(VideoCompressionPreset.LOW, "Low", describeQualityConfig(state.lowPresetConfig)),
+        Triple(VideoCompressionPreset.HIGH, "高", describeQualityConfig(state.highPresetConfig)),
+        Triple(VideoCompressionPreset.MEDIUM, "中", describeQualityConfig(state.mediumPresetConfig)),
+        Triple(VideoCompressionPreset.LOW, "低", describeQualityConfig(state.lowPresetConfig)),
       )
 
     presets.forEach { (preset, title, subtitle) ->
@@ -1061,7 +1061,7 @@ private fun CompressorVideoTab(
     ) {
       val options =
         buildList {
-          add(originalShortSide to "Original")
+          add(originalShortSide to "原始")
           listOf(
             2160,
             1440,
@@ -1079,7 +1079,7 @@ private fun CompressorVideoTab(
       options.forEach { (value, label) ->
         FilterChip(
           selected =
-            currentShortSide == value || (label == "Original" && state.targetResolutionHeight == state.originalHeight),
+            currentShortSide == value || (label == "原始" && state.targetResolutionHeight == state.originalHeight),
           onClick = { onSetResolution(value) },
           label = { Text(label) },
         )
@@ -1313,7 +1313,7 @@ private fun CompressorProgressSurface(
           Text(
             text =
               if (state.isBatch) {
-                "File ${state.currentQueueIndex + 1} of ${state.queueSize} - ${state.originalName ?: state.sourceVideo?.displayName.orEmpty()}"
+                "第 ${state.currentQueueIndex + 1} 个文件，共 ${state.queueSize} 个 - ${state.originalName ?: state.sourceVideo?.displayName.orEmpty()}"
               } else {
                 state.originalName ?: state.sourceVideo?.displayName.orEmpty()
               },
@@ -1443,13 +1443,13 @@ private fun CompressorResultSurface(
           )
         }
         Text(
-          if (state.isBatch) "Batch Compression Complete!" else "Compression Complete!",
+          if (state.isBatch) "批量压缩完成！" else "压缩完成！",
           style = MaterialTheme.typography.headlineMedium,
           fontWeight = FontWeight.Bold,
         )
         if (state.isBatch) {
           Text(
-            "${state.completedCount} videos saved",
+            "${state.completedCount} 个视频已保存",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )

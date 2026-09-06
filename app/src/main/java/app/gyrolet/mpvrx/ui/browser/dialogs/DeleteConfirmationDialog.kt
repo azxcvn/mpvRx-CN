@@ -65,7 +65,7 @@ fun DeleteConfirmationDialog(
           modifier = Modifier.size(28.dp),
         )
         Text(
-          text = "Delete $itemCount $itemText?",
+          text = "删除 $itemCount 个$itemText？",
           style = MaterialTheme.typography.headlineSmall,
           fontWeight = FontWeight.Bold,
           color = MaterialTheme.colorScheme.onSurface,
@@ -96,7 +96,7 @@ fun DeleteConfirmationDialog(
               modifier = Modifier.size(20.dp),
             )
             Text(
-              text = "This action cannot be undone. The selected item${if (itemCount == 1) "" else "s"} will be permanently deleted.",
+              text = "此操作无法撤销。所选项目将被永久删除。",
               style = MaterialTheme.typography.bodyMedium,
               fontWeight = FontWeight.Medium,
               color = MaterialTheme.colorScheme.onErrorContainer,

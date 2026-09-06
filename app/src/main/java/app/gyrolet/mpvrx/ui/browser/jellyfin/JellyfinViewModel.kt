@@ -52,11 +52,11 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 enum class JellyfinMusicTab(val title: String) {
-  HOME("Home"),
-  TRACKS("Songs"),
-  ALBUMS("Albums"),
-  ARTISTS("Artists"),
-  PLAYLISTS("Playlists"),
+  HOME("主页"),
+  TRACKS("歌曲"),
+  ALBUMS("专辑"),
+  ARTISTS("艺术家"),
+  PLAYLISTS("播放列表"),
 }
 
 data class JellyfinLibraryView(
@@ -309,9 +309,9 @@ class JellyfinViewModel(
               val title = if (lib.name.startsWith("Latest", ignoreCase = true)) {
                 lib.name
               } else {
-                "Latest ${lib.name}"
+                "最新 ${lib.name}"
               }
-              val subtitle = if (isShows) "Newly updated series" else "Newly added to ${lib.name}"
+              val subtitle = if (isShows) "新更新的剧集" else "新添加到 ${lib.name}"
               JellyfinHomeSection(
                 library = lib,
                 title = title,
@@ -1518,7 +1518,7 @@ class JellyfinViewModel(
         _uiState.update {
           it.copy(
             isAuthenticating = false,
-            authError = e.localizedMessage ?: "Failed to connect to Jellyfin server",
+            authError = e.localizedMessage ?: "无法连接到 Jellyfin 服务器",
           )
         }
       }

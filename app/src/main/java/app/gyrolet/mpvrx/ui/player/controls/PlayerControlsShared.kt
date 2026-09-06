@@ -1322,21 +1322,21 @@ internal fun readBatterySnapshot(context: Context): BatterySnapshot {
       ?: BatteryManager.BATTERY_STATUS_UNKNOWN
   val statusText =
     when (status) {
-      BatteryManager.BATTERY_STATUS_CHARGING -> "Charging"
-      BatteryManager.BATTERY_STATUS_DISCHARGING -> "Discharging"
-      BatteryManager.BATTERY_STATUS_FULL -> "Full"
-      BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Not charging"
+      BatteryManager.BATTERY_STATUS_CHARGING -> "正在充电"
+      BatteryManager.BATTERY_STATUS_DISCHARGING -> "正在放电"
+      BatteryManager.BATTERY_STATUS_FULL -> "已充满"
+      BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "未充电"
       else ->
         when {
-          (currentMicroAmps ?: 0L) > 0L -> "Charging"
-          (currentMicroAmps ?: 0L) < 0L -> "Discharging"
-          else -> "Unknown"
+          (currentMicroAmps ?: 0L) > 0L -> "正在充电"
+          (currentMicroAmps ?: 0L) < 0L -> "正在放电"
+          else -> "未知"
         }
     }
 
   val currentMilliAmps = currentMicroAmps?.let { abs(it).toFloat() / 1000f }?.takeIf { it > 0f }
   val rateText =
-    if (currentMilliAmps != null && statusText != "Full" && statusText != "Unknown") {
+    if (currentMilliAmps != null && statusText != "已充满" && statusText != "未知") {
       val formattedCurrent =
         if (currentMilliAmps >= 100f) {
           String.format("%.0f mA", currentMilliAmps)

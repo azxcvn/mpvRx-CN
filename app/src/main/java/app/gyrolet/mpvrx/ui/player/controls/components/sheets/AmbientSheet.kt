@@ -165,17 +165,17 @@ fun AmbientSheet(
         verticalAlignment = Alignment.CenterVertically,
       ) {
         ExpressivePresetButton(
-          label = "Fast",
+          label = "快速",
           selected = isFast,
           onClick = { viewModel.applyAmbientProfileFast() },
         )
         ExpressivePresetButton(
-          label = "Balanced",
+          label = "均衡",
           selected = isBalanced,
           onClick = { viewModel.applyAmbientProfileBalanced() },
         )
         ExpressivePresetButton(
-          label = "HQ",
+          label = "高品质",
           selected = isHQ,
           onClick = { viewModel.applyAmbientProfileHighQuality() },
         )
@@ -218,7 +218,7 @@ fun AmbientSheet(
           verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
         ) {
           SliderItem(
-            label = "Blur Samples",
+            label = "模糊采样",
             valueText = "$blurSamples",
             value = blurSamples,
             onChange = { viewModel.updateAmbientParams(blurSamples = it) },
@@ -235,7 +235,7 @@ fun AmbientSheet(
           )
 
           SliderItem(
-            label = "Spread",
+            label = "扩散",
             valueText = "%.2f".format(maxRadius),
             value = maxRadius,
             onChange = { viewModel.updateAmbientParams(maxRadius = it) },
@@ -253,7 +253,7 @@ fun AmbientSheet(
           )
 
           SliderItem(
-            label = "Glow Intensity",
+            label = "辉光强度",
             valueText = "%.1f".format(glowIntensity),
             value = glowIntensity,
             onChange = { viewModel.updateAmbientParams(glowIntensity = it) },
@@ -271,7 +271,7 @@ fun AmbientSheet(
           )
 
           SliderItem(
-            label = "Fade Curve",
+            label = "衰减曲线",
             valueText = "%.1f".format(fadeCurve),
             value = fadeCurve,
             onChange = { viewModel.updateAmbientParams(fadeCurve = it) },
@@ -327,7 +327,7 @@ fun AmbientSheet(
           verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
         ) {
           SliderItem(
-            label = "Saturation",
+            label = "饱和度",
             valueText = "%.1f".format(satBoost),
             value = satBoost,
             onChange = { viewModel.updateAmbientParams(satBoost = it) },
@@ -345,7 +345,7 @@ fun AmbientSheet(
           )
 
           SliderItem(
-            label = "Warmth",
+            label = "暖色调",
             valueText = if (warmth == 0f) "0" else "%.2f".format(warmth),
             value = warmth,
             onChange = { viewModel.updateAmbientParams(warmth = it) },
@@ -401,7 +401,7 @@ fun AmbientSheet(
           verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
         ) {
           SliderItem(
-            label = "Opacity",
+            label = "不透明度",
             valueText = "%.2f".format(opacity),
             value = opacity,
             onChange = { viewModel.updateAmbientParams(opacity = it) },
@@ -419,7 +419,7 @@ fun AmbientSheet(
           )
 
           SliderItem(
-            label = "Vignette",
+            label = "暗角",
             valueText = "%.1f".format(vignetteStrength),
             value = vignetteStrength,
             onChange = { viewModel.updateAmbientParams(vignetteStrength = it) },

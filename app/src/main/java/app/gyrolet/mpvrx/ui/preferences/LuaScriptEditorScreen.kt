@@ -287,7 +287,7 @@ data class LuaScriptEditorScreen(
                     putExtra(Intent.EXTRA_SUBJECT, scriptName)
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                   }
-                context.startActivity(Intent.createChooser(shareIntent, "Share $scriptName"))
+                context.startActivity(Intent.createChooser(shareIntent, "分享 $scriptName"))
               }
             }
           }
@@ -296,7 +296,7 @@ data class LuaScriptEditorScreen(
             Toast
               .makeText(
                 context,
-                "Failed to share: ${e.message}",
+                "分享失败：${e.message}",
                 Toast.LENGTH_LONG,
               ).show()
           }
@@ -348,7 +348,7 @@ data class LuaScriptEditorScreen(
             Toast
               .makeText(
                 context,
-                "Failed to delete: ${e.message}",
+                "删除失败：${e.message}",
                 Toast.LENGTH_LONG,
               ).show()
           }

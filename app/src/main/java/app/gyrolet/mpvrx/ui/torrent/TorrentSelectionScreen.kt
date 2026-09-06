@@ -276,7 +276,7 @@ private fun TorrentReadyScreen(
                   IconButton(onClick = { searchQuery = "" }) {
                     Icon(
                       imageVector = Icons.RoundedFilled.Close,
-                      contentDescription = "Clear",
+                      contentDescription = "清除",
                       modifier = Modifier.size(18.dp),
                     )
                   }

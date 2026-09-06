@@ -190,7 +190,7 @@ fun LyricsView(
       if (showTitleHeader) {
         val mediaTitle by PlaybackSession.propString["media-title"].collectAsState()
         val artistName by PlaybackSession.propString["metadata/by-key/Artist"].collectAsState()
-        val displayTitle = mediaTitle?.takeIf { it.isNotBlank() } ?: "Current Track"
+        val displayTitle = mediaTitle?.takeIf { it.isNotBlank() } ?: "当前曲目"
         val displayArtist = artistName?.takeIf { it.isNotBlank() } ?: ""
 
         Text(
@@ -275,7 +275,7 @@ fun LyricsView(
               CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
               Spacer(modifier = Modifier.height(12.dp))
               Text(
-                text = "Fetching synced lyrics...",
+                text = "正在获取同步歌词…",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -515,14 +515,14 @@ fun LyricsView(
               verticalArrangement = Arrangement.Center,
             ) {
               Text(
-                text = "No lyrics available for this track.",
+                text = "此曲目暂无可用歌词",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
               )
               Spacer(modifier = Modifier.height(8.dp))
               TextButton(onClick = { viewModel.loadLyricsForCurrentTrack(forceRefresh = true) }) {
-                Text("Search Online", fontWeight = FontWeight.Bold)
+                Text("在线搜索", fontWeight = FontWeight.Bold)
               }
             }
           }
