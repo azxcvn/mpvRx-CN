@@ -84,7 +84,7 @@ fun ModelSearchDialog(
     text = {
       if (sortedFiltered.isEmpty()) {
         Text(
-          text = if (searchQuery.isNotBlank()) "No models match \"$searchQuery\"" else "No models available",
+          text = if (searchQuery.isNotBlank()) "没有匹配“$searchQuery”的模型" else "没有可用模型",
           style = MaterialTheme.typography.bodyMedium,
           color = MaterialTheme.colorScheme.outline,
           modifier = Modifier.padding(vertical = 24.dp),
@@ -92,7 +92,7 @@ fun ModelSearchDialog(
       } else {
         Column(modifier = Modifier.heightIn(max = 480.dp)) {
           Text(
-            text = "${sortedFiltered.size} model${if (sortedFiltered.size != 1) "s" else ""}",
+            text = "共找到 ${sortedFiltered.size} 个模型",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.outline,
             modifier = Modifier.padding(bottom = 8.dp),
@@ -184,9 +184,7 @@ fun FreeTag() {
     color = MaterialTheme.colorScheme.primary,
   ) {
     Text(
-      text =
-        androidx.compose.ui.res
-          .stringResource(app.gyrolet.mpvrx.R.string.pref_player_orientation_free),
+      text = "免费",
       modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
       color = MaterialTheme.colorScheme.onPrimary,
       style = MaterialTheme.typography.labelSmall,

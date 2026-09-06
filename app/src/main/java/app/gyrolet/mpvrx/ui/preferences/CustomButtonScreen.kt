@@ -891,7 +891,7 @@ fun ButtonExpandedContent(
 
     // Tap action — required
     LuaEditorEntryCard(
-      label = "Tap action *",
+      label = "点击操作 *",
       code = draftContent,
       isRequired = true,
       onClick = { onOpenScriptEditor("content") },

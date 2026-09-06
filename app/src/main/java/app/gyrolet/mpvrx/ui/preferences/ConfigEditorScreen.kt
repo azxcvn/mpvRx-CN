@@ -81,8 +81,8 @@ data class ConfigEditorScreen(
       }
     val screenTitle =
       when (configType) {
-        ConfigType.MPV_CONF -> "Edit mpv.conf"
-        ConfigType.INPUT_CONF -> "Edit input.conf"
+        ConfigType.MPV_CONF -> "编辑 mpv.conf"
+        ConfigType.INPUT_CONF -> "编辑 input.conf"
       }
     val editorLanguage =
       when (configType) {
@@ -156,7 +156,7 @@ data class ConfigEditorScreen(
 
           withContext(Dispatchers.Main) {
             hasUnsavedChanges = false
-            Toast.makeText(context, "$fileName saved", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "$fileName 已保存", Toast.LENGTH_SHORT).show()
             backStack.popSafely()
           }
         } catch (e: Exception) {

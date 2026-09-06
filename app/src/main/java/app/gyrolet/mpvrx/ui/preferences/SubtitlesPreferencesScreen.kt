@@ -146,7 +146,7 @@ object SubtitlesPreferencesScreen : Screen {
           Toast
             .makeText(
               context,
-              context.getString(R.string.pref_subtitles_font_copy_failed, error.message ?: "Unknown error"),
+              context.getString(R.string.pref_subtitles_font_copy_failed, error.message ?: "未知错误"),
               Toast.LENGTH_SHORT,
             ).show()
         }
@@ -284,7 +284,7 @@ object SubtitlesPreferencesScreen : Screen {
               sourcesResponse = it
               isLoadingSources = false
             }.onFailure { err ->
-              sourcesError = err.message ?: "Failed to fetch sources"
+              sourcesError = err.message ?: "获取来源失败"
               isLoadingSources = false
             }
         }
@@ -691,7 +691,7 @@ object SubtitlesPreferencesScreen : Screen {
                   text = {
                     Column(modifier = Modifier.fillMaxWidth()) {
                       sourcesResponse?.key?.let { keyInfo ->
-                        val keyType = keyInfo.type?.replaceFirstChar { it.uppercase() } ?: "Unknown"
+                        val keyType = keyInfo.type?.replaceFirstChar { it.uppercase() } ?: "未知"
                         val badgeColor = if (keyInfo.valid) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer
                         val badgeTextColor = if (keyInfo.valid) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer
 
@@ -713,7 +713,7 @@ object SubtitlesPreferencesScreen : Screen {
 
                       if (sourcesError != null && sourcesResponse == null) {
                         Text(
-                          text = sourcesError ?: "Error loading sources",
+                          text = sourcesError ?: "加载来源失败",
                           color = MaterialTheme.colorScheme.error,
                           style = MaterialTheme.typography.bodyMedium,
                           modifier = Modifier.padding(vertical = 16.dp),

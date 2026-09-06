@@ -381,7 +381,7 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.pref_online_skip_markers_title,
-          summary = "Fetch intro, recap, outro, credits, and preview markers from an online provider.",
+          summary = "从在线提供商获取片头、前情提要、片尾、演职员表和预告标记。",
           keywords =
             listOf(
               "online",
@@ -393,6 +393,12 @@ object SearchablePreferences {
               "recap",
               "opening",
               "ending",
+              "在线",
+              "跳过标记",
+              "片头",
+              "片尾",
+              "演职员",
+              "预告",
             ),
           category = "Player",
           screen = PlayerPreferencesScreen,
@@ -401,7 +407,7 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.pref_marker_provider_title,
-          summary = "Choose IntroDB, TIDB, AniSkip, or Anime Skip for online intro/outro markers.",
+          summary = "选择用于在线片头/片尾标记的提供商：IntroDB、TIDB、AniSkip 或 Anime Skip。",
           keywords =
             listOf(
               "provider",
@@ -414,6 +420,9 @@ object SearchablePreferences {
               "animeskip",
               "online markers",
               "skip provider",
+              "提供商",
+              "标记来源",
+              "跳过提供商",
             ),
           category = "Player",
           screen = PlayerPreferencesScreen,
@@ -422,7 +431,7 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.pref_chapter_detect_title,
-          summary = "Create skip markers from chapter names such as opening, ending, credits, or preview.",
+          summary = "根据章节名称（如片头、片尾、演职员表或预告）创建跳过标记。",
           keywords =
             listOf(
               "chapter titles",
@@ -434,6 +443,9 @@ object SearchablePreferences {
               "credits",
               "preview",
               "markers",
+              "章节",
+              "章节标题",
+              "标记",
             ),
           category = "Player",
           screen = PlayerPreferencesScreen,
@@ -442,8 +454,8 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.pref_auto_skip_intro_title,
-          summary = "Skip opening markers automatically during playback.",
-          keywords = listOf("auto skip", "intro", "opening", "automatic", "skip op"),
+          summary = "在播放过程中自动跳过片头标记。",
+          keywords = listOf("auto skip", "intro", "opening", "automatic", "skip op", "自动跳过", "自动跳过片头", "片头"),
           category = "Player",
           screen = PlayerPreferencesScreen,
         ),
@@ -451,8 +463,8 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.pref_auto_skip_outro_title,
-          summary = "Skip ending markers automatically during playback.",
-          keywords = listOf("auto skip", "outro", "ending", "credits", "automatic", "skip ed"),
+          summary = "在播放过程中自动跳过片尾标记。",
+          keywords = listOf("auto skip", "outro", "ending", "credits", "automatic", "skip ed", "自动跳过", "自动跳过片尾", "片尾"),
           category = "Player",
           screen = PlayerPreferencesScreen,
         ),
@@ -1103,7 +1115,7 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.pref_advanced_notification_style,
-          summary = "Choose media controls, progress with chapters, or no playback notification.",
+          summary = "选择媒体控制、带章节进度或不显示播放通知。",
           keywords =
             listOf(
               "notification",
@@ -1113,6 +1125,11 @@ object SearchablePreferences {
               "no notification",
               "hide notification",
               "background playback",
+              "通知",
+              "媒体控制",
+              "进度",
+              "章节",
+              "后台播放",
             ),
           category = "Player",
           screen = PlayerPreferencesScreen,
@@ -1150,7 +1167,7 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.pref_section_ai_title,
-          summary = "AI-powered rename, subtitle formatting, speech-to-text, subtitle translation",
+          summary = "AI 驱动的重命名、字幕格式化、语音转文字与字幕翻译",
           keywords =
             listOf(
               "ai",
@@ -1162,6 +1179,8 @@ object SearchablePreferences {
               "openrouter",
               "machine learning",
               "intelligence",
+              "人工智能",
+              "大模型",
             ),
           category = "AI",
           screen = AiIntegrationScreen,
@@ -1171,7 +1190,7 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.pref_ai_provider_title,
-          summary = "Choose OpenCode, Groq, OpenAI, Anthropic, OpenRouter, or Together",
+          summary = "选择 OpenCode、Groq、OpenAI、Anthropic、OpenRouter 或 Together",
           keywords =
             listOf(
               "provider",
@@ -1184,6 +1203,10 @@ object SearchablePreferences {
               "local",
               "offline",
               "api",
+              "提供商",
+              "AI 提供商",
+              "本地",
+              "离线",
             ),
           category = "AI",
           screen = AiIntegrationScreen,
@@ -1193,8 +1216,8 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.search_api_key_config_title,
-          summary = "Enter and verify your AI provider API key",
-          keywords = listOf("api key", "key", "authentication", "token", "verify", "opencode", "groq", "openai"),
+          summary = "输入并验证您的 AI 提供商 API 密钥",
+          keywords = listOf("api key", "key", "authentication", "token", "verify", "opencode", "groq", "openai", "API 密钥", "密钥", "令牌", "验证"),
           category = "AI",
           screen = AiIntegrationScreen,
           targetRes = R.string.pref_section_ai_title,
@@ -1203,8 +1226,8 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.search_ai_model_selection_title,
-          summary = "Fetch and select which AI model to use",
-          keywords = listOf("model", "llm", "opencode", "gpt", "claude", "mixtral", "deepseek", "selection"),
+          summary = "获取并选择要使用的 AI 模型",
+          keywords = listOf("model", "llm", "opencode", "gpt", "claude", "mixtral", "deepseek", "selection", "模型", "模型选择", "大语言模型"),
           category = "AI",
           screen = AiIntegrationScreen,
           targetRes = R.string.pref_section_ai_title,
@@ -1213,8 +1236,8 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.pref_ai_rename_title,
-          summary = "Use AI to generate clean filenames for bulk rename operations",
-          keywords = listOf("rename", "bulk", "filename", "clean", "ai", "organize"),
+          summary = "使用 AI 生成规范文件名以进行批量重命名操作",
+          keywords = listOf("rename", "bulk", "filename", "clean", "ai", "organize", "重命名", "批量重命名", "规范文件名"),
           category = "AI",
           screen = AiIntegrationScreen,
           targetRes = R.string.pref_section_ai_title,
@@ -1223,8 +1246,8 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.pref_ai_search_title,
-          summary = "Auto-format video titles for Wyzie/SubHub subtitle search",
-          keywords = listOf("subtitle", "search", "format", "wyzie", "subhub", "title", "ai"),
+          summary = "为 Wyzie / SubHub 字幕搜索自动格式化视频标题",
+          keywords = listOf("subtitle", "search", "format", "wyzie", "subhub", "title", "ai", "字幕搜索", "标题格式化", "字幕"),
           category = "AI",
           screen = AiIntegrationScreen,
           targetRes = R.string.pref_section_ai_title,
@@ -1233,7 +1256,7 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.search_stt_title,
-          summary = "Configure STT provider, real-time model, audio language, and output format",
+          summary = "配置 STT 语音转文字提供商、实时模型、音频语言和输出格式",
           keywords =
             listOf(
               "speech",
@@ -1244,6 +1267,10 @@ object SearchablePreferences {
               "language",
               "voice",
               "speech to text",
+              "语音转文字",
+              "语音识别",
+              "转录",
+              "音频语言",
             ),
           category = "AI",
           screen = AiIntegrationScreen,
@@ -1253,8 +1280,8 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.pref_translation_section,
-          summary = "Translate external subtitles using AI with auto-translate target languages",
-          keywords = listOf("translation", "translate", "subtitle", "language", "auto", "target"),
+          summary = "使用 AI 翻译外挂字幕，支持设置自动翻译目标语言",
+          keywords = listOf("translation", "translate", "subtitle", "language", "auto", "target", "翻译", "字幕翻译", "目标语言", "自动翻译"),
           category = "AI",
           screen = AiIntegrationScreen,
           targetRes = R.string.pref_section_ai_title,
@@ -1263,8 +1290,8 @@ object SearchablePreferences {
       add(
         SearchablePreference(
           titleRes = R.string.search_custom_ai_prompts_title,
-          summary = "Override default instructions for rename, translation, and formatting tasks",
-          keywords = listOf("prompt", "custom", "instructions", "override", "rename", "translate", "format"),
+          summary = "覆盖重命名、翻译和格式化任务的默认提示词指令",
+          keywords = listOf("prompt", "custom", "instructions", "override", "rename", "translate", "format", "提示词", "自定义提示词", "指令"),
           category = "AI",
           screen = AiIntegrationScreen,
           targetRes = R.string.pref_section_ai_title,

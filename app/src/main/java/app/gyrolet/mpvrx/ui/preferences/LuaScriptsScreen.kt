@@ -235,7 +235,7 @@ object LuaScriptsScreen : Screen {
             item {
               LuaScriptsEmptyState(
                 title = stringResource(R.string.lua_no_mpv_folder),
-                summary = "Choose an MPV config folder in Advanced settings to browse and manage scripts.",
+                summary = "在“高级设置”中选择 MPV 配置文件夹以浏览和管理脚本。",
               )
             }
           }
@@ -243,7 +243,7 @@ object LuaScriptsScreen : Screen {
             item {
               LuaScriptsEmptyState(
                 title = stringResource(R.string.lua_no_scripts_found),
-                summary = "Put your .lua or .js files inside the MPV scripts folder to manage them here.",
+                summary = "将您的 .lua 或 .js 脚本文件放入 MPV 的 scripts 文件夹中即可在此管理。",
               )
             }
           }

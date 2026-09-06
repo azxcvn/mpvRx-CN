@@ -1998,7 +1998,7 @@ private fun QualityPresetConfigEditor(
 
   AlertDialog(
     onDismissRequest = onDismiss,
-    title = { Text("Edit $title") },
+    title = { Text("编辑 $title") },
     text = {
       Column(
         modifier = Modifier.verticalScroll(rememberScrollState()),
